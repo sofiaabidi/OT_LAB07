@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 13,
+  "algorithm": "NPGA",
+  "problem": "P3",
+  "objectives": 2,
+  "seed": 633,
+  "group": "sensitivity",
+  "parameters": "{\"sigma\": 0.1}",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.24544811703202102,
+  "IGD": 0.2562440643680022,
+  "Spacing": 0.010848628870963698,
+  "runtime": 0.6939872500001911,
+  "front_size": 25,
+  "feasible_fraction": 1.0,
+  "file": "sensitivity_A13_P3_M2_S633_B10000_sigma_0.1"
+}

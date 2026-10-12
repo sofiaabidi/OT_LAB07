@@ -1,0 +1,1307 @@
+
+PAGE 1
+C H A P T E R  5
+Multiobjective
+Optimization
+Part 1 · Foundations, Classical Methods & the MOO Problem-Solving Framework
+Department of Artificial Intelligence & Data Science
+M.Tech Program
+Foundations · Pareto Theory · 9 Classical Methods · Worked Numericals
+
+PAGE 2
+CHAPTER ROADMAP
+What We Will Cover
+Nine milestones from first principles to a full solved-example toolkit
+01
+Why Multiobjective Optimization?
+Limits of single-objective methods on real trade-off 
+problems
+02
+Pareto Dominance, Optimality & Front
+The core mathematical language of MOO
+03
+Mixed Objectives (Min + Max)
+Handling opposing directions in one problem
+04
+10-Step MOO Solving Procedure
+A repeatable framework, phase by phase
+05
+Classical Methods (9 methods)
+Formulas, worked numericals, pros & cons
+06
+Non-Elitist MOEAs — Part 2
+VEGA, MOGA, NSGA, NPGA
+07
+Elitist MOEAs — Part 3
+NSGA-II, SPEA2, PESA-II and more
+08
+Heuristics + Hybrids — Part 4
+MOPSO, MOACO, MOEA/D, memetic methods
+09
+Advanced MOO — Bonus
+Many-objective & preference-based methods
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 1
+
+PAGE 3
+SECTION 1 · BASICS OF MOO
+Why Multiobjective Optimization?
+Real-world problems rarely have just one goal
+● Real design and decision problems involve several competing goals at 
+once, not one:
+– Car design — minimize cost, maximize mileage, maximize safety
+– Investment portfolio — maximize return, minimize risk
+– 5G network planning — maximize bandwidth, minimize latency, minimize 
+energy
+● The core difficulty: conflict — improving one objective typically worsens 
+another.
+● Single-objective tools (Simplex, GA, PSO) return one point — they cannot 
+represent a trade-off.
+● Multiobjective Optimization instead returns a whole set of trade-off 
+solutions for a human decision-maker to choose from. 0
+5
+10
+15
+20
+25
+0 2 4 6 8 10 12 14
+Mileage (km/l)
+Price (₹ Lakh)
+Cost vs. Mileage — the conflict
+Cars on the market
+Cheapest cars have poor mileage; best-mileage cars are expensive — no single car 
+wins on both.
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 2
+
+PAGE 4
+SECTION 1 · BASICS OF MOO
+The Mathematical Formulation
+General vector-optimization form of a multiobjective problem
+min F(x) = [ f1(x), f2(x), ... , fk(x) ]T
+subject to:   gi(x) ≤ 0 ,      hj(x) = 0
+Notation used throughout this chapter
+● x = (x₁, x₂, …, xₙ) — the decision variable vector (what we control)
+● F(x) — the objective vector; each fᵢ(x) is one objective function
+● k ≥ 2 — number of objectives (this is what makes it "multi")
+● gᵢ(x) ≤ 0 — inequality constraints on the design
+● hⱼ(x) = 0 — equality constraints on the design
+● Key consequence: with k ≥ 2 conflicting goals, there is no single "best" x* — we instead 
+seek the Pareto-optimal set.
+F(x)
+f₁(x)  — minimize cost
+f₂(x)  — maximize mileage
+f₃(x)  — maximize safety
+A vector-valued objective function maps one design x to several 
+simultaneous outcomes.
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 3
+
+PAGE 5
+SECTION 1 · BASICS OF MOO
+Pareto Dominance: When Is One Solution Better?
+The rule that lets us compare solutions without collapsing objectives into one number
+A ≺ B  ⟺  fi(A) ≤ fi(B)  ∀i,   and   fj(A) < fj(B)  ∃j
+● Solution A dominates solution B (written A ≺ B) when, for minimization:
+– A is no worse than B in every objective
+– A is strictly better than B in at least one objective
+● A solution is non-dominated if no other feasible solution dominates it.
+● Dominance gives a partial order — not every pair of solutions is comparable, 
+which is exactly why a Pareto front (a set), not a single point, is the outcome of 
+MOO.
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+0 2 4 6 8 10
+Defect rate % (min)
+Cost (min)
+A dominates B (lower cost AND lower defect rate)
+A B
+Both objectives are minimized here — the mixed min/max case (e.g. cost vs. mileage) is 
+covered next, on Slide 7.
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 4
+
+PAGE 6
+SECTION 1 · BASICS OF MOO
+Pareto Optimal Set and Pareto Front
+The goal of every MOO algorithm, stated precisely
+● Pareto Optimal Set
+– All non-dominated solutions in decision space (the x's).
+● Pareto Front
+– The image of that set in objective space (the F(x) values) — what 
+we actually plot.
+● Goal of MOO
+– Find solutions that are both close to the true front and well 
+spread along it.
+● Convergence
+– How close the obtained solutions are to the true Pareto front.
+● Diversity
+– How evenly the obtained solutions are spread along the front.
+0
+10
+20
+30
+40
+50
+60
+70
+80
+90
+100
+0 5 10 15 20
+Obtained solutions
+Teal curve = true Pareto front (unknown in practice)   ·   Amber dots = an algorithm's obtained solutions
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 5
+
+PAGE 7
+SECTION 1 · BASICS OF MOO
+Pareto Dominance with Mixed Objectives
+Handling simultaneous minimize + maximize goals
+● Real problems mix directions, e.g. Min Cost (f₁) and Max Mileage (f₂).
+● Standard trick: convert every maximize objective to minimize.
+– Max f₂  ≡  Min (−f₂)
+● Mixed dominance rule — A dominates B if:
+– f₁(A) ≤ f₁(B)   (A is no more expensive)
+– f₂(A) ≥ f₂(B)   (A gives no worse mileage)
+– and at least one of these is a strict inequality.
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+0 2 4 6 8 10
+MILEAGE (MAX) →
+COST (MIN) →
+A DOMINATES B — LEFT AND 
+ABOVE
+A B Linear (A)
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 6
+
+PAGE 8
+SECTION 1 · BASICS OF MOO
+Visualizing the Pareto Front (Cost vs. Mileage)
+How to read — and how to build — the front graphically
+● Axes: X = Cost (minimize), Y = Mileage (maximize).
+● Pareto front sits in the top-left corner of the plot.
+● Dominated region is the bottom-right — worse in both 
+objectives.
+● How to identify the front:
+– 1. Plot all feasible solutions.
+– 2. Remove any solution dominated by another.
+– 3. What remains, connected in order, is the Pareto front.
+Dominated
+region
+8
+10
+12
+14
+16
+18
+20
+22
+24
+26
+28
+4 5 6 7 8 9 10 11
+Mileage (km/l)
+Cost (₹L)
+Feasible solutions in objective space
+Non-dominated (front) Dominated
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 7
+
+PAGE 9
+SECTION 1 · BASICS OF MOO
+Worked Example: Finding the Pareto Front
+Min Cost (f₁), Max Mileage (f₂)
+Car Cost ₹L (f₁) Mileage km/l (f₂) Dominated by
+A 5 15 —
+B 8 22 —
+C 6 18 —
+D 10 25 —
+E 7 12 A
+F 9 20 B
+● Step 1 — E vs A: 5 ≤ 7 and 15 ≥ 12  ⟹ A dominates E.
+● Step 2 — F vs B: 8 ≤ 9 and 22 ≥ 20  ⟹ B dominates F.
+● Step 3 — Remaining non-dominated set = Pareto Front.
+8
+10
+12
+14
+16
+18
+20
+22
+24
+26
+28
+4 5 6 7 8 9 10 11
+Mileage km/l
+Cost ₹L
+Pareto Front = {A, C, B, D}
+Pareto Front {A,C,B,D} Dominated {E,F}
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 8
+
+PAGE 10
+SECTION 1 · BASICS OF MOO
+Reading the Graph: Cost vs. Mileage
+Turning a front into a decision
+● Top-left = best region: low cost, high mileage.
+● Bottom-right = worst region (dominated).
+● Moving along the front:
+– Left → lower cost, lower mileage (car A)
+– Right → higher cost, higher mileage (car D)
+● Decision guide:
+– Tight budget → choose A
+– Mileage priority → choose D
+– Balanced trade-off → choose B or C
+8
+10
+12
+14
+16
+18
+20
+22
+24
+26
+28
+4 5 6 7 8 9 10 11
+Mileage km/l
+Cost ₹L
+Annotated decision regions
+Pareto Front Dominated
+Budget-friendly (A)
+Balanced (B/C)
+Mileage-focused (D)
+Dominated (E,F)
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 9
+
+PAGE 11
+SECTION 1 · BASICS OF MOO
+Step-by-Step: Solving Mixed-Objective Problems
+A general 7-step recipe used before any algorithm is chosen
+1
+Identify objectives
+& their directions →
+2
+Convert all
+to minimization →
+3
+Evaluate all
+candidate solutions →
+4
+Apply Pareto
+dominance rule →
+5
+Identify the
+non-dominated set →
+6
+Plot the
+Pareto front →
+7
+Present to the
+decision-maker
+Why this order matters
+● Steps 1–2 remove all ambiguity about "better" before any comparison is made.
+● Steps 3–5 are purely mechanical once directions are fixed — this is where dominance checks (Slide 9's method) are applied.
+● Steps 6–7 turn a mathematical set into something a human can act on: a visual trade-off curve, handed to whoever must pick one final design.
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 10
+
+PAGE 12
+SECTION 1 · BASICS OF MOO
+Min Risk, Max Return — Portfolio Optimization
+A finance example with the same Pareto machinery
+Portfolio Risk % (f₁) Return % (f₂) Dominated by
+P1 5 8 —
+P2 8 12 —
+P3 10 15 —
+P4 6 7 P1
+P5 12 14 P2
+Reading the result
+● P4: 6 ≥ 5 (worse risk) and 7 ≤ 8 (worse return) than P1 ⟹
+dominated.
+● P5: 12 ≥ 8 and 14 ≤ 15 vs. P2 ⟹ dominated.
+● Pareto Front = {P1, P2, P3} — the efficient frontier of this portfolio 
+set.
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+4 6 8 10 12
+Return %
+Risk %
+Risk vs. Return
+Efficient frontier {P1,P2,P3} Dominated {P4,P5}
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 11
+
+PAGE 13
+SECTION 2 · 10 -STEP MOO PROCEDURE
+The 10-Step MOO Problem-Solving Procedure
+Four phases that take any problem from statement to decision
+PHASE 1
+Problem Setup
+Steps 1–3
+Decision variables, objectives, 
+constraints
+PHASE 2
+Algorithm 
+Preparation
+Steps 4–5
+Choose algorithm, initialize 
+parameters
+PHASE 3
+Iterative 
+Optimization
+Steps 6–9
+Evaluate, sort, preserve diversity, 
+vary
+PHASE 4
+Decision & Output
+Step 10
+Stop and hand the Pareto front to 
+the decision-maker
+This is the full version of the simpler 7-step recipe from Slide 11 — Phase 1 replaces its "identify & convert" steps, and Phases 2–3 turn its one-shot "evaluate & filter" into an 
+iterative, population-based search.
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 12
+
+PAGE 14
+SECTION 2 · 10 -STEP MOO PROCEDURE
+Step 1: Define Decision Variables
+The quantities we are actually allowed to change
+x = (x1, x2, … , xn)     bounds:  xi ∈ [xiL, xiU]
+Worked example — Car Design
+● x₁ : Engine size, range 1.0 – 3.0 litres
+● x₂ : Safety-feature level, range 1 – 5
+● x₃ : Material quality grade, range 1 – 3
+● These three numbers fully describe one candidate car design; 
+every objective and constraint in the rest of this example is 
+written purely in terms of x₁, x₂, x₃.
+Required vs. free variables
+● n = 3 — dimensionality of the decision space (fixed by the designer)
+● x₁, x₂, x₃ — the free (random / searchable) variables an algorithm perturbs
+● xᵢᴸ, xᵢᵁ — required bounds; every algorithm in this chapter needs these to 
+generate or clip feasible x
+● These bounds later become the initialization range in Step 5 (e.g. NSGA-II's 
+random population).
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 13
+
+PAGE 15
+SECTION 2 · 10 -STEP MOO PROCEDURE
+Step 2: Define Objective Functions
+What each design is judged by, and in which direction
+F(x) = [ f1(x), … , fk(x) ]T
+Worked example — Car Design
+● f₁ : Cost  →  Minimize
+● f₂ : Mileage  →  Maximize
+● f₃ : Safety  →  Maximize
+● Conversion for a uniform minimization framework:
+– Minimize   f₁,  −f₂,  −f₃
+Required variables
+● k = 3 — number of objectives
+● f₁(x), f₂(x), f₃(x) — objective functions, each computed from x₁, x₂, x₃
+● Direction flags (min/max) per objective — required before any dominance check 
+can run (see Slide 7)
+● Every later method (weighted sum, ε-constraint, NSGA-II's sorting…) consumes 
+exactly this vector F(x).
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 14
+
+PAGE 16
+SECTION 2 · 10 -STEP MOO PROCEDURE
+Step 3: Define Constraints
+The boundary of what counts as a valid design
+hj(x) = 0      gi(x) ≤ 0      xi ∈ [xiL, xiU]
+Worked example — Car Design
+● Budget:  x₁ + x₂ + x₃ ≤ 8
+● Safety minimum:  x₂ ≥ 2
+Required variables
+● gᵢ(x) — inequality constraint functions (≤ 0 form)
+● hⱼ(x) — equality constraint functions (= 0 form)
+● Any x violating these is infeasible and is discarded before dominance is 
+ever checked.
+Feasible Region
+x₁+x₂+x₃ ≤ 8 x₂ ≥ 2
+Feasible
+region
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 15
+
+PAGE 17
+SECTION 2 · 10 -STEP MOO PROCEDURE
+Step 4: Select the MOO Algorithm
+Choice depends on objective count, problem type, constraints and budget
+● Number of objectives — 2 vs. 3-or-more changes 
+which algorithms scale well.
+● Problem type — continuous, discrete, or mixed 
+decision variables.
+● Constraint handling — how strict and how many 
+constraints exist.
+● Computational budget — how many evaluations can 
+be afforded.
+● Don't worry if the acronyms on the right are 
+unfamiliar — Weighted Sum and ε-Constraint are 
+covered later this chapter; the rest (NSGA-II, 
+MOEA/D, MOPSO, …) are covered in Parts 2–4.
+Problem Type Recommended Algorithm
+2 objectives, convex front Weighted Sum
+2 objectives, non-convex ε-Constraint, NSGA-II
+3+ objectives NSGA-III, MOEA/D
+Constrained problem Constrained NSGA-II
+Discrete variables MOACO, MOGA
+Continuous variables MOPSO, MODE
+Many objectives (5+) RVEA, MOEA/D
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 16
+
+PAGE 18
+SECTION 2 · 10 -STEP MOO PROCEDURE
+Which MOO Algorithm Should I Use?
+A five-question decision guide
+① Number of objectives
+● 2, convex → Weighted Sum
+● 2, non-convex → ε-Constraint / NSGA-II
+● 3+ → NSGA-III / MOEA-D / RVEA
+② Variable type
+● Continuous → MOPSO, MODE
+● Discrete → MOACO, MOGA
+● Mixed → MOMA, NSGA-II
+③ Constraints present?
+● Yes → Constrained NSGA-II
+● No → Standard MOEA
+④ Computational budget
+● Large → MOMA, SPEA2, SMS-EMOA
+● Small → MOPSO, MODE, PESA-II
+⑤ Decision-maker preferences?
+● Yes → R-NSGA-II, Interactive
+● No → Standard MOEA → TOPSIS / VIKOR
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 17
+
+PAGE 19
+SECTION 2 · 10 -STEP MOO PROCEDURE
+Real-World Scenario → Recommended Algorithm
+Fourteen applied scenarios, mapped end to end
+Scenario Algorithm Why
+Car Design NSGA-III 3 objectives
+Portfolio NSGA-II / W.Sum 2 objectives
+5G Network MOEA/D 3 objectives
+Supply Chain Constr. NSGA-II + constraints
+Wind Farm MOPSO Continuous
+TSP + Time MOACO Discrete
+Protein Folding MOABC Multimodal
+Scenario Algorithm Why
+Chip Design MOSA Multimodal
+Neural Network MGDA Differentiable
+Multi-Task Learn GradNorm Adaptive
+Water Mgmt NSGA-II + constraint
+Feature Selection MOGWO Mixed
+Cloud Computing MOEA/D Many obj.
+Ranking solutions TOPSIS / VIKOR Post-opt
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 18
+
+PAGE 20
+SECTION 2 · 10 -STEP MOO PROCEDURE
+Step 5: Initialize Population / Parameters
+Every method needs a starting point
+● Population-based methods (NSGA-II, MOPSO, …): a random 
+population of size N, sampled inside the Step-1 bounds.
+● Classical / scalarizing methods: fixed inputs instead of a 
+population — weights, ε values, reference points, or targets.
+NSGA-II example parameters (required)
+● N = 100 — population size
+● p_c = 0.9 — crossover probability (how often two parents combine —
+defined in Step 9)
+● p_m = 0.1 — mutation probability (how often a solution is randomly 
+perturbed — defined in Step 9)
+● These are the "knobs" set once, before Step 6 begins.
+0
+2
+4
+6
+8
+10
+12
+0 2 4 6 8 10 12
+f₂
+f₁
+Random population in objective space (Gen 0)
+Randomly initialized population
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 19
+
+PAGE 21
+SECTION 2 · 10 -STEP MOO PROCEDURE
+Step 6: Evaluate All Objectives
+For every candidate xᵢ, compute f₁(xᵢ), f₂(xᵢ), …, fₖ(xᵢ)
+Solution f₁ f₂
+A 1 5
+B 2 3
+C 3 4
+Why this step matters
+● This is the only step where the real simulation / cost 
+model / physics runs.
+● Everything downstream (Steps 7–9) works purely on 
+these numbers — no further access to x is needed.
+● This is usually the most computationally expensive 
+step, which is why population size N (Step 5) is 
+chosen carefully.
+0
+1
+2
+3
+4
+5
+6
+0 0.5 1 1.5 2 2.5 3 3.5 4
+f₂
+f₁
+Objective space after evaluation
+Evaluated solutions
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 20
+
+PAGE 22
+SECTION 2 · 10 -STEP MOO PROCEDURE
+Step 7: Rank Solutions (Non-Dominated Sorting)
+Layering the population into fronts of decreasing quality
+● For every solution p, count:
+– nₚ — number of solutions that dominate p
+– Sₚ — the set of solutions p dominates
+● If nₚ = 0 → p belongs to Front 1 (the current non-dominated set).
+● For each q ∈ Sₚ, decrement n_q by 1; if n_q becomes 0, q joins the next 
+front.
+● Repeat until every solution is assigned to a front.
+● This assumes every solution is feasible — the next slide covers what 
+changes when some aren't.
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+0 1 2 3 4 5 6 7 8
+f₂
+f₁
+Population split into fronts
+Front 1 Front 2 Front 3
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 21
+
+PAGE 23
+SECTION 2 · 10 -STEP MOO PROCEDURE
+Comparing Solutions Under Constraints
+Deb's rule — extending dominance so infeasible solutions never sneak into the front
+● The dominance rule from Slide 5 only compares objective values — it has 
+no notion of whether a solution is even feasible.
+● Deb's constrained-dominance rule extends it with three cases, checked in 
+order:
+● Rule 1 — Feasible beats infeasible, always.
+– A feasible solution dominates any infeasible one, no matter how good 
+the infeasible one's objectives look.
+● Rule 2 — Feasible vs. feasible.
+– Use ordinary Pareto dominance (Slide 5) on the objectives.
+● Rule 3 — Infeasible vs. infeasible.
+– The solution with the smaller total constraint violation dominates —
+objectives are ignored entirely.
+CV(x) = Σ max(0, gi(x)) + Σ | hj(x) |
+Solution Feasible? Violation f₁ f₂
+A Yes 0 3 6
+D Yes 0 4 5
+B No 2 1 2
+C No 5 0.5 1
+Applying the rules
+● A, D dominate B, C (Rule 1) — regardless of B, C's objective values.
+● A vs. D (Rule 2): neither dominates — a genuine trade-off (3<4 but 6>5).
+● B vs. C (Rule 3): violation 2 < 5, so B dominates C — even though C's 
+objectives (0.5, 1) look better than B's (1, 2).
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 22
+
+PAGE 24
+SECTION 2 · 10 -STEP MOO PROCEDURE
+Step 8: Preserve Diversity (Crowding Distance)
+Rewarding solutions that sit in sparsely populated parts of the front
+di = Σm | fm(i+1) − fm(i−1) | ⁄  fmmax − fmmin
+● First sort the front's solutions by each objective in turn — "i−1" and "i+1" 
+mean a solution's neighbors in that sorted order, not its neighbors in the 
+population list.
+● Boundary solutions (first/last on a front) get d = ∞ — they are always 
+kept.
+● Higher d means better diversity — the point has more "elbow room" from 
+its neighbors.
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+0 2 4 6 8
+f₂
+f₁
+Crowding distance for a middle point
+Front Middle point i
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 23
+
+PAGE 25
+SECTION 2 · 10 -STEP MOO PROCEDURE
+Step 9: Select, Crossover, Mutate
+Turning today's population into tomorrow's, without losing the best
+1
+Tournament Selection
+(by rank, then crowding)
+→
+2
+Crossover
+(combine two parents)
+→
+3
+Mutation
+(random perturbation)
+→
+4
+Elitism
+(parents + offspring → best N survive)
+Why elitism is essential
+● Without it, a lucky mutation could destroy this generation's best solution with no way to recover it.
+● Combining the parent and offspring pools before selecting survivors guarantees the Pareto front can only improve or stay the same across generations.
+● This single idea is what separates elitist MOEAs (NSGA-II, SPEA2 — Part 3) from earlier non-elitist ones (VEGA, NSGA — Part 2).
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 24
+
+PAGE 26
+SECTION 2 · 10 -STEP MOO PROCEDURE
+Step 10: Stop and Output the Pareto Front
+Knowing when to end the search
+● Stopping criteria (any one triggers a stop):
+– Maximum number of generations reached
+– No improvement in hypervolume — the area/volume of 
+objective space the front dominates, a common front-quality 
+score — over several generations
+– The front has visibly converged
+● Output: the final Pareto front — a set, not a single answer.
+● Decision: this set is handed to a human decision-maker to pick one 
+solution — the final hand-off step of the general procedure back on 
+Slide 11.
+0
+10
+20
+30
+40
+50
+60
+70
+80
+90
+100
+0 5 10 15 20
+Final Pareto front
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 25
+
+PAGE 27
+SECTION 2 · 10 -STEP MOO PROCEDURE
+The Complete 10-Step Procedure
+One continuous pipeline, color-coded by phase
+1
+Variables →
+2
+Objectives →
+3
+Constraints →
+4
+Algorithm →
+5
+Initialize →
+6
+Evaluate →
+7
+Sort →
+8
+Diversity →
+9
+Vary →
+10
+Output
+Setup Preparation Iteration Output
+Output → the Pareto front, ready for the decision-maker.
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 26
+
+PAGE 28
+SECTION 2 · 10 -STEP MOO PROCEDURE
+Common Mistakes Students Make
+...and the one-line fix for each
+Mistake Why It Happens How to Avoid It
+Weighted Sum on a non-convex front Convexity was never checked Plot the front first
+Forgetting max → min conversion Mixed directions in one problem Always convert everything to minimization
+Ignoring constraint violation Focus only on objective values Apply Deb's constrained-dominance rule (Slide 23)
+Poor diversity in the final set No crowding / niching used Include an explicit diversity-preservation step
+Premature convergence Population loses diversity too early Use an archive and sufficient mutation
+Wrong algorithm for many objectives NSGA-II applied to 5+ objectives Switch to NSGA-III or MOEA/D
+Not normalizing objectives Objectives on very different scales Normalize before optimizing
+Forgetting elitism Best solutions can be lost between generations Use an elitist MOEA (Part 3)
+No stopping criterion The search simply never terminates Fix a maximum generation count
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 27
+
+PAGE 29
+SECTION 3 · CLASSICAL METHODS
+Before the Methods: Convex vs. Non-Convex Fronts
+The one shape distinction that decides which classical method will actually work
+● A front is convex when every point on it sits on the outer edge of the 
+point cloud — a straight line between any two front points never cuts 
+inside the front.
+● A front is non-convex when part of it "dents" inward — some non-
+dominated points sit behind the straight line joining their neighbors.
+● Why it matters:
+– Weighted Sum only ever finds points on the outer straight-line 
+boundary (the convex hull) of the front.
+– A dented, non-convex point can never win for ANY choice of weights 
+— no matter how they're tuned — so Weighted Sum silently skips it.
+– ε-Constraint, Benson's, and the Tchebycheff (p→∞) Weight Metric 
+don't have this blind spot — they can reach into the dent.
+0
+1
+2
+3
+4
+5
+6
+7
+8
+0 1 2 3 4 5 6
+f₂
+f₁
+Convex — B is reachable
+0
+1
+2
+3
+4
+5
+6
+0 1 2 3 4 5 6
+f₂
+f₁
+Non-convex — the middle point is a "dent"
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 28
+
+PAGE 30
+SECTION 3 · CLASSICAL METHODS
+Weighted Sum Method
+Combine every objective into one scalar using fixed weights
+F(x) = Σi=1k wi fi(x)      ,      Σwi = 1 , wi ≥ 0
+Algorithm Steps
+● 1. Choose weights w₁, …, wₖ that reflect relative importance.
+● 2. Solve the resulting single-objective problem for x*.
+● 3. Vary the weights and re-solve to trace out multiple Pareto points.
+Parameters & When to Use
+● Parameters: weights wᵢ
+● Complexity: same as one single-objective solve
+● Best used when: the true Pareto front is convex and preferences are roughly 
+known
+● Avoid when: the front is non-convex — whole regions become unreachable
+✓ Advantages
+● Simple to implement
+● Fast — one optimization call per weight set
+● Works with any single-objective optimizer
+✗ Disadvantages
+● Cannot find solutions in non-convex regions of the front
+● Requires meaningful weights up front
+● Very sensitive to the relative scaling of objectives
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 29
+
+PAGE 31
+SECTION 3 · CLASSICAL METHODS
+Real-Life Problem: Manufacturing Trade-off
+Weighted Sum Method
+Scenario
+● A factory wants to minimize production cost (f₁) while 
+maximizing product quality (f₂).
+● Decision variable: x = production speed, ranging 1–10.
+F(x) = w1(x−3)2 + w2(x−7)2
+Variables in this problem
+● x — production speed (decision variable), 1 ≤ x ≤ 10
+● f₁(x) = (x − 3)² — cost, minimized when speed is near 3
+● f₂(x) = (x − 7)² — treated as minimize(−quality), so quality peaks near speed 7
+● w₁, w₂ — required weights, with w₁ + w₂ = 1
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 30
+
+PAGE 32
+SECTION 3 · CLASSICAL METHODS
+Solving: Weighted Sum Method
+Two parameter settings, then the resulting Pareto front
+Iteration 1 — w₁ = 0.5, w₂ = 0.5
+● F(x) = 0.5(x−3)² + 0.5(x−7)² = x² − 10x + 29
+● F′(x) = 2x − 10 = 0  ⟹ x* = 5
+● Result:  f₁ = 4 ,  f₂ = 4
+Iteration 2 — w₁ = 0.8, w₂ = 0.2
+● F(x) = 0.8(x−3)² + 0.2(x−7)² = x² − 7.6x + 17
+● F′(x) = 2x − 7.6 = 0  ⟹ x* = 3.8
+● Result:  f₁ = 0.64 ,  f₂ = 10.24
+Weights (w₁, w₂) x* f₁ f₂
+(0.2, 0.8) 6.2 10.24 0.64
+(0.5, 0.5) 5.0 4.00 4.00
+(0.8, 0.2) 3.8 0.64 10.24
+0
+2
+4
+6
+8
+10
+12
+0 2 4 6 8 10 12
+f₂ (quality)
+f₁ (cost)
+Front from 3 weight settings
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 31
+
+PAGE 33
+SECTION 3 · CLASSICAL METHODS
+ε-Constraint Method
+Optimize one primary objective; turn the rest into constraints
+min f1(x)      s.t.      fi(x) ≤ εi ,  i = 2, …, k
+Algorithm Steps
+● 1. Choose the primary objective f₁ to optimize directly.
+● 2. Fix ε values (upper bounds) for every other objective.
+● 3. Solve the constrained single-objective problem.
+● 4. Vary εᵢ and re-solve to sweep out the front.
+Parameters & When to Use
+● Parameters: εᵢ bound for each secondary objective
+● Complexity: k × one single-objective solve
+● Best used when: the front is non-convex and one objective has clear priority
+● Avoid when: there are many objectives — tuning many εᵢ values becomes 
+unwieldy
+✓ Advantages
+● Finds solutions in non-convex regions unreachable by weighted sum
+● Gives precise, interpretable control per objective
+✗ Disadvantages
+● Needs careful tuning of ε for each secondary objective
+● Requires many separate optimization runs
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 32
+
+PAGE 34
+SECTION 3 · CLASSICAL METHODS
+Real-Life Problem: Supply Chain Trade-off
+ε-Constraint Method
+Scenario
+● A logistics company wants to minimize delivery cost (f₁) and 
+minimize delivery time (f₂).
+● Decision variable: x = number of vehicles deployed.
+f1(x) = 100 / x      f2(x) = x2
+Variables in this problem
+● x — number of vehicles (decision variable), x ≥ 1
+● f₁(x) = 100/x — total cost, falls as more vehicles are used
+● f₂(x) = x² — total time penalty, rises as more vehicles are coordinated
+● ε₂ — required upper bound placed on f₂ (delivery-time budget)
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 33
+
+PAGE 35
+SECTION 3 · CLASSICAL METHODS
+Solving: ε-Constraint Method
+Two parameter settings, then the resulting Pareto front
+Iteration 1 — ε₂ = 4
+● x² ≤ 4  ⟹ x ≤ 2
+● Minimize 100/x over x ≤ 2  ⟹ x* = 2
+● Result:  f₁ = 50 ,  f₂ = 4
+Iteration 2 — ε₂ = 9
+● x² ≤ 9  ⟹ x ≤ 3
+● Minimize 100/x over x ≤ 3  ⟹ x* = 3
+● Result:  f₁ = 33.33 ,  f₂ = 9
+ε₂ x* f₁ (cost) f₂ (time)
+4 2 50.00 4
+9 3 33.33 9
+16 4 25.00 16
+0
+5
+10
+15
+20
+0 10 20 30 40 50 60
+f₂ (time)
+f₁ (cost)
+Front from 3 ε settings
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 34
+
+PAGE 36
+SECTION 3 · CLASSICAL METHODS
+Benson's Method
+Maximize weighted "distance past target", summed across objectives
+max Σ λi si(x)      s.t.  si(x) ≥ 0
+Algorithm Steps
+● 1. Choose a reference point z* — one target value per objective, in 
+that objective's own original units.
+● 2. Define sᵢ = (target − value) if objective i is minimized, or (value − 
+target) if maximized — always "how far past target, in the good 
+direction".
+● 3. Choose direction weights λᵢ.
+● 4. Maximize Σλᵢsᵢ(x), subject to sᵢ(x) ≥ 0 for every i, and solve for x*.
+Parameters & When to Use
+● Parameters: reference point z*, weights λᵢ
+● Complexity: one constrained solve per (z*, λ) pair
+● Best used when: a meaningful reference point is available and the front may be 
+non-convex
+● Avoid when: no sensible reference point can be defined
+✓ Advantages
+● Can locate non-convex Pareto regions
+● Reference point gives an intuitive anchor for the search
+✗ Disadvantages
+● Requires choosing a reference point
+● Still needs weights, so preferences must be at least partly known
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 35
+
+PAGE 37
+SECTION 3 · CLASSICAL METHODS
+Real-Life Problem: Hospital Resource Allocation
+Benson's Method — problem and solution together
+Scenario
+● A hospital wants to minimize operating cost (f₁) while 
+maximizing patients treated (f₂).
+● Reference point z* = (100, 50) — a cost target of 100 and a 
+patients target of 50.  Weights: λ₁ = λ₂ = 0.5.
+● Achievements: s₁(x) = 100 − f₁(x)   (cost is minimized, so "past 
+target" means below it) s₂(x) = f₂(x) − 50   (patients is 
+maximized, so "past target" means above it)
+● Solve:  maximize  0.5·s₁ + 0.5·s₂ = 0.5(100 − f₁) + 0.5(f₂ − 50)   
+subject to  s₁ ≥ 0 (f₁ ≤ 100) and s₂ ≥ 0 (f₂ ≥ 50).
+● Result: the optimizer pushes cost as far below 100, and 
+patients as far above 50, as feasibility allows — tracing a non-
+dominated point on the front for this (z*, λ) choice.
+Variables in this problem
+● z₁* = 100 — reference cost target (a min-type objective, so s₁ = target − value)
+● z₂* = 50 — reference patients-treated target (a max-type objective, so s₂ = value − 
+target)
+● λ₁ = λ₂ = 0.5 — equal-priority direction weights
+● Re-running with different λ gives different points along the Pareto front.
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 36
+
+PAGE 38
+SECTION 3 · CLASSICAL METHODS
+Weight Metric Methods
+Minimize a weighted distance to an ideal point, using a p-norm
+min ( Σ wi | fi(x) − zi* |p )1/p
+Algorithm Steps
+● 1. Choose the ideal point z* (the best achievable value of each 
+objective alone).
+● 2. Choose the norm order: p = 1 (Manhattan), p = 2 (Euclidean), p 
+→ ∞ (Tchebycheff).
+● 3. Choose weights wᵢ and minimize the resulting distance.
+Parameters & When to Use
+● Parameters: weights wᵢ, norm order p, ideal point z*
+● Complexity: one solve per (p, w, z*) combination
+● Best used when: fine control over the shape of the trade-off is needed
+● Avoid when: the ideal point z* is not known or expensive to estimate
+✓ Advantages
+● Flexible — the p-norm choice reshapes what gets found
+● As p → ∞ (Tchebycheff), non-convex regions become reachable
+✗ Disadvantages
+● Needs an ideal point z*, which itself requires k extra single-objective solves
+● Solution is sensitive to the choice of p
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 37
+
+PAGE 39
+SECTION 3 · CLASSICAL METHODS
+Value Function Method
+Optimize the decision-maker's own utility function directly
+max  v( f1(x), f2(x), … , fk(x) )
+Algorithm Steps
+● 1. Elicit the decision-maker's value function v(·) — how they trade 
+off objectives.
+● 2. Substitute F(x) into v and solve as a single-objective problem.
+● 3. The resulting x* is the decision-maker's most-preferred point on 
+the front — no further ranking needed.
+Parameters & When to Use
+● Parameters: the value function v(·) itself
+● Complexity: one single-objective solve, given v
+● Best used when: the decision-maker can articulate a believable trade-off function
+● Avoid when: preferences are unknown, unstable, or hard to elicit reliably
+✓ Advantages
+● Theoretically the most correct result — it directly optimizes what the decision-
+maker actually values
+● Skips the need to generate and then rank a whole front
+✗ Disadvantages
+● v(·) is very rarely known precisely in practice
+● Eliciting an accurate value function from a human is difficult and error-prone
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 38
+
+PAGE 40
+SECTION 3 · CLASSICAL METHODS
+Goal Programming
+Set numeric targets and minimize how far you fall from them
+min Σ (di⁺ + di⁻)      s.t.  fi(x) + di⁻ − di⁺ = Ti
+Algorithm Steps
+● 1. Set a target Tᵢ for every objective.
+● 2. Introduce deviation variables dᵢ⁺ (overshoot) and dᵢ⁻ (undershoot) 
+per objective.
+● 3. Minimize the total deviation, subject to the target equation for 
+each objective.
+Parameters & When to Use
+● Parameters: targets Tᵢ, deviation weights
+● Complexity: one linear/nonlinear program
+● Best used when: the decision-maker can state clear numeric targets for each goal
+● Avoid when: no sensible targets exist, or the targets make the problem infeasible
+✓ Advantages
+● Very intuitive — thinking in "targets" matches how people naturally set goals
+● Naturally handles many goals at once, even with different units
+✗ Disadvantages
+● Requires meaningful targets Tᵢ to be set in advance
+● A poorly chosen target set can make the problem infeasible
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 39
+
+PAGE 41
+SECTION 3 · CLASSICAL METHODS
+Real-Life Problem: University Budget Allocation
+Goal Programming — problem and solution together
+Scenario
+● A university allocates its budget between teaching (x₁) and 
+research (x₂).
+● Targets: Teaching = 60, Research = 40.  Total budget: x₁ + x₂ = 
+100.
+● Goal: minimize d₁⁺ + d₁⁻ + d₂⁺ + d₂⁻ (total deviation from both 
+targets).
+● Solution: x₁ = 60, x₂ = 40 exactly meets both targets, so every 
+deviation term is zero — the ideal (fully achievable) outcome.
+Variables in this problem
+● x₁ — teaching allocation, x₂ — research allocation
+● T₁ = 60 — teaching target,  T₂ = 40 — research target
+● d₁⁺, d₁⁻, d₂⁺, d₂⁻ — required deviation (slack) variables, all ≥ 0
+● Budget constraint: x₁ + x₂ = 100
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 40
+
+PAGE 42
+SECTION 3 · CLASSICAL METHODS
+Lexicographic Method
+Rank objectives strictly by importance, and never trade a higher-ranked one away
+1
+Optimize the
+most important
+objective → f₁*
+→
+2
+Add constraint
+f₁ ≤ f₁* + ε₁ →
+3
+Optimize the
+next objective →
+4
+Repeat down
+the priority list
+✓ Advantages
+● Simple to apply once priorities are clear
+● Needs no weights at all
+✗ Disadvantages
+● Requires a strict, total ranking of objectives
+● Allows essentially no trade-off between objectives of different rank
+Parameters & fit
+● Parameters required: an objective-priority ranking, and a small tolerance εᵢ at each step.
+● Best used when: priorities are strict and non-negotiable (e.g. safety before cost). Avoid when: objectives are of roughly equal importance.
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 41
+
+PAGE 43
+SECTION 3 · CLASSICAL METHODS
+TOPSIS: Ranking Pareto Solutions
+Technique for Order of Preference by Similarity to Ideal Solution
+Algorithm Steps
+● 1. Normalize the decision matrix.
+● 2. Determine the ideal (A⁺) and anti-ideal (A⁻) points.
+● 3. Compute distances dᵢ⁺ (to ideal) and dᵢ⁻ (to anti-ideal).
+Ci = di⁻ / ( di⁺ + di⁻ )      then rank by Ci
+✓ Advantages
+● Produces a single, intuitive 
+ranking
+● Simple geometric idea —
+closeness to the best case
+✗ Disadvantages
+● Requires weights on each 
+criterion
+● Sensitive to the normalization 
+method chosen
+Solution f₁ (norm.) f₂ (norm.) Cᵢ Rank
+A 0.20 0.80 0.80 1
+B 0.50 0.50 0.50 2
+C 0.80 0.20 0.20 3
+Worked mini-example
+● A⁺ = (0, 1) — ideal;  A⁻ = (1, 0) — anti-ideal (after normalization).
+● Solution A sits closest to A⁺ ⟹ largest Cᵢ = 0.80 ⟹ ranked #1.
+● TOPSIS is applied after a Pareto front already exists — it never generates new 
+solutions, only ranks the ones you already have.
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 42
+
+PAGE 44
+SECTION 3 · CLASSICAL METHODS
+VIKOR: Compromise Ranking
+VIseKriterijumska Optimizacija I Kompromisno Resenje
+Algorithm Steps
+● 1. Compute Sᵢ (group utility) and Rᵢ (individual regret) per solution.
+● 2. Combine them into Qᵢ using the trade-off parameter v.
+● 3. Rank solutions by Qᵢ — lowest is the best compromise.
+Qi = v (Si − S*)/(S⁻ − S*) + (1−v) (Ri − R*)/(R⁻ − R*)
+✓ Advantages
+● Balances group utility and 
+individual regret
+● Gives a well-defined 
+compromise, even with 
+conflicting criteria
+✗ Disadvantages
+● Requires choosing v (the 
+utility/regret trade-off 
+weight)
+● More computation than a 
+plain ranking method
+Solution Sᵢ Rᵢ Qᵢ (v=0.5) Rank
+A 0.30 0.15 0.00 1
+B 0.55 0.30 0.50 2
+C 0.80 0.45 1.00 3
+Worked mini-example
+● v = 0.5 gives equal weight to overall utility and worst-case regret.
+● Solution A has both the lowest utility gap and lowest regret ⟹ Qₐ = 0.00, the best 
+compromise.
+● Unlike TOPSIS, VIKOR explicitly protects against a solution that is excellent on 
+average but very poor on one criterion (high regret).
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 43
+
+PAGE 45
+SECTION 3 · CLASSICAL METHODS
+Classical Methods — Comparison Table
+Nine methods, side by side
+Method Diversity Convergence Complexity Non-Convex? Needs
+Weighted Sum Poor Good Low ✗ Weights
+ε-Constraint Good Good Medium ✓ ε values
+Benson's Good Good Medium ✓ Reference point
+Weight Metric Good Good Medium ✓ (p→∞) Ideal point
+Value Function Excellent Excellent Varies ✓ Value function
+Goal Programming Good Good Low (LP) ✓ Targets
+Lexicographic Poor Good Low ✗ Priority ranking
+TOPSIS — — O(kN) — Weights
+VIKOR — — O(kN) — Trade-off v
+"Diversity" and "Convergence" describe the front you get after re-solving a classical method many times with different weights/ε/targets (as in Slides 30–35) — each single solve only returns one point.
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 44
+
+PAGE 46
+SECTION 3 · CLASSICAL METHODS
+When to Use Which Classical Method
+A quick decision reference
+Scenario Method Why
+Convex front, weights known Weighted Sum Simple and fast
+Non-convex front ε-Constraint Reaches all regions of the front
+Reference point available Benson's Method Direct, anchored search
+Ideal point known Weight Metric Flexible via the p-norm
+Preferences well understood Value Function Theoretically optimal result
+Numeric targets exist Goal Programming Intuitive target-based framing
+Clear strict priority order Lexicographic No trade-off needed — simplest logic
+Ranking an existing front TOPSIS / VIKOR Turns a set into one final choice
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 45
+
+PAGE 47
+SECTION 3 · CLASSICAL METHODS
+Same Problem, Different Methods
+Min f₁ = x², Min f₂ = (x−2)²
+Results across methods
+● Weighted Sum (w=0.5): x* = 1  →  (f₁, f₂) = (1, 1)
+● ε-Constraint (ε₂=1): x* = 1  →  (f₁, f₂) = (1, 1)
+● Goal Programming (T₁=T₂=1): x* = 1  →  (f₁, f₂) = (1, 1)
+● All three agree here because this particular problem is symmetric and 
+convex — that agreement disappears on non-convex problems (see 
+Slides 29–35).
+● TOPSIS ranking of 3 sampled solutions:
+– (0.25, 2.25)  <  (1, 1)  <  (2.25, 0.25)  — the middle, most balanced 
+point ranks best.
+0
+0.5
+1
+1.5
+2
+2.5
+0 0.5 1 1.5 2 2.5
+f₂
+f₁
+All methods converge to the same point here
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 46
+
+PAGE 48
+SECTION 3 · CLASSICAL METHODS
+Key Takeaways — Classical Methods
+One line per method, for quick recall
+● Weighted Sum:
+– simple, but convex fronts only.
+● ε-Constraint:
+– reaches non-convex regions, needs ε tuning.
+● Benson's:
+– reference-point search, handles non-convexity.
+● Weight Metric:
+– flexible p-norm distance to an ideal point.
+● Value Function:
+– theoretically optimal, needs known preferences.
+● Goal Programming:
+– intuitive, target-based.
+● Lexicographic:
+– strict priority order, no trade-off.
+● TOPSIS / VIKOR:
+– post-optimization ranking of an existing front.
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 47
+
+PAGE 49
+SECTION 3 · CLASSICAL METHODS
+Test Your Understanding
+Apply what you've just learned
+Problem
+● Apply the Weighted Sum method to minimize f₁ = (x−1)² and f₂ = (x+1)², with w₁ = w₂ = 0.5.
+Answer (try it yourself first!)
+● F(x) = 0.5(x−1)² + 0.5(x+1)² = x² + 1
+● F′(x) = 2x = 0  ⟹ x* = 0
+● Result:  f₁ = 1 ,  f₂ = 1
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 48
+
+PAGE 50
+COMING UP NEXT
+Next: Non-Elitist MOEAs
+Part 2 of Chapter 5
+VEGA MOGA NSGA NPGA
+Each algorithm will be covered with: full form, formulas, step-by-step procedure, a real-life problem, and a fully worked numerical solution — exactly as 
+we did for the classical methods.
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 49
+
+PAGE 51
+Questions?
+Q & A
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 50
+
+PAGE 52
+WRAP -UP
+Summary of Part 1
+The essentials to carry forward into Part 2
+● MOO deals with conflicting objectives — the answer is a Pareto front, not one point.
+● Pareto dominance gives the comparison rule; mixed min/max problems convert to all-minimize first.
+● The 10-step procedure (variables → objectives → constraints → algorithm → … → output) is the same skeleton behind every method in this 
+chapter, classical or evolutionary.
+● Classical methods (weighted sum, ε-constraint, Benson's, weight metric, value function, goal programming, lexicographic) each turn the 
+multiobjective problem into one or more single-objective problems.
+● TOPSIS and VIKOR don't generate solutions — they rank a front you already have.
+● Choosing convex vs. non-convex-capable methods, and matching complexity to your objective count, are the two decisions that matter 
+most in practice.
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 51
+
+PAGE 53
+REFERENCES
+References
+Foundational texts for this chapter
+● Deb, K. — Multi-Objective Optimization Using Evolutionary Algorithms. Wiley.
+● Coello Coello, C. A., Lamont, G. B., & Van Veldhuizen, D. A. — Evolutionary Algorithms for Solving Multi-Objective Problems. 
+Springer.
+● Zitzler, E. — Evolutionary Algorithms for Multiobjective Optimization: Methods and Applications. PhD Thesis, ETH Zurich.
+Ch.5 · Multiobjective Optimization — Foundations & Classical Methods 52

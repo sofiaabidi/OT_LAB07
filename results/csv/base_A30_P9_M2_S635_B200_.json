@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 30,
+  "algorithm": "MOMA",
+  "problem": "P9",
+  "objectives": 2,
+  "seed": 635,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 200,
+  "evaluations": 200,
+  "HV": 0.884801527180171,
+  "IGD": null,
+  "Spacing": 0.12311178850908748,
+  "runtime": 6.404552750000221,
+  "front_size": 5,
+  "feasible_fraction": 1.0,
+  "file": "base_A30_P9_M2_S635_B200_"
+}

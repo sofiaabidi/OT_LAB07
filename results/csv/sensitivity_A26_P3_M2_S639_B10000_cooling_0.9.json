@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 26,
+  "algorithm": "MOSA",
+  "problem": "P3",
+  "objectives": 2,
+  "seed": 639,
+  "group": "sensitivity",
+  "parameters": "{\"cooling\": 0.9}",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.5184100533481452,
+  "IGD": 0.016486773044636284,
+  "Spacing": 0.03963023240876423,
+  "runtime": 0.1959142079999765,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "sensitivity_A26_P3_M2_S639_B10000_cooling_0.9"
+}

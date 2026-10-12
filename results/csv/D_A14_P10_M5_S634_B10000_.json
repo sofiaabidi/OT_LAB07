@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 14,
+  "algorithm": "NSGA-II",
+  "problem": "P10",
+  "objectives": 5,
+  "seed": 634,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.045806741943359396,
+  "IGD": 0.6414332884373124,
+  "Spacing": 0.43142072703762807,
+  "runtime": 0.6037350840001636,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "D_A14_P10_M5_S634_B10000_"
+}

@@ -1,0 +1,1580 @@
+
+PAGE 1
+C H A P T E R  5   ·   M U L T I O B J E C T I V E  O P T I M I Z A T I O N   ·   P A R T  4
+Constrained MOEAs & Multiobjective 
+Heuristics
+Constraint handling, Constrained NSGA-II, and nine multi-objective metaheuristics — with corrected, fully worked 
+two-iteration numerical examples, case studies, and practice problems.
+[Instructor / Your Name]
+[Department of Computer Science / Engineering]
+[Institution Name]
+f2
+f1  →
+● Feasible Pareto front   ● Infeasible
+
+PAGE 2
+S E S S I O N  R O A D M A P
+What We Will Cover Today
+01 Constraint Handling in Multi-Objective Optimization
+02 Constrained NSGA-II
+03 MOPSO — Multi-Objective Particle Swarm Optimization
+04 MOGWO — Multi-Objective Grey Wolf Optimizer
+05 MOABC — Multi-Objective Artificial Bee Colony
+06 MOACO — Multi-Objective Ant Colony Optimization
+07 MOSA — Multi-Objective Simulated Annealing
+08 MODE — Multi-Objective Differential Evolution
+09 MO-TLBO — Multi-Objective Teaching-Learning-Based Optimization
+10 MOBA — Multi-Objective Bat Algorithm
+11 MOMA — Multi-Objective Memetic Algorithm
+12 Comparison, Applications, Case Studies & Practice
+Part 4 · Outline 1
+
+PAGE 3
+F O U N D A T I O N S  ·  Q U I C K  R E C A P
+Pareto Dominance & the Pareto Front
+FORMAL DEFINITION (MINIMIZATION CONVENTION)
+a dominates b  (written a ≺ b)   iff
+fᵢ(a) ≤ fᵢ(b)  for every objective i,   AND   fⱼ(a) < fⱼ(b)  for at least one objective j
+● If neither a nor b dominates the other, they are non-dominated — both are valid trade-offs.
+● Pareto-optimal solution: a feasible solution not dominated by any other feasible solution.
+● Pareto front / Pareto-optimal set: the set of every Pareto-optimal solution across the whole search space.
+● Archive (used throughout this chapter): an algorithm's evolving approximation of the true Pareto front, built from the best non-dominated solutions found so far — it usually isn't the exact front, 
+just the best estimate after N iterations.
+WORKED EXAMPLE (MINIMIZE BOTH F₁, F₂)
+Pair f₁, f₂ values Verdict
+a=(2,8) vs b=(4,5) a better on f₁, b better on f₂ Non-dominated — neither wins both
+a=(2,8) vs c=(2,6) c ties on f₁, strictly better on f₂ c dominates a
+a=(2,8) vs d=(3,9) a strictly better on BOTH f₁ and f₂ a dominates d
+Maximizing an objective instead? Just flip that objective's inequality (≥ / >) — exactly how the NSGA-II, MOGWO, MOABC, MODE, MO-TLBO, MOBA, and MOMA examples later in this chapter work, since each maximizes at least one 
+objective.
+Pareto Dominance 2
+
+PAGE 4
+F O U N D A T I O N S
+Handling Constraints in Multiobjective Optimization
+DEB'S FEASIBILITY RULES (COMPARING ANY TWO CANDIDATES A, B)
+One feasible, one infeasible The feasible solution always wins, regardless of objective values.
+Both feasible Compare using ordinary Pareto dominance on f₁, f₂, …
+Both infeasible The solution with the smaller total constraint violation wins.
+CONSTRAINT VIOLATION (CV)
+CV(x) = Σᵢ max(0, gᵢ(x))  +  Σⱼ |hⱼ(x)|
+gᵢ(x) ≤ 0 inequality constraints · hⱼ(x) = 0 equality constraints. CV = 0 means fully feasible.
+PRACTICAL HANDLING STRATEGIES
+● Penalty functions — add a CV-scaled penalty to each objective
+● Repair operators — project an infeasible x back onto the feasible region
+● Feasibility-first selection — used directly inside Constrained NSGA-II
+Constraint Handling 3
+
+PAGE 5
+F O U N D A T I O N S
+Crowding Distance: How Diversity Is Measured
+WHY IT MATTERS
+Every heuristic in this chapter leans on crowding distance to pick archive leaders (MOGWO's αβδ, MOBA's x_best), to choose which individuals get local search (MOMA), or to prune an over-full 
+archive — it is the mechanism that keeps the front spread out instead of clumping in one region. Terminology note: NSGA-II calls its non-dominated set a “front”; the swarm/evolutionary 
+heuristics call the same idea an “archive” — both mean “the best trade-off solutions found so far.”
+FORMULA (PER OBJECTIVE, THEN SUMMED)
+d_i = Σₘ [ fₘ(i+1) − fₘ(i−1) ] / [ fₘ_max − fₘ_min ]
+Solutions are sorted by each objective m; boundary solutions (smallest/largest) get d_i = ∞ so they are always kept.
+WORKED EXAMPLE
+Solution f₁ f₂ Crowding distance d
+P1 (boundary) 32.0 48.0 ∞ (always kept)
+P2 34.0 45.0 1.00
+P3 36.0 42.0 0.70  ← smallest
+P4 36.8 40.8 1.00
+P5 (boundary) 40.0 36.0 ∞ (always kept)
+Example calculation for P3 (neighbors P2 and P4): d = (36.8−34.0)/(40.0−32.0) + (45.0−40.8)/(48.0−36.0) = 0.35 + 0.35 = 0.70 — the smallest finite value, so P3 is the most “crowded” point and the first candidate to drop if the 
+archive needs to shrink; P2 and P4 are more isolated and stay protected.
+Foundations · Crowding Distance 4
+
+PAGE 6
+F O U N D A T I O N S
+Fast Non-Dominated Sorting: Assigning Fronts
+THE PROCEDURE EVERY NSGA -II -FAMILY METHOD RUNS EACH GENERATION
+1 For every solution p, compute n_p (how many solutions dominate p) and S_p (the set of solutions p dominates).
+2 Front 1 = every solution with n_p = 0 (nobody dominates it) — these are the current non-dominated solutions.
+3 For each p in Front 1, decrement n_q for every q in S_p; any q that drops to n_q = 0 joins Front 2.
+4 Repeat step 3 for Front 2, Front 3, … until every solution is assigned to a front.
+WORKED EXAMPLE — PREVIEW OF THE UPCOMING CONSTRAINED NSGA -II SCENARIO
+Solution (f₁,f₂) Dominated by n_p Front
+B (40,36) — (non-dominated) 0 1
+C (32,48) — (non-dominated) 0 1
+D (36,42) — (non-dominated) 0 1
+F (34,45) — (non-dominated) 0 1
+E (38.4,36) B 1 2
+Complexity: this procedure runs in O(M·N²) for M objectives and N solutions — the dominant cost of one NSGA-II generation, which is why archive size is usually capped.
+Foundations · Non-Dominated Sorting 5
+
+PAGE 7
+S E C T I O N  0 2
+Constrained NSGA-II: Modifications to Standard NSGA-II
+THREE CHANGES TURN NSGA -II INTO A CONSTRAINED OPTIMIZER
+1
+Compute constraint violation
+CV(x) = Σ max(0, gᵢ(x)) + Σ |hⱼ(x)|  for every individual.
+2
+Replace crowded-comparison with feasibility-first comparison
+Feasible beats infeasible → both feasible: Pareto dominance → both infeasible: lower CV wins.
+3
+Non-dominated sort only among feasible solutions
+Infeasible individuals are ranked strictly below every feasible front by CV.
+RESULT
+The output is a Pareto front consisting only of feasible solutions — every point on it satisfies all constraints and is non -dominated among feasible candidates.
+Constrained NSGA-II 6
+
+PAGE 8
+C o n s t r a i n e d  N S G A- I I  ·  G E N E R A L I Z A T I O N
+Formula Across Dimensions: 1D, 2D, and n-D
+Constraint violation and crossover both generalize the same way — sum/average over however many decision variables and constraints the problem has. (The n-D example below is a fresh, independent 
+illustration, not a continuation of the water-allocation scenario worked through later in this section.)
+Dimensionality General Formula Worked Example (random vector)
+1 variable
+(x)
+CV(x) = max(0, g(x))
+Crossover:  D = (B + C) / 2
+Mutation: x' = x + δ, δ a random perturbation
+g(x): x ≤ 80;  x = 90  →  CV = 10.  Mutation: B=50 → mutate → 48  (δ=−2)
+2 variables
+(x₁,x₂)
+CV(x) = Σᵢ max(0, gᵢ(x))
+D = ( (B₁+C₁)/2 , (B₂+C₂)/2 )
+Mutation: x'ᵢ=xᵢ+δᵢ only for genes chosen with probability p_m (each gene decided 
+independently); unchosen genes keep δᵢ=0
+As solved: B=(50,30), C=(40,40) → D=(45,35). Mutation: gene 1 chosen (δ₁=−2), gene 2 not chosen (δ₂=0) 
+→ E=(48,30)
+n variables
+(x₁,…,xₙ)
+CV(x) = Σᵢ₌₁ᵏ max(0,gᵢ(x)) + Σⱼ₌₁ˡ |hⱼ(x)|
+Crossover (e.g. SBX) acts independently on each of the n genes
+Mutation: x'ᵢ=xᵢ+δᵢ, with δ = (δ₁,…,δₙ) drawn only for genes that pass their own p_m 
+coin-flip
+n=4, 2 constraints: x=(50,40,25,10) → CV=15 (as before). Mutation: genes 1,3 chosen (δ=(−2,0,+3,0)) → 
+mutated=(48,40,28,10)
+Constrained NSGA-II · Dimensions 7
+
+PAGE 9
+S E C T I O N  0 2  ·  W O R K E D  E X A M P L E
+Real-Life Problem: Water Allocation with Environmental Flow
+SCENARIO
+● Allocate available water between agriculture (x₁, megaliters/day) and industry (x₂, megaliters/day)
+● Objective f₁(x₁) = 0.8·x₁  — maximize agricultural yield (tons/day)
+● Objective f₂(x₂) = 1.2·x₂  — maximize industrial output (units/day)
+● Constraint g(x): x₁ + x₂ ≤ 80  — mandatory environmental flow limit
+● Constraint violation: CV(x) = max(0, x₁ + x₂ − 80)
+INITIAL POPULATION (GENERATION 0)
+Solution (x₁, x₂) x₁+x₂ CV(x) Feasible?
+A (30, 70) 100 20 No
+B (50, 30) 80 0 Yes
+C (40, 40) 80 0 Yes
+By Deb's rules, A is dominated by every feasible solution outright — it is discarded before Pareto ranking even begins. B and C move on to non-dominated sorting.
+Constrained NSGA-II · Scenario 8
+
+PAGE 10
+C o n s t r a i n e d  N S G A- I I  ·  F U L L  S T E P- BY - S T E P  S O L U T I O N
+Iteration 1 — Worked Solution
+1 Generate offspring from the Gen-0 feasible front {B(50,30), C(40,40)}
+Crossover: D = avg(B,C) = ((50+40)/2, (30+40)/2) = (45, 35)
+Mutation:  E = mutate(B) ≈ (48, 30)
+2 Check feasibility (CV)
+D: x₁+x₂ = 45+35 = 80 ≤ 80  →  CV = 0  →  feasible
+E: x₁+x₂ = 48+30 = 78 ≤ 80  →  CV = 0  →  feasible
+3 Evaluate objectives f₁=0.8x₁, f₂=1.2x₂
+D: f₁ = 0.8×45 = 36.0,  f₂ = 1.2×35 = 42.0
+E: f₁ = 0.8×48 = 38.4,  f₂ = 1.2×30 = 36.0
+4 Apply Deb's rule (both feasible → Pareto dominance)
+E(38.4,36.0) vs B(40.0,36.0): f₁ worse, f₂ equal  →  B dominates E  →  E discarded
+D(36.0,42.0) vs B and C: neither dominates D  →  D is non-dominated  →  D kept
+Result of iteration 1: Gen-1 feasible Pareto front = {B(40,36), C(32,48), D(36,42)} — E was generated but correctly removed for being dominated.
+Constrained NSGA-II · Iteration 1 9
+
+PAGE 11
+C o n s t r a i n e d  N S G A- I I  ·  F U L L  S T E P- BY - S T E P  S O L U T I O N
+Iteration 2 — Worked Solution
+1 Generate offspring from the Gen-1 front {B, C, D}
+Crossover: F = avg(D,C) = ((45+40)/2, (35+40)/2) = (42.5, 37.5)
+Mutation:  G = mutate(D) ≈ (46, 34)
+2 Check feasibility (CV)
+F: x₁+x₂ = 42.5+37.5 = 80 ≤ 80  →  CV = 0  →  feasible
+G: x₁+x₂ = 46+34 = 80 ≤ 80  →  CV = 0  →  feasible
+3 Evaluate objectives
+F: f₁ = 0.8×42.5 = 34.0,  f₂ = 1.2×37.5 = 45.0
+G: f₁ = 0.8×46 = 36.8,  f₂ = 1.2×34 = 40.8
+4 Apply Deb's rule against the whole Gen-1 front
+F vs C(32,48): 34>32 better, 45<48 worse  →  non-dominated  →  F kept
+F vs D(36,42): 34<36 worse, 45>42 better  →  non-dominated  →  F kept
+G vs D(36,42) and B(40,36): non-dominated both ways  →  G kept
+Result of iteration 2: Gen-2 feasible Pareto front = {B(40,36), C(32,48), D(36,42), F(34,45), G(36.8,40.8)} — 5 members, up from 2 at Gen 0.
+Constrained NSGA-II · Iteration 2 10
+
+PAGE 12
+S E C T I O N  0 2  ·  I T E R A T I O N  S U M M A R Y
+Constrained NSGA-II — Generation-by-Generation 
+Convergence
+f₁ = 0.8x₁ (agri. yield, maximize) · f₂ = 1.2x₂ (industrial output, maximize) · CV = max(0, x₁+x₂−80)
+Gen Sol. (x₁,x₂) CV Feasible f₁ f₂ Outcome
+0 A (30,70) 20 No — — Discarded (infeasible)
+0 B (50,30) 0 Yes 40.0 36.0 Front 1 (kept)
+0 C (40,40) 0 Yes 32.0 48.0 Front 1 (kept)
+1 D = cross(B,C) (45,35) 0 Yes 36.0 42.0 Non-dom. vs B,C → kept
+1 E = mut(B) (48,30) 0 Yes 38.4 36.0 Dominated by B → removed
+2 F = cross(D,C) (42.5,37.5) 0 Yes 34.0 45.0 Non-dom. → kept
+2 G = mut(D) (46,34) 0 Yes 36.8 40.8 Non-dom. → kept
+How the optimal set is decided: Feasibility first (Deb's rule) — any feasible solution beats any infeasible one; among feasible solutions, ordinary Pareto dominance decides; among infeasible solutions, the 
+lower constraint violation (CV) wins.
+Converged feasible Pareto front (after Gen 2): B(40,36), C(32,48), D(36,42), F(34,45), G(36.8,40.8)
+Iterations to fully solve: the front grew every generation shown (2→3→5 members) with one dominance-based removal already observed at Gen 1 — in practice, convergence is declared once a generation produces 
+zero new non-dominated points.
+Constrained NSGA-II · Iteration Table 11
+
+PAGE 13
+C o n s t r a i n e d  N S G A- I I  ·  V I S U A L I Z A T I O N
+Pareto Front: Solutions in Objective Space
+Gray = Gen-0 feasible front {B, C}. Teal = the non-dominated offspring D found in Gen 1. Amber = F and G, the new non-dominated offspring found in Gen 2. The dashed line traces the final feasible Pareto 
+front. The gray × is offspring E — generated but dominated by B, so discarded. The red 
+ is A — high industrial output but infeasible (exceeds the environmental flow limit), so it never enters the 
+comparison at all.
+Constrained NSGA-II · Pareto Front 12
+
+PAGE 14
+MOPSO:
+Multi-Objective Particle Swarm Optimization
+Proposed by Coello Coello & Lechuga (2002)
+Swarm Intelligence
+CORE IDEA
+Extend classical PSO with an external archive of non-dominated solutions; each particle's personal best (pbest) and the swarm's global guide (gbest) are chosen via Pareto 
+dominance and archive crowding distance rather than a single fitness value.
+v = w·v + c₁r₁(pbest−x) + c₂r₂(gbest−x)
+x_new = x + v_new
+ADVANTAGES
+● + Fast convergence on continuous landscapes
+● + Simple velocity/position update rule
+● + Archive preserves front diversity
+DISADVANTAGES
+● – Prone to premature convergence
+● – Sensitive to w, c₁, c₂ settings
+Best used when: Continuous decision variables; Fast, good-enough results needed    Avoid when: 
+Highly discrete / combinatorial problems
+Parameters: w = 0.7,  c₁ = c₂ = 1.5  (r₁ = r₂ = 0.5 fixed for this example)     |     Complexity: O(kN) per iteration
+MOPSO · Concept 13
+
+PAGE 15
+M O P S O  ·  G E N E R A L I Z A T I O N
+Formula Across Dimensions: 1D, 2D, and n-D
+The same update rule generalizes from a single decision variable to any number of decision variables — only the vector length changes. (The numbers below are a fresh, independent illustration — they do 
+not continue the specific scenario worked through later in this section.)
+Dimensionality General Formula Worked Example (random vector)
+1 variable
+(x)
+v = w·v + c₁r₁(pbest−x) + c₂r₂(gbest−x)
+x_new = x + v  (r₁, r₂ ∈ [0,1] are single random draws — only 1 dimension exists)
+x=8, pbest=5, gbest=14, v=2, w=0.6, c₁=c₂=1.5, r₁=0.5, r₂=0.4 → 
+v_new=0.6×2+1.5×0.5×(5−8)+1.5×0.4×(14−8)=2.55 → x_new=10.55
+2 variables
+(x₁,x₂)
+vᵢ = w·vᵢ + c₁r₁,ᵢ(pbestᵢ−xᵢ) + c₂r₂,ᵢ(gbestᵢ−xᵢ), i=1,2  (r₁,ᵢ, r₂,ᵢ drawn independently 
+PER DIMENSION, not shared)
+x=(8,3), pbest=(5,6), gbest=(14,1), v=(2,−1), w=0.6, c₁=c₂=1.5, r₁=(0.5,0.3), r₂=(0.4,0.6) → v_new=(2.55, 
+−1.05) → x_new=(10.55, 1.95)
+n variables
+(x₁,…,xₙ)
+vᵢ = w·vᵢ + c₁r₁,ᵢ(pbestᵢ−xᵢ) + c₂r₂,ᵢ(gbestᵢ−xᵢ) for every i=1,…,n; x_new = x + v  (r₁, r₂ 
+are length-n random vectors, one fresh draw per dimension)
+x=(8,3,−2,5), pbest=(5,6,0,4), gbest=(14,1,−4,7), v=(2,−1,1,0), r₁=(0.5,0.3,0.7,0.2), r₂=(0.4,0.6,0.5,0.8) → 
+v_new=(2.55,−1.05,1.20,2.10) → x_new=(10.55,1.95,−0.80,7.10)
+MOPSO · Dimensions 14
+
+PAGE 16
+M O P S O  ·  W O R K E D  E X A M P L E
+Real-Life Problem: Drone Delivery Routing
+SCENARIO
+● Decision variable: x = cruising speed, 5–15 m/s
+● Objective f₁(x) = 100 / x  — minimize delivery time (minutes)
+● Objective f₂(x) = x²  — minimize energy consumption (Wh)
+● Faster flight cuts delivery time but burns energy quadratically — a genuine trade-off
+OBJECTIVE SPACE PREVIEW
+A move that improves f₁ usually worsens f₂ here (or vice-versa) — there is no single best answer, only a Pareto-optimal trade-off curve that MOPSO tries to 
+map with its archive.
+MOPSO · Scenario 15
+
+PAGE 17
+M O P S O  ·  F U L L  S T E P- BY - S T E P  S O L U T I O N
+Iteration 1 — Worked Solution
+1 Compute velocity (pbest−x = 0 at initialization)
+v = w·0 + c₁r₁·0 + c₂r₂(gbest−x) = 0.75(gbest−x)
+P1: gbest=15,x=5 → v=0.75×10=7.5   P2: gbest=15,x=10 → v=0.75×5=3.75   P3: gbest=5,x=15 → v=0.75×(−10)=−7.5
+2 Update position: x_new = x + v
+P1: 5+7.5=12.50   P2: 10+3.75=13.75   P3: 15−7.5=7.50
+3 Evaluate objectives f₁=100/x, f₂=x²
+P1: (8.00, 156.25)   P2: (7.27, 189.06)   P3: (13.33, 56.25)
+4 Decide pbest / archive membership
+Each new point vs. its old pbest is non-dominated (one objective better, one worse) → pbest unchanged for all three
+All 3 new points are non-dominated against the existing archive → archive grows from 3 to 6
+Result of iteration 1: Archive grows from 3 to 6 non-dominated points; all three pbest values stay unchanged since every new position was non-dominated, not dominating.
+MOPSO · Iteration 1 16
+
+PAGE 18
+M O P S O  ·  F U L L  S T E P- BY - S T E P  S O L U T I O N
+Iteration 2 — Worked Solution
+1 Compute velocity v_new = w·v_old + 0.75(pbest−x) + 0.75(gbest−x)
+P1: 0.7×7.5 + 0.75(5−12.5) + 0.75(15−12.5) = 5.25−5.625+1.875 = 1.50
+P2: 0.7×3.75 + 0.75(10−13.75) + 0.75(15−13.75) = 2.625−2.8125+0.9375 = 0.75
+P3: 0.7×(−7.5) + 0.75(15−7.5) + 0.75(5−7.5) = −5.25+5.625−1.875 = −1.50
+2 Update position: x_new = x + v
+P1: 12.5+1.5=14.00   P2: 13.75+0.75=14.50   P3: 7.5−1.5=6.00
+3 Evaluate objectives
+P1: (7.14, 196.00)   P2: (6.90, 210.25)   P3: (16.67, 36.00)
+4 Decide pbest / archive membership
+Again non-dominated vs. each pbest → pbest unchanged for all three particles
+All 3 new points non-dominated vs. archive → archive grows from 6 to 9
+Result of iteration 2: Archive grows from 3 → 6 → 9 non-dominated points spanning x = 5.0 to 15.0 m/s. Since f₁ strictly decreases and f₂ strictly increases with x, every sampled 
+speed is genuinely Pareto-optimal — MOPSO's job is to spread particles across the whole curve, which the growing archive confirms it does.
+MOPSO · Iteration 2 17
+
+PAGE 19
+M O P S O  ·  I T E R A T I O N  S U M M A R Y
+MOPSO — Iteration-by-Iteration Table
+Iter Particle x v f₁ (time) f₂ (energy) pbest x gbest x Archive
+0 P1 5.00 0.00 20.00 25.00 5.00 15.00 3
+0 P2 10.00 0.00 10.00 100.00 10.00 15.00 3
+0 P3 15.00 0.00 6.67 225.00 15.00 5.00 3
+1 P1 12.50 7.50 8.00 156.25 5.00 (kept) 15.00 6
+1 P2 13.75 3.75 7.27 189.06 10.00 (kept) 15.00 6
+1 P3 7.50 -7.50 13.33 56.25 15.00 (kept) 5.00 6
+2 P1 14.00 1.50 7.14 196.00 5.00 (kept) 15.00 9
+2 P2 14.50 0.75 6.90 210.25 10.00 (kept) 15.00 9
+2 P3 6.00 -1.50 16.67 36.00 15.00 (kept) 5.00 9
+How the optimal set is decided: A trial position updates the archive only if it is non-dominated against the current archive; a particle's own pbest is replacedonly when the new position dominates it outright —
+otherwise the older, still non-dominated pbest is retained for stability.
+Archive grows from 3 → 6 → 9 non-dominated points spanning x = 5.0 to 15.0 m/s. Since f₁ strictly decreases and f₂ strictly increases with x, every sampled speed is genuinely Pareto-optimal — MOPSO's job is to 
+spread particles across the whole curve, which the growing archive confirms it does.
+Iterations to fully solve: The archive grew from 3 → 6 → 9 points in two iterations without saturating, because every speed on this trade -off curve is genuinely Pareto-optimal; in practice MOPSO stops when archive size and 
+hypervolume plateau across several generations.
+MOPSO · Iteration Table 18
+
+PAGE 20
+M O P S O  ·  V I S U A L I Z A T I O N
+Pareto Front: Solutions in Objective Space
+Gray = the 3 initial particle positions. Teal = the 3 new positions found in iteration 1. Amber = the 3 new positions found in iteration 2. Because f₁ strictly decreases and f₂ strictly increases with speed, every 
+point sits exactly on the true Pareto front (dashed line) — there is no dominated interior to filter out here.
+MOPSO · Pareto Front 19
+
+PAGE 21
+MOGWO:
+Multi-Objective Grey Wolf Optimizer
+Proposed by Mirjalili, Saremi, Mirjalili & Coelho (2016)
+Swarm Intelligence
+CORE IDEA
+Extend GWO with an archive: the three pack leaders α, β, δ are re-selected each iteration from the archive by crowding distance (not single-objective rank), and every 
+omega wolf moves toward their average.
+X_new = (X_α + X_β + X_δ) / 3
+ADVANTAGES
+● + Very few control parameters
+● + Fast convergence
+● + Archive-based diversity maintenance
+DISADVANTAGES
+● – Can converge prematurely on multimodal fronts
+Best used when: Continuous MOO with smooth landscapes    Avoid when: 
+Highly multimodal problems
+Parameters: Leaders re-selected by crowding distance each iteration; archive size     |     Complexity: O(kN) per iteration
+MOGWO · Concept 20
+
+PAGE 22
+M O G W O  ·  G E N E R A L I Z A T I O N
+Formula Across Dimensions: 1D, 2D, and n-D
+The same update rule generalizes from a single decision variable to any number of decision variables — only the vector length changes. (The numbers below are a fresh, independent illustration — they do 
+not continue the specific scenario worked through later in this section.)
+Dimensionality General Formula Worked Example (random vector)
+1 variable
+(x) X_new = (X_α + X_β + X_δ) / 3 α=5, β=20, δ=12 → X_new = (5+20+12)/3 = 12.33
+2 variables
+(x₁,x₂) X_new,ᵢ = (X_α,ᵢ + X_β,ᵢ + X_δ,ᵢ) / 3, i=1,2 α=(5,10), β=(20,4), δ=(12,7) → X_new = (12.33, 7.00)
+n variables
+(x₁,…,xₙ) X_new,ᵢ = (X_α,ᵢ + X_β,ᵢ + X_δ,ᵢ) / 3 for every i=1,…,n α=(5,10,2), β=(20,4,9), δ=(12,7,5) → X_new = (12.33, 7.00, 5.33)
+MOGWO · Dimensions 21
+
+PAGE 23
+M O G W O  ·  W O R K E D  E X A M P L E
+Real-Life Problem: Feature Selection for a Classifier
+SCENARIO
+● Decision variable: x = number of selected features, 5–20
+● Objective f₁(x) = x  — minimize feature count (model simplicity)
+● Objective f₂(x) = min(0.5 + 0.02x, 0.95)  — maximize validation accuracy
+● More features generally improve accuracy but hurt interpretability and speed
+OBJECTIVE SPACE PREVIEW
+A move that improves f₁ usually worsens f₂ here (or vice-versa) — there is no single best answer, only a Pareto-optimal trade-off curve that MOGWO tries to 
+map with its archive.
+MOGWO · Scenario 22
+
+PAGE 24
+M O G W O  ·  F U L L  S T E P- BY - S T E P  S O L U T I O N
+Iteration 1 — Worked Solution
+1 Select leaders by crowding distance from the 5-point archive
+Boundary points α=5 and β=20 have infinite crowding distance
+δ=12 is the most isolated interior point → α=5, β=20, δ=12
+2 Move omega wolves toward the leader centroid X_new=(X_α+X_β+X_δ)/3
+Ω₁: (5+20+12)/3 = 12.33 → rounds to 12
+Ω₂: independent random draw lands at 11
+3 Evaluate objectives f₁=x, f₂=0.5+0.02x
+Ω₁(12): (12, 0.74)     Ω₂(11): (11, 0.72)
+4 Update archive
+Ω₁'s point (12,0.74) duplicates δ → skip
+Ω₂'s point (11,0.72) is new and non-dominated → archive grows from 5 to 6
+Result of iteration 1: Omega wolves move to (12) and (11); archive grows from 5 to 6 as Ω₂'s point is new — leaders α=5, β=20, δ=12 stay unchanged.
+MOGWO · Iteration 1 23
+
+PAGE 25
+M O G W O  ·  F U L L  S T E P- BY - S T E P  S O L U T I O N
+Iteration 2 — Worked Solution
+1 Re-select leaders by crowding distance
+Archive shape hasn't shifted enough to change the ranking → α=5, β=20, δ=12 unchanged
+2 Move omega wolves toward the same centroid
+Ω₁: (5+20+12)/3 = 12.33 → 12  (already there — converged)
+Ω₂: independent draw again lands at 11 (already there — converged)
+3 Evaluate objectives
+Ω₁(12): (12, 0.74)     Ω₂(11): (11, 0.72)  — identical to iteration 1
+4 Update archive
+Both points already in the archive → no new entries → archive stays at 6
+This confirms the pack has converged around δ
+Result of iteration 2: Archive = {5, 10, 11, 12, 18, 20} (6 feature-count subsets). Omega wolves converge toward the crowding-selected leader δ = 12 (the pack's encircling 
+behavior), while α = 5 and β = 20 keep anchoring the extremes of the accuracy/simplicity trade-off, so the front's spread is preserved even as the pack converges.
+MOGWO · Iteration 2 24
+
+PAGE 26
+M O G W O  ·  I T E R A T I O N  S U M M A R Y
+MOGWO — Iteration-by-Iteration Table
+Iter Wolf Role x f₁ (#features) f₂ (accuracy) Archive
+0 α Leader 5 5 0.60 5
+0 β Leader 20 20 0.90 5
+0 δ Leader 12 12 0.74 5
+0 Ω₁ Omega 10 10 0.70 5
+0 Ω₂ Omega 18 18 0.86 5
+1 α,β,δ Leaders (reselected) 5, 20, 12 — — 6
+1 Ω₁ Omega → (5+20+12)/3 12 12 0.74 6
+1 Ω₂ Omega (diversified draw) 11 11 0.72 6
+2 Ω₁ Omega → (5+20+12)/3 12 12 0.74 6
+2 Ω₂ Omega (diversified draw) 11 11 0.72 6
+How the optimal set is decided: The three archive members with the largest crowding distance become leaders α, β, δ each round; every omega wolf moves to their centroid, and any resulting position that is 
+non-dominated is added to the archive.
+Archive = {5, 10, 11, 12, 18, 20} (6 feature-count subsets). Omega wolves converge toward the crowding-selected leader δ = 12 (the pack's encircling behavior), while α = 5 and β = 20 keep anchoring the extremes of 
+the accuracy/simplicity trade-off, so the front's spread is preserved even as the pack converges.
+Iterations to fully solve: Leaders α=5 and β=20 (the extremes) never change because they always carry the largest crowding distance; omega wolves converge onto δ=12 within a single iteration — the pack is effectively 
+stable after iteration 1.
+MOGWO · Iteration Table 25
+
+PAGE 27
+M O G W O  ·  V I S U A L I Z A T I O N
+Pareto Front: Solutions in Objective Space
+Gray = the initial pack (α, β, δ leaders and 2 omega wolves). Teal = the one genuinely new point found in iteration 1 (Ω₂ → 11 features). No new amber points appear because iteration 2 reproduces the 
+same positions — the pack has already converged around δ.
+MOGWO · Pareto Front 26
+
+PAGE 28
+MOABC:
+Multi-Objective Artificial Bee Colony
+Proposed by Akbari, Hedayatzadeh, Ziarati & Hassanizadeh (2012)
+Swarm Intelligence
+CORE IDEA
+Extend ABC with Pareto dominance: employed bees exploit a source via greedy dominance-based replacement, onlooker bees probabilistically favor less-crowded archive 
+regions, and scout bees replace sources abandoned after too many failed trials.
+x_new = xᵢ + φ·(xᵢ − x_k),  φ ∈ [−1, 1],  k ≠ i
+ADVANTAGES
+● + Strong diversity via scout bees
+● + Good multimodal exploration
+DISADVANTAGES
+● – Slower convergence than PSO/DE variants
+● – Needs the "limit" (abandonment) parameter tuned
+Best used when: Multimodal MOO landscapes    Avoid when: 
+Fast results are the priority
+Parameters: Colony size = 3, limit (trial cap), φ = 0.5 (fixed for this example)     |     Complexity: O(kN) per iteration
+MOABC · Concept 27
+
+PAGE 29
+M O A B C  ·  G E N E R A L I Z A T I O N
+Formula Across Dimensions: 1D, 2D, and n-D
+The same update rule generalizes from a single decision variable to any number of decision variables — only the vector length changes. (The numbers below are a fresh, independent illustration — they do 
+not continue the specific scenario worked through later in this section.)
+Dimensionality General Formula Worked Example (random vector)
+1 variable
+(x) x_new = xᵢ + φ(xᵢ − x_k) xᵢ=3, x_k=6, φ=0.5 → x_new = 1.5
+2 variables
+(x₁,x₂)
+Pick a random dimension j∈{1,2}; x_new,ⱼ = xᵢ,ⱼ + φ(xᵢ,ⱼ − x_k,ⱼ); the other dimension 
+is copied unchanged xᵢ=(3,7), x_k=(6,4), φ=0.5, j=2 → x_new = (3, 8.5)
+n variables
+(x₁,…,xₙ)
+Pick a random dimension j∈{1,…,n}; x_new,ⱼ = xᵢ,ⱼ + φ(xᵢ,ⱼ − x_k,ⱼ); x_new,d = xᵢ,d for 
+every d≠j xᵢ=(3,7,2), x_k=(6,4,9), φ=0.5, j=2 → x_new = (3, 8.5, 2)
+MOABC · Dimensions 28
+
+PAGE 30
+M O A B C  ·  W O R K E D  E X A M P L E
+Real-Life Problem: Protein Conformation Search
+SCENARIO
+● Decision variable: x = conformation index, 1–10
+● Objective f₁(x) = 30 − 2x  — minimize folding energy (kcal/mol)
+● Objective f₂(x) = min(0.4 + 0.05x, 0.9)  — maximize structural stability
+● Lower-energy folds tend to be more stable — but the search space is rugged
+OBJECTIVE SPACE PREVIEW
+A move that improves f₁ usually worsens f₂ here (or vice-versa) — there is no single best answer, only a Pareto-optimal trade-off curve that MOABC tries to 
+map with its archive.
+MOABC · Scenario 29
+
+PAGE 31
+M O A B C  ·  F U L L  S T E P- BY - S T E P  S O L U T I O N
+Iteration 1 — Worked Solution
+1 Employed bees generate trial sources: x_new = xᵢ + φ(xᵢ−x_k), φ=0.5
+S1 (partner S2): 3+0.5(3−6)=1.5    S2 (partner S3): 6+0.5(6−9)=4.5    S3 (partner S1): 9+0.5(9−3)=12 → clipped to 10
+2 Evaluate trials: energy=30−2x, stability=min(0.4+0.05x, 0.9)
+Trial S1 (1.5): (27.0, 0.475)   Trial S2 (4.5): (21.0, 0.625)   Trial S3 (10): (10.0, 0.900)
+3 Greedy dominance test vs. the originals
+Trial S1 (27.0,0.475) vs S1 (24.0,0.550): worse on both → reject
+Trial S2 (21.0,0.625) vs S2 (18.0,0.700): worse on both → reject
+Trial S3 (10.0,0.900) vs S3 (12.0,0.850): better on both → accept, replace
+4 Update sources and archive
+S1=3 (unchanged), S2=6 (unchanged), S3=10 (replaced)
+Archive: remove (9→12.0,0.850), add (10,10.0,0.900) → still 3 points
+Result of iteration 1: S3's trial (10, 0.900) dominates the original S3 (12, 0.850) on both objectives, so S3 is replaced; S1 and S2's trials are rejected as dominated.
+MOABC · Iteration 1 30
+
+PAGE 32
+M O A B C  ·  F U L L  S T E P- BY - S T E P  S O L U T I O N
+Iteration 2 — Worked Solution
+1 New trials with rotated partners
+S1 (partner S3): 3+0.5(3−10)=−0.5 → clipped to 1    S2 (partner S1): 6+0.5(6−3)=7.5    S3 (partner S2): 10+0.5(10−7.5)=11.25 → clipped to 10
+2 Evaluate trials
+Trial S1 (1): (28.0, 0.450)   Trial S2 (7.5): (15.0, 0.775)   Trial S3 (10): (10.0, 0.900, unchanged)
+3 Greedy dominance test
+Trial S1 (28.0,0.450) vs S1 (24.0,0.550): worse on both → reject
+Trial S2 (15.0,0.775) vs S2 (18.0,0.700): better on both → accept, replace
+Trial S3 ties the bound → no change
+4 Update sources and archive
+S1=3, S2=7.5 (replaced), S3=10
+Archive: remove (6→18.0,0.700), add (7.5,15.0,0.775) → still 3 points, better spread
+Result of iteration 2: Final food sources: S1 = 3 (E=24.0, Stab=0.55), S2 = 7.5 (E=15.0, Stab=0.775), S3 = 10 (E=10.0, Stab=0.90). Only genuinely dominating trials survive the greedy 
+replacement test — every kept move above strictly improves both objectives.
+MOABC · Iteration 2 31
+
+PAGE 33
+M O A B C  ·  I T E R A T I O N  S U M M A R Y
+MOABC — Iteration-by-Iteration Table
+Iter Source x f₁ (energy) f₂ (stability) Phase Outcome
+0 S1 3 24.0 0.550 Initialize Archived
+0 S2 6 18.0 0.700 Initialize Archived
+0 S3 9 12.0 0.850 Initialize Archived
+1 S1’ trial 1.5 27.0 0.475 Employed Dominated by S1 → reject
+1 S2’ trial 4.5 21.0 0.625 Employed Dominated by S2 → reject
+1 S3’ trial 10.0 10.0 0.900 Employed Dominates S3 → replace
+2 S1’ trial 1.0 28.0 0.450 Employed Dominated by S1 → reject
+2 S2’ trial 7.5 15.0 0.775 Employed Dominates S2 → replace
+2 S3’ trial 10.0 10.0 0.900 Employed Bound reached → no changeHow the optimal set is decided: Greedy dominance: a trial food source replaces the original only when it Pareto-dominates it on both energy and stability; a trial that is merely non-dominated (a genuine trade-off) is rejected and the original source is kept.
+Final food sources: S1 = 3 (E=24.0, Stab=0.55), S2 = 7.5 (E=15.0, Stab=0.775), S3 = 10 (E=10.0, Stab=0.90). Only genuinely dominating trials survive the greedy replacement test — every kept move above strictly 
+improves both objectives.
+Iterations to fully solve: S3 improved in iteration 1 and S2 improved in iteration 2 — one genuine replacement per round; ABC is considered converged once a full round produces zero replacements (not yet reached in this 
+2-iteration excerpt).
+MOABC · Iteration Table 32
+
+PAGE 34
+M O A B C  ·  V I S U A L I Z A T I O N
+Pareto Front: Solutions in Objective Space
+Gray = the 3 initial food sources. Teal = S3's improved replacement found in iteration 1. Amber = S2's improved replacement f ound in iteration 2. The faint gray dot at (18, 0.70) is the stale, superseded S2 
+position; the × marks show trials that were correctly rejected for being dominated.
+MOABC · Pareto Front 33
+
+PAGE 35
+MOACO:
+Multi-Objective Ant Colony Optimization
+Proposed by Various extensions of Dorigo's ACO (2000s)
+Swarm Intelligence
+CORE IDEA
+Maintain two pheromone matrices, one per objective. Only ants whose completed route is non-dominated deposit pheromone, so future ants are probabilistically biased 
+toward the Pareto set and away from dominated tours.
+pᵢⱼ = [τᵢⱼ]ᵅ·[ηᵢⱼ]ᵇ / Σₗ [τᵢₗ]ᵅ·[ηᵢₗ]ᵇ   (route-construction probability; η=1/distance)
+τ_new = (1−ρ)·τ_old + Δτ,   Δτ = Q / f(route)
+ADVANTAGES
+● + Excellent for combinatorial / discrete MOO (TSP, scheduling)
+● + Two pheromone trails keep trade-offs alive
+DISADVANTAGES
+● – Slow convergence
+● – Parameter sensitive (α, β, ρ)
+Best used when: Discrete / combinatorial MOO    Avoid when: 
+Continuous decision spaces
+Parameters: ρ = 0.5 (evaporation), Q = 10 (deposit constant)     |     Complexity: O(kN²) per iteration
+MOACO · Concept 34
+
+PAGE 36
+M O A C O  ·  G E N E R A L I Z A T I O N
+Formula Across Dimensions: 1D, 2D, and n-D
+The same update rule generalizes from a single decision variable to any number of decision variables — only the vector length changes. (The numbers below are a fresh, independent illustration — they do 
+not continue the specific scenario worked through later in this section.)
+Dimensionality General Formula Worked Example (random vector)
+1 objective pair,
+single edge τ_new = (1−ρ)τ_old + Q/f(route) τ=1.0, ρ=0.5, f=10, Q=10 → τ_new = 0.5×1.0 + 10/10 = 1.50
+2 objectives
+⇒ 2 pheromone matrices
+τᵏ_new = (1−ρ)τᵏ_old + Q/fᵏ(route) for each objective k=1,2, updated on every edge 
+of the route As solved: τ¹(R1)=1.50, τ²(R1)=1.33
+k objectives,
+n-city route
+k separate n×n pheromone matrices (one per objective); every edge in the chosen 
+route gets Δτ=Q/fᵏ in each matrix k=1,…,K
+K=3 objectives (distance, time, cost) on a 5-city tour → 3 pheromone matrices of size 5×5, each updated 
+the same way
+MOACO · Dimensions 35
+
+PAGE 37
+M O A C O  ·  W O R K E D  E X A M P L E
+Real-Life Problem: Delivery TSP: Distance vs. Time
+SCENARIO
+● Fixed candidate routes over stops A–B–C–D
+● Objective f₁ = total distance (km) — minimize
+● Objective f₂ = total travel time (min) — minimize
+● R1 favors distance, R2 favors time, R3 is dominated on both
+OBJECTIVE SPACE PREVIEW
+A move that improves f₁ usually worsens f₂ here (or vice-versa) — there is no single best answer, only a Pareto-optimal trade-off curve that MOACO tries to 
+map with its archive.
+MOACO · Scenario 36
+
+PAGE 38
+M O A C O  ·  F U L L  S T E P- BY - S T E P  S O L U T I O N
+Iteration 1 — Worked Solution
+1 Construct tours and check dominance
+R1(10,12), R2(12,10), R3(14,14)
+R3 vs R1 and vs R2: worse on both objectives → dominated; R1, R2 are mutually non-dominated
+2 Assign one ant per route and apply the deposit rule
+Only R1, R2 (non-dominated) deposit Δτ=Q/f; R3 deposits nothing
+Δτ(R1)=(10/10,10/12)=(1.00,0.83)     Δτ(R2)=(10/12,10/10)=(0.83,1.00)
+3 Update pheromone: τ_new=(1−ρ)τ_old+Δτ, ρ=0.5
+τ(R1)=0.5×1+1.00=1.50 / 0.5×1+0.83=1.33     τ(R2)=0.5×1+0.83=1.33 / 0.5×1+1.00=1.50
+τ(R3)=0.5×1+0=0.50 / 0.50
+4 Result
+R1 and R2 both reinforced; R3 already decaying toward zero
+Result of iteration 1: R1 and R2 (non-dominated) both deposit pheromone and rise to 1.50/1.33; R3 (dominated) deposits nothing and starts decaying to 0.50.
+MOACO · Iteration 1 37
+
+PAGE 39
+M O A C O  ·  F U L L  S T E P- BY - S T E P  S O L U T I O N
+Iteration 2 — Worked Solution
+1 Ants sample routes using pheromone-weighted probability (pᵢⱼ formula above)
+Higher τ on R1/R2 raise their pᵢⱼ, making them more likely; Ant1→R1, Ant2→R2, Ant3→R2 (R3 now discouraged)
+(Full pᵢⱼ values need every edge's τ and η; this walkthrough shows the resulting sampled routes directly to keep the arithmetic focusedon the pheromone update.)
+2 Apply the deposit rule
+R1 (1 ant): Δτ=(1.00,0.83)     R2 (2 ants): Δτ=(0.83+0.83,1.00+1.00)=(1.67,2.00)     R3 (0 ants): Δτ=(0,0)
+3 Update pheromone
+τ(R1)=0.5×1.50+1.00=1.75 / 0.5×1.33+0.83=1.50
+τ(R2)=0.5×1.33+1.67=2.34 / 0.5×1.50+2.00=2.75     τ(R3)=0.5×0.50=0.25 / 0.25
+4 Result
+R2 is now the most reinforced route (2 ants chose it); R3's pheromone is nearly abandoned
+Pareto route archive = {R1, R2}
+Result of iteration 2: Pareto-optimal route archive = {R1(10,12), R2(12,10)}. Pheromone on R3 decays toward zero across iterations because dominated routes never deposit —
+this is exactly how MOACO prunes inferior tours while reinforcing the distance/time trade-off.
+MOACO · Iteration 2 38
+
+PAGE 40
+M O A C O  ·  I T E R A T I O N  S U M M A R Y
+MOACO — Iteration-by-Iteration Table
+Iter Route f₁ (distance) f₂ (time) Ants on route τ₁ (new) τ₂ (new) Status
+0 R1 (A-B-C-D) 10 12 — 1.00 1.00 Non-dominated
+0 R2 (A-C-B-D) 12 10 — 1.00 1.00 Non-dominated
+0 R3 (A-B-D-C) 14 14 — 1.00 1.00 Dominated by R1 & R2
+1 R1 10 12 1 1.50 1.33 Deposits (non-dom)
+1 R2 12 10 1 1.33 1.50 Deposits (non-dom)
+1 R3 14 14 1 0.50 0.50 No deposit (dominated)
+2 R1 10 12 1 1.75 1.50 Deposits (non-dom)
+2 R2 12 10 2 2.34 2.75 Reinforced (non-dom)
+2 R3 14 14 0 0.25 0.25 Abandoned (dominated)
+How the optimal set is decided: Only ants that complete a non-dominated route deposit pheromone; dominated routes receive zero deposit and their pheromone simply evaporates, so future ants are 
+probabilistically steered away from them.
+Pareto-optimal route archive = {R1(10,12), R2(12,10)}. Pheromone on R3 decays toward zero across iterations because dominated routes never deposit — this is exactly how MOACO prunes inferior tours while 
+reinforcing the distance/time trade-off.
+Iterations to fully solve: R3's pheromone fell from 1.00 → 0.50 → 0.25 in two iterations while R2's rose to 2.75/2.34 from reinforcement — the colony typically needs several more iterations before pheromone on 
+dominated routes effectively reaches zero.
+MOACO · Iteration Table 39
+
+PAGE 41
+M O A C O  ·  V I S U A L I Z A T I O N
+Pareto Front: Solutions in Objective Space
+R1 and R2 are non-dominated from the very first tour construction and stay in the archive across both iterations — only their pheromone strength changes. R3 (×) is dominated by both and never enters the 
+archive at all.
+MOACO · Pareto Front 40
+
+PAGE 42
+MOSA:
+Multi-Objective Simulated Annealing
+Proposed by Multiple extensions of Kirkpatrick's SA (2000s)
+Physics-Inspired
+CORE IDEA
+A single search agent explores via random neighbors. Non-dominated neighbors are always accepted; dominated neighbors are accepted with Boltzmann probability; a 
+cooling schedule gradually tightens acceptance of worse moves.
+P(accept dominated move) = exp(−ΔE / T),   ΔE = Σₘ (fₘ_neighbor − fₘ_current)  summed only over worsened objectives
+T_{k+1} = α·T_k
+ADVANTAGES
+● + Excellent diversity
+● + Escapes local optima well
+DISADVANTAGES
+● – Slow convergence
+● – Cooling schedule needs careful tuning
+Best used when: Highly multimodal MOO    Avoid when: 
+Fast results are the priority
+Parameters: T₀ = 100, α = 0.9     |     Complexity: O(kN) per iteration
+MOSA · Concept 41
+
+PAGE 43
+M O S A  ·  G E N E R A L I Z A T I O N
+Formula Across Dimensions: 1D, 2D, and n-D
+The same update rule generalizes from a single decision variable to any number of decision variables — only the vector length changes. (The numbers below are a fresh, independent illustration — they do 
+not continue the specific scenario worked through later in this section.)
+Dimensionality General Formula Worked Example (random vector)
+1 variable
+(x) x_new = x + Δ x=10, Δ=3 → x_new = 13
+2 variables
+(x₁,x₂) x_new = (x₁+Δ₁, x₂+Δ₂) x=(10,5), Δ=(3,−1) → x_new = (13, 4)
+n variables
+(x₁,…,xₙ)
+x_new = x + Δ, where Δ=(Δ₁,…,Δₙ) is a random perturbation vector; the acceptance 
+test P=exp(−ΔE/T) is unchanged regardless of n x=(10,5,2), Δ=(3,−1,0.5) → x_new = (13, 4, 2.5)
+MOSA · Dimensions 42
+
+PAGE 44
+M O S A  ·  W O R K E D  E X A M P L E
+Real-Life Problem: VLSI Chip Layout
+SCENARIO
+● Decision variable: x = layout compaction parameter, 5–25
+● Objective f₁(x) = 30 − x  — minimize die area (mm²)
+● Objective f₂(x) = 5 + 0.5x  — minimize power draw (W)
+● Tighter layouts shrink area but raise power density
+OBJECTIVE SPACE PREVIEW
+A move that improves f₁ usually worsens f₂ here (or vice-versa) — there is no single best answer, only a Pareto-optimal trade-off curve that MOSA tries to map 
+with its archive.
+MOSA · Scenario 43
+
+PAGE 45
+M O S A  ·  F U L L  S T E P- BY - S T E P  S O L U T I O N
+Iteration 1 — Worked Solution
+1 Generate a random neighbor of the current solution x=10
+x_new = 13 (a small random perturbation)
+2 Evaluate objectives f₁=30−x, f₂=5+0.5x
+Current (10): (20.0, 10.0)     Neighbor (13): (17.0, 11.5)
+3 Compare via dominance
+Area better (17.0<20.0) but power worse (11.5>10.0) → neither dominates → non-dominated
+4 Apply acceptance rule and cool
+Non-dominated neighbors are always accepted → current becomes x=13; archive = {(20,10),(17,11.5)}
+Cool: T₁ = 0.9×100 = 90
+Result of iteration 1: The neighbor at x=13 is non-dominated vs. the current x=10, so it is accepted unconditionally; the archive grows to 2 points and temperature cools to 90.
+MOSA · Iteration 1 44
+
+PAGE 46
+M O S A  ·  F U L L  S T E P- BY - S T E P  S O L U T I O N
+Iteration 2 — Worked Solution
+1 Generate a neighbor of the new current solution x=13
+x_new = 15
+2 Evaluate objectives
+Current (13): (17.0, 11.5)     Neighbor (15): (15.0, 12.5)
+3 Compare via dominance
+Area better (15.0<17.0) but power worse (12.5>11.5) → non-dominated
+4 Apply acceptance rule and cool
+Accepted unconditionally → current becomes x=15; archive = {(20,10),(17,11.5),(15,12.5)}
+Cool: T₂ = 0.9×90 = 81
+Result of iteration 2: Pareto archive of chip layouts = {(Area=20,Power=10), (17,11.5), (15,12.5)}. Every accepted move above is non-dominated relative to the point it replaced, 
+so the archive simply grows; MOSA's Boltzmann test only kicks in once a neighbor is dominated.
+MOSA · Iteration 2 45
+
+PAGE 47
+M O S A  ·  I T E R A T I O N  S U M M A R Y
+MOSA — Iteration-by-Iteration Table
+Iter Current x Neighbor x f₁ (area) f₂ (power) vs. Current Temperature T Decision
+0 — 10 20.0 10.0 — 100 Initial solution
+1 10 13 17.0 11.5 Non-dominated 90 Accept (always)
+2 13 15 15.0 12.5 Non-dominated 81 Accept (always)
+How the optimal set is decided: A neighbor that is non-dominated relative to the current solution is always accepted (it grows the archive); a dominated neighbor is accepted only with probability exp(−ΔE/T), 
+and the cooling temperature T falls every iteration so bad moves become progressively less likely.
+Pareto archive of chip layouts = {(Area=20,Power=10), (17,11.5), (15,12.5)}. Every accepted move above is non-dominated relative to the point it replaced, so the archive simply grows; MOSA's Boltzmann test only 
+kicks in once a neighbor is dominated.
+Iterations to fully solve: Both iterations here produced non-dominated neighbors, so every move was accepted outright; MOSA is considered converged once th e acceptance rate for dominated moves falls near zero as 
+T→0, which typically takes tens of cooling steps in practice.
+What if a neighbor HAD been dominated?: Every neighbor tried above sits exactly on the area–power trade-off line (f₂=5+0.5f₁), so none can ever dominate another. A dominated neighbor would need to be worse 
+on BOTH objectives — e.g. a poorly-laid-out x that gives (23.0,12.0) versus the current (20.0,10.0): ΔE=(23.0−20.0)+(12.0−10.0)=5.0. Early on (T=100): P=exp(−5.0/100)=0.951 (almost always accepted, encouraging 
+exploration). Late in the run (T=1): P=exp(−5.0/1)≈0.007 (almost always rejected) — this is exactly how cooling shifts MOSA from “accept nearly anything” toward “accept only genuine improvements."
+MOSA · Iteration Table 46
+
+PAGE 48
+M O S A  ·  V I S U A L I Z A T I O N
+Pareto Front: Solutions in Objective Space
+Gray = the starting chip layout. Teal = the layout accepted in iteration 1. Amber = the layout accepted in iteration 2. Every neighbor tried here was non-dominated relative to the current point, so each move 
+was accepted outright and the archive simply grew along the trade-off curve.
+MOSA · Pareto Front 47
+
+PAGE 49
+MODE:
+Multi-Objective Differential Evolution
+Proposed by Xue, Sanderson & Graves (2003)
+Evolutionary
+CORE IDEA
+Apply DE mutation and crossover to generate a trial vector for each target; the trial replaces the target only if it Pareto-dominates it — otherwise the target survives and 
+the (non-dominated) trial simply enriches the archive.
+V = X_r1 + F·(X_r2 − X_r3)
+U = crossover(X_target, V , CR); replace target only if U dominates it
+ADVANTAGES
+● + Very fast convergence
+● + Excels on continuous, smooth objectives
+DISADVANTAGES
+● – Needs F and CR tuned
+Best used when: Continuous MOO, fast results needed    Avoid when: 
+Discrete problems
+Parameters: F = 0.5 (iter 1), F = 0.6 (iter 2); single-variable case so the trial always inherits the mutant     |     Complexity: O(kN) per iteration
+MODE · Concept 48
+
+PAGE 50
+M O D E  ·  G E N E R A L I Z A T I O N
+Formula Across Dimensions: 1D, 2D, and n-D
+The same update rule generalizes from a single decision variable to any number of decision variables — only the vector length changes. (The numbers below are a fresh, independent illustration — they do 
+not continue the specific scenario worked through later in this section.)
+Dimensionality General Formula Worked Example (random vector)
+1 variable
+(x)
+V = X_r1 + F(X_r2 − X_r3)
+Crossover: with only 1 gene, i_rand always selects it → U = V unconditionally X_r1=4, X_r2=8, X_r3=2, F=0.5 → V = 4+0.5(8−2) = 7.0 → U = V = 7.0
+2 variables
+(x₁,x₂)
+Vᵢ = X_r1,ᵢ + F(X_r2,ᵢ − X_r3,ᵢ), i=1,2
+Crossover: Uᵢ = Vᵢ if randᵢ≤CR (or i=i_rand, forced); else Uᵢ = X_target,ᵢ  (randᵢ drawn 
+independently per dimension)
+X_r1=(4,10), X_r2=(8,2), X_r3=(2,5), F=0.5 → V=(7.0,8.5). Target=(6,3), CR=0.6, rand=(0.3,0.8), i_rand=1 
+→ U=(7.0, 3.0)  [dim 1 from mutant (rand≤CR); dim 2 keeps target (rand>CR)]
+n variables
+(x₁,…,xₙ)
+Vᵢ = X_r1,ᵢ + F(X_r2,ᵢ − X_r3,ᵢ) for every i=1,…,n
+Crossover: Uᵢ = Vᵢ if randᵢ≤CR (or i=i_rand); else Uᵢ = X_target,ᵢ  (rand = 
+(rand₁,…,randₙ), fresh draw per gene)
+X_r1=(4,10,6), X_r2=(8,2,9), X_r3=(2,5,3), F=0.5 → V=(7.0,8.5,9.0). Target=(5,9,4), CR=0.7, 
+rand=(0.42,0.85,0.75), i_rand=2 → U=(7.0, 8.5, 4.0)  [dims 1,2 from mutant; dim 3 keeps target since 
+rand₃=0.75>CR]
+MODE · Dimensions 49
+
+PAGE 51
+M O D E  ·  W O R K E D  E X A M P L E
+Real-Life Problem: Antenna Design
+SCENARIO
+● Decision variable: x = antenna size parameter, 2–20
+● Objective f₁(x) = x  — minimize physical size
+● Objective f₂(x) = 2 + 0.3x  — maximize signal gain
+● Bigger antennas give more gain but cost more space and material
+OBJECTIVE SPACE PREVIEW
+A move that improves f₁ usually worsens f₂ here (or vice-versa) — there is no single best answer, only a Pareto-optimal trade-off curve that MODE tries to map 
+with its archive.
+MODE · Scenario 50
+
+PAGE 52
+M O D E  ·  F U L L  S T E P- BY - S T E P  S O L U T I O N
+Iteration 1 — Worked Solution
+1 Mutate: V = X_r1 + F(X_r2−X_r3), F=0.5
+X1=4 (r1=X2,r2=X3,r3=X4): V=8+0.5(12−16)=6.0
+X2=8: V=12+0.5(16−4)=18.0     X3=12: V=16+0.5(4−8)=14.0     X4=16: V=4+0.5(8−12)=2.0
+2 Crossover (single variable ⇒ trial = mutant)
+U1=6.0, U2=18.0, U3=14.0, U4=2.0
+3 Evaluate trials f₁=size, f₂=2+0.3·size
+U1:(6.0,3.8)  U2:(18.0,7.4)  U3:(14.0,6.2)  U4:(2.0,2.6)
+4 Selection: replace target only if trial dominates it
+Every trial is non-dominated vs. its target (better size, worse gain, or vice-versa) → all 4 targets survive unchanged
+All 4 trials are archived → archive 4 → 8
+Result of iteration 1: All four DE trials are non-dominated vs. their targets, so every target survives unchanged while all 4 trials are added — archive grows from 4 to 8.
+MODE · Iteration 1 51
+
+PAGE 53
+M O D E  ·  F U L L  S T E P- BY - S T E P  S O L U T I O N
+Iteration 2 — Worked Solution
+1 Mutate again with F=0.6
+X1: V=16+0.6(12−8)=18.4     X2: V=4+0.6(16−12)=6.4
+X3: V=8+0.6(4−16)=0.8 → clipped to 2.0     X4: V=12+0.6(8−4)=14.4
+2 Crossover
+U1=18.4, U2=6.4, U3=2.0, U4=14.4
+3 Evaluate trials
+U1:(18.4,7.52)  U2:(6.4,3.92)  U3:(2.0,2.60) [duplicate of an iter-1 trial]  U4:(14.4,6.32)
+4 Selection
+Again every trial is non-dominated vs. its target → targets unchanged
+3 new unique trials archived (U3 is a duplicate) → archive 8 → 11
+Result of iteration 2: 11-point archive spans size 2–18.4 (gain 2.6–7.52). Because size and gain trade off monotonically, no trial ever dominates its target on this problem —
+MODE's real contribution is steadily enriching the archive, exactly what an archive-based MOEA is for.
+MODE · Iteration 2 52
+
+PAGE 54
+M O D E  ·  I T E R A T I O N  S U M M A R Y
+MODE — Iteration-by-Iteration Table
+Iter Target Mutant V Trial U (x) f₁ (size) f₂ (gain) vs. Target Outcome
+1 X1 = 4 8+0.5(12−16)=6.0 6.00 6.00 3.80 Non-dominated Target kept, trial archived
+1 X2 = 8 12+0.5(16−4)=18.0 18.00 18.00 7.40 Non-dominated Target kept, trial archived
+1 X3 = 12 16+0.5(4−8)=14.0 14.00 14.00 6.20 Non-dominated Target kept, trial archived
+1 X4 = 16 4+0.5(8−12)=2.0 2.00 2.00 2.60 Non-dominated Target kept, trial archived
+2 X1 = 4 16+0.6(12−8)=18.4 18.40 18.40 7.52 Non-dominated Target kept, trial archived
+2 X2 = 8 4+0.6(16−12)=6.4 6.40 6.40 3.92 Non-dominated Target kept, trial archived
+2 X3 = 12 8+0.6(4−16)=0.8→clip 2 2.00 2.00 2.60 Non-dominated Duplicate of iter-1 trial
+2 X4 = 16 12+0.6(8−4)=14.4 14.40 14.40 6.32 Non-dominated Target kept, trial archived
+How the optimal set is decided: A trial vector replaces its target only if it Pareto-dominates the target on every objective; if the trial is merely non-dominated, the target survives unchanged and the trial is 
+simply added to the archive as an extra sampled point.
+11-point archive spans size 2–18.4 (gain 2.6–7.52). Because size and gain trade off monotonically, no trial ever dominates its target on this problem — MODE's real contribution is steadily enriching the archive, 
+exactly what an archive-based MOEA is for.
+Iterations to fully solve: No target was ever replaced in either iteration because size and gain trade off monotonically here; MODE is considered conver ged in practice once the archive's hypervolume stops growing between 
+generations.
+MODE · Iteration Table 53
+
+PAGE 55
+M O D E  ·  V I S U A L I Z A T I O N
+Pareto Front: Solutions in Objective Space
+Gray = the 4 initial target vectors. Teal = the 4 trial vectors generated in iteration 1 (all non-dominated, so all archived alongside their targets). Amber = the 3 new unique trials from iteration 2. No target is 
+ever replaced because every trial lands back on the same size–gain curve.
+MODE · Pareto Front 54
+
+PAGE 56
+MO-TLBO:
+Multi-Objective Teaching-Learning-Based Optimization
+Proposed by Rao & Patel (2013)
+Human-Behavior-Inspired
+CORE IDEA
+Teacher phase pulls every learner toward a crowding-distance-selected archive leader (the "teacher"), scaled by how far the class mean already is from that teacher. 
+Learner phase then compares random pairs and keeps only non-dominated moves. No algorithm-specific parameters beyond population size.
+X_new = X + r·(X_teacher − T_F×X_mean)
+ADVANTAGES
+● + No algorithm-specific parameters to tune
+● + Simple to implement
+DISADVANTAGES
+● – Slower convergence
+● – Multi-objective version still needs an external archive
+Best used when: A parameter-free MOO method is preferred    Avoid when: 
+Fast results are the priority
+Parameters: r = 0.5 (fixed); teaching factor T_F = 2 (iter 1), T_F = 1 (iter 2)     |     Complexity: O(kN) per iteration
+MO-TLBO · Concept 55
+
+PAGE 57
+MO - T L B O  ·  G E N E R A L I Z A T I O N
+Formula Across Dimensions: 1D, 2D, and n-D
+The same update rule generalizes from a single decision variable to any number of decision variables — only the vector length changes. (The numbers below are a fresh, independent illustration — they do 
+not continue the specific scenario worked through later in this section.)
+Dimensionality General Formula Worked Example (random vector)
+1 variable
+(x)
+X_new = X + r(X_teacher − T_F×X_mean)  (r ∈ [0,1] single random draw — only 1 
+dimension exists; T_F ∈ {1,2} is one shared random draw per learner) X=2, teacher=7, mean=5.75, r=0.5, T_F=2 → X_new = 2+0.5(7−2×5.75) = −0.25 → clipped to 0
+2 variables
+(x₁,x₂)
+X_new,ᵢ = Xᵢ + rᵢ(X_teacher,ᵢ − T_F×X_mean,ᵢ), i=1,2  (rᵢ drawn independently PER 
+DIMENSION; T_F stays one shared draw for the whole learner) X=(2,5), teacher=(7,9), mean=(5,6), r=(0.5,0.7), T_F=1 → X_new = (2+0.5(7−5), 5+0.7(9−6)) = (3.0, 7.1)
+n variables
+(x₁,…,xₙ)
+X_new,ᵢ = Xᵢ + rᵢ(X_teacher,ᵢ − T_F×X_mean,ᵢ) for every i=1,…,n  (r = (r₁,…,rₙ), fresh 
+draw per gene; T_F still one shared draw per learner) X=(2,5,1), teacher=(7,9,4), mean=(5,6,3), r=(0.5,0.7,0.3), T_F=1 → X_new = (3.0, 7.1, 1.3)
+MO-TLBO · Dimensions 56
+
+PAGE 58
+MO - T L B O  ·  W O R K E D  E X A M P L E
+Real-Life Problem: University Course Scheduling
+SCENARIO
+● Decision variable: x = schedule shift index, 0–10
+● Objective f₁(x) = 5 + x  — minimize total scheduling conflicts (time)
+● Objective f₂(x) = 2 + 0.4x  — maximize student satisfaction
+● Shifting classes later raises satisfaction but creates more conflicts
+OBJECTIVE SPACE PREVIEW
+A move that improves f₁ usually worsens f₂ here (or vice-versa) — there is no single best answer, only a Pareto-optimal trade-off curve that MO-TLBO tries to 
+map with its archive.
+MO-TLBO · Scenario 57
+
+PAGE 59
+MO - T L B O  ·  F U L L  S T E P- BY - S T E P  S O L U T I O N
+Iteration 1 — Worked Solution
+1 Compute the class mean and pick the teacher
+Mean = (2+5+7+9)/4 = 5.75
+Archive-crowding picks L3 (x=7, highest satisfaction) as teacher
+2 Apply the teacher-phase update: X_new=X+r(X_teacher−T_F×X_mean), r=0.5, T_F=2
+T_F = round(1+rand(0,1)) ∈ {1,2} is redrawn randomly each iteration; this run drew T_F=2
+Shift = 0.5×(7−2×5.75) = 0.5×(−4.5) = −2.25  (applied to every non-teacher learner)
+3 Update each learner (clip at the lower bound 0)
+L1: 2−2.25=−0.25 → 0.00     L2: 5−2.25=2.75     L4: 9−2.25=6.75     (L3 stays at 7)
+4 Evaluate & learner-phase check (f₁=5+x, f₂=2+0.4x)
+L1(0):(5.0,2.0)  L2(2.75):(7.75,3.1)  L4(6.75):(11.75,4.7) — all non-dominated vs. classmates → kept
+Archive: 4 → 7
+Result of iteration 1: Teacher-phase shift of −2.25 moves L1, L2, L4 toward the teacher L3; all new positions are non-dominated vs. classmates and are kept — archive grows from 
+4 to 7.
+MO-TLBO · Iteration 1 58
+
+PAGE 60
+MO - T L B O  ·  F U L L  S T E P- BY - S T E P  S O L U T I O N
+Iteration 2 — Worked Solution
+1 Recompute the class mean with the new positions
+Mean = (0+2.75+7+6.75)/4 = 4.125
+2 Apply the teacher-phase update with a smaller drawn value, T_F=1
+Shift = 0.5×(7−1×4.125) = 0.5×2.875 = 1.4375
+3 Update each learner
+L1: 0+1.4375=1.4375     L2: 2.75+1.4375=4.1875     L4: 6.75+1.4375=8.1875     (L3 stays at 7)
+4 Evaluate & learner-phase check
+L1:(6.44,2.58)  L2:(9.19,3.68)  L4:(13.19,5.28) — all non-dominated vs. classmates → kept
+Archive: 7 → 10
+Result of iteration 2: Archive after 2 iterations = {0, 1.44, 2, 2.75, 4.19, 5, 6.75, 7, 8.19, 9} — 10 non-dominated schedules spanning time 5–14 and satisfaction 2.0–5.6. The 
+teacher (L3) anchors the high-satisfaction end while a shrinking T_F reins in how hard the rest of the class is pulled each round.
+MO-TLBO · Iteration 2 59
+
+PAGE 61
+MO - T L B O  ·  I T E R A T I O N  S U M M A R Y
+MO-TLBO — Iteration-by-Iteration Table
+Iter Learner Class mean T_F New x f₁ (time) f₂ (satisf.) Role
+0 L1 — — 2.00 7.00 2.80 Learner
+0 L2 — — 5.00 10.00 4.00 Learner
+0 L3 — — 7.00 12.00 4.80 Teacher (archive leader)
+0 L4 — — 9.00 14.00 5.60 Learner
+1 L1 5.75 2 0.00 5.00 2.00 Updated (clipped at 0)
+1 L2 5.75 2 2.75 7.75 3.10 Updated
+1 L4 5.75 2 6.75 11.75 4.70 Updated
+2 L1 4.125 1 1.44 6.44 2.58 Updated
+2 L2 4.125 1 4.19 9.19 3.68 Updated
+2 L4 4.125 1 8.19 13.19 5.28 Updated
+How the optimal set is decided: Every learner moves toward the crowding-selected 'teacher' by an amount scaled by the teaching factor T_F; the learner phase then keeps a move only if it is non-dominated 
+against a random classmate.
+Archive after 2 iterations = {0, 1.44, 2, 2.75, 4.19, 5, 6.75, 7, 8.19, 9} — 10 non-dominated schedules spanning time 5–14 and satisfaction 2.0–5.6. The teacher (L3) anchors the high-satisfaction end while a shrinking 
+T_F reins in how hard the rest of the class is pulled each round.
+Iterations to fully solve: T_F shrank from 2 to 1 between iterations, pulling the class more gently toward the teacher each round; MO -TLBO is considered converged once the class mean stops moving and T_F draws no 
+longer change any learner's position.
+MO-TLBO · Iteration Table 60
+
+PAGE 62
+MO - T L B O  ·  V I S U A L I Z A T I O N
+Pareto Front: Solutions in Objective Space
+Gray = the initial class of 4 learners (L3 is the fixed teacher). Teal = the 3 learners' new positions after the iteration-1 teaching shift. Amber = their positions after the smaller iteration-2 shift. The class visibly 
+contracts toward the teacher's high-satisfaction end each round.
+MO-TLBO · Pareto Front 61
+
+PAGE 63
+MOBA:
+Multi-Objective Bat Algorithm
+Proposed by Yang (2011), extended to MOO
+Swarm Intelligence
+CORE IDEA
+Each bat's frequency-driven velocity is pulled toward (or, for diversity, away from) a crowding-selected archive best. Loudness decays over time, shifting the swarm from 
+exploration to exploitation. (The full algorithm also raises each bat's pulse-emission rate r toward 1 in step with the loudness decay, biasing later iterations toward small 
+local moves near the best solutions — this walkthrough tracks only loudness A since r doesn't change which points enter the archive.)
+fᵢ = f_min + (f_max−f_min)β
+v = v + (x_best − x)·fᵢ;  x_new = x + v
+A_{t+1} = α·A_t
+ADVANTAGES
+● + Good exploration–exploitation balance
+● + Fast
+DISADVANTAGES
+● – Sensitive to frequency range and loudness decay rate
+Best used when: Continuous MOO    Avoid when: 
+Discrete problems
+Parameters: f_min=0, f_max=2, β=0.2 ⇒ fᵢ=0.4;  A₀=1.0, α=0.9     |     Complexity: O(kN) per iteration
+MOBA · Concept 62
+
+PAGE 64
+M O B A  ·  G E N E R A L I Z A T I O N
+Formula Across Dimensions: 1D, 2D, and n-D
+The same update rule generalizes from a single decision variable to any number of decision variables — only the vector length changes. (The numbers below are a fresh, independent illustration — they do 
+not continue the specific scenario worked through later in this section.)
+Dimensionality General Formula Worked Example (random vector)
+1 variable
+(x) v = v + (x_best − x)fᵢ;  x_new = x + v x=5, x_best=15, fᵢ=0.4, v=0 → v_new=4.0 → x_new=9.0
+2 variables
+(x₁,x₂) vᵢ = vᵢ + (x_best,ᵢ − xᵢ)fᵢ, i=1,2 (frequency fᵢ is one scalar shared by both dimensions) x=(5,10), x_best=(15,4), fᵢ=0.4 → v=(4.0,−2.4) → x_new=(9.0, 7.6)
+n variables
+(x₁,…,xₙ) vᵢ = vᵢ + (x_best,ᵢ − xᵢ)fᵢ for every i=1,…,n x=(5,10,2), x_best=(15,4,8), fᵢ=0.4 → v=(4.0,−2.4,2.4) → x_new=(9.0, 7.6, 4.4)
+MOBA · Dimensions 63
+
+PAGE 65
+M O B A  ·  W O R K E D  E X A M P L E
+Real-Life Problem: Wireless Sensor Network Placement
+SCENARIO
+● Decision variable: x = number of sensors deployed, 4–20
+● Objective f₁(x) = x  — minimize deployment cost
+● Objective f₂(x) = min(5x, 95)  — maximize area coverage (%)
+● More sensors raise coverage but the budget is limited
+OBJECTIVE SPACE PREVIEW
+A move that improves f₁ usually worsens f₂ here (or vice-versa) — there is no single best answer, only a Pareto-optimal trade-off curve that MOBA tries to map 
+with its archive.
+MOBA · Scenario 64
+
+PAGE 66
+M O B A  ·  F U L L  S T E P- BY - S T E P  S O L U T I O N
+Iteration 1 — Worked Solution
+1 Set frequency fᵢ=f_min+(f_max−f_min)β = 0+2×0.2 = 0.4 for all bats
+2 Update velocity v=v+(x_best−x)fᵢ
+B1,B2 target x_best=15 (exploit): v_B1=(15−5)×0.4=4.0, v_B2=(15−10)×0.4=2.0
+B3 targets x_best=5 (explore): v_B3=(5−15)×0.4=−4.0
+3 Update position x_new=x+v
+B1: 5+4=9.0     B2: 10+2=12.0     B3: 15−4=11.0
+4 Evaluate & update loudness (f₁=cost=x, f₂=coverage=5x)
+B1:(9.0,45.0)  B2:(12.0,60.0)  B3:(11.0,55.0) — all non-dominated vs. archive → archive 3→6
+Loudness: A₁=0.9×1.0=0.90
+Result of iteration 1: B1 and B2 move toward the high-coverage bat (x=15) while B3 is pushed toward the low-cost bat (x=5); all three new points are non-dominated — archive 
+grows from 3 to 6.
+MOBA · Iteration 1 65
+
+PAGE 67
+M O B A  ·  F U L L  S T E P- BY - S T E P  S O L U T I O N
+Iteration 2 — Worked Solution
+1 Same frequency, fᵢ=0.4
+2 Update velocity (carries forward v_old)
+B1: v=4.0+(15−9)×0.4=6.4     B2: v=2.0+(15−12)×0.4=3.2     B3: v=−4.0+(5−11)×0.4=−6.4
+3 Update position
+B1: 9+6.4=15.4     B2: 12+3.2=15.2     B3: 11−6.4=4.6
+4 Evaluate & update loudness
+B1:(15.4,77.0)  B2:(15.2,76.0)  B3:(4.6,23.0) — all non-dominated → archive 6→9
+Loudness: A₂=0.9×0.90=0.81
+Result of iteration 2: 9-point archive spans cost 4.6–15.4 sensors (coverage 23%–77%). B1 and B2 exploit toward the high-coverage extreme while B3 is deliberately steered 
+toward the low-cost extreme, keeping both ends of the trade-off populated even as loudness decays.
+MOBA · Iteration 2 66
+
+PAGE 68
+M O B A  ·  I T E R A T I O N  S U M M A R Y
+MOBA — Iteration-by-Iteration Table
+Iter Bat x v f₁ (cost) f₂ (coverage) x_best target Loudness A
+0 B1 5.0 0.0 5.0 25.0 — 1.00
+0 B2 10.0 0.0 10.0 50.0 — 1.00
+0 B3 15.0 0.0 15.0 75.0 — 1.00
+1 B1 9.0 4.0 9.0 45.0 15 (exploit) 0.90
+1 B2 12.0 2.0 12.0 60.0 15 (exploit) 0.90
+1 B3 11.0 -4.0 11.0 55.0 5 (diversify) 0.90
+2 B1 15.4 6.4 15.4 77.0 15 (exploit) 0.81
+2 B2 15.2 3.2 15.2 76.0 15 (exploit) 0.81
+2 B3 4.6 -6.4 4.6 23.0 5 (diversify) 0.81
+How the optimal set is decided: Bats near the archive's high-coverage extreme are pulled toward it (exploitation); at least one bat is deliberately pulled toward the low-cost extreme (exploration) — every 
+resulting position that is non-dominated is added to the archive, and loudness decays each round.
+9-point archive spans cost 4.6–15.4 sensors (coverage 23%–77%). B1 and B2 exploit toward the high-coverage extreme while B3 is deliberately steered toward the low-cost extreme, keeping both ends of the trade-
+off populated even as loudness decays.
+Iterations to fully solve: Loudness fell from 1.00 → 0.90 → 0.81 across the two iterations shown; MOBA is considered converged once loudness approaches zero and bats stop moving, which takes many more iterations 
+than shown here.
+MOBA · Iteration Table 67
+
+PAGE 69
+M O B A  ·  V I S U A L I Z A T I O N
+Pareto Front: Solutions in Objective Space
+Gray = the 3 initial bat positions. Teal = iteration 1 (B1, B2 exploiting toward high coverage; B3 exploring toward low cost) . Amber = iteration 2, pushing both extremes further apart while loudness decays 
+from 1.00 to 0.81.
+MOBA · Pareto Front 68
+
+PAGE 70
+MOMA:
+Multi-Objective Memetic Algorithm
+Proposed by Various — NSGA-II + local search hybrids
+Hybrid (Evolutionary + Local Search)
+CORE IDEA
+Run one generation of NSGA-II-style crossover, then apply hill-climbing local search to the least-crowded individuals; a local move is accepted only if it improves a 
+combined score, giving global exploration and local exploitation in the same loop.
+score = −Δf₁ + Δf₂   (accept local-search step if score > 0)
+ADVANTAGES
+● + Combines global (EA) and local (hill-climb) search
+● + Excellent final convergence quality
+DISADVANTAGES
+● – Computationally expensive
+● – More complex to implement and tune
+Best used when: A high-quality Pareto front is worth the extra compute    Avoid when: 
+Computational budget is tightly limited
+Parameters: Local-search step = ±1; NSGA-II population = 4     |     Complexity: O(kN²) + local-search cost
+MOMA · Concept 69
+
+PAGE 71
+M O M A  ·  G E N E R A L I Z A T I O N
+Formula Across Dimensions: 1D, 2D, and n-D
+The same update rule generalizes from a single decision variable to any number of decision variables — only the vector length changes. (The numbers below are a fresh, independent illustration — they do 
+not continue the specific scenario worked through later in this section.)
+Dimensionality General Formula Worked Example (random vector)
+1 variable
+(x) x_new = x ± 1;  score = −Δf₁ + Δf₂ x=4→3: score=+0.7 → accept
+2 variables
+(x₁,x₂) Perturb one randomly chosen dimension: x_new=(x₁±1,x₂) or (x₁,x₂±1) x=(4,7)→(4,8): recompute Δf₁,Δf₂ and apply the same score test
+n variables
+(x₁,…,xₙ)
+Coordinate-descent style: pick random dimension j, x_new,ⱼ=xⱼ±step, all other 
+dimensions fixed; the score test is unchanged x=(4,7,2) → perturb dim 2 → (4,8,2): apply score=−Δf₁+Δf₂ test
+MOMA · Dimensions 70
+
+PAGE 72
+M O M A  ·  W O R K E D  E X A M P L E
+Real-Life Problem: Container Stowage Planning
+SCENARIO
+● Decision variable: x = stowage configuration index, 0–15
+● Objective f₁(x) = x  — minimize crane shuffles required
+● Objective f₂(x) = 2 + 0.3x  — maximize vessel stability
+● Reshuffling less tends to leave a less-stable load distribution
+OBJECTIVE SPACE PREVIEW
+A move that improves f₁ usually worsens f₂ here (or vice-versa) — there is no single best answer, only a Pareto-optimal trade-off curve that MOMA tries to 
+map with its archive.
+MOMA · Scenario 71
+
+PAGE 73
+M O M A  ·  F U L L  S T E P- BY - S T E P  S O L U T I O N
+Iteration 1 — Worked Solution
+1 Apply hill-climbing to the least-crowded individuals, P1 and P4
+Try P1 at x=4: score=−(4−3)+(3.2−2.9)=−0.7 → reject
+Try P1 at x=2: score=−(2−3)+(2.6−2.9)=+0.7 → accept
+2 Apply the same test to P4
+Try x=13: score=−(13−12)+(5.9−5.6)=−0.7 → reject
+Try x=11: score=−(11−12)+(5.3−5.6)=+0.7 → accept
+3 Update the population
+P1: 3→2, f=(2.0,2.6)     P4: 12→11, f=(11.0,5.3)
+4 Update archive
+Both new points are non-dominated vs. the originals → archive grows from 4 to 6: {2,3,6,9,11,12}
+Result of iteration 1: Hill-climbing finds an improving move (score=+0.7) for both P1 and P4, replacing them; both new points are non-dominated vs. the originals — archive grows 
+from 4 to 6.
+MOMA · Iteration 1 72
+
+PAGE 74
+M O M A  ·  F U L L  S T E P- BY - S T E P  S O L U T I O N
+Iteration 2 — Worked Solution
+1 Run one NSGA-II-style crossover generation
+O1=avg(P1,P2)=avg(2,6)=4.0     O2=avg(P3,P4)=avg(9,11)=10.0
+2 Evaluate offspring
+O1:(4.0,3.2)  O2:(10.0,5.0) — both non-dominated vs. the population → archived
+3 Apply hill-climbing to the least-crowded offspring, O1
+Try x=5: score=−(5−4)+(3.5−3.2)=−0.7 → reject
+Try x=3: score=−(3−4)+(2.9−3.2)=+0.7 → accept
+4 Update population & archive
+O1: 4→3, f=(3.0,2.9)     Final archive = {2,3,4,6,9,10,11,12}, 8 points
+Result of iteration 2: 8-point archive = {2,3,4,6,9,10,11,12} spans shuffles 2–12 (stability 2.6–5.6) — double the resolution of the plain 4-member NSGA-II population, illustrating 
+the memetic edge that local search adds on top of global search.
+MOMA · Iteration 2 73
+
+PAGE 75
+M O M A  ·  I T E R A T I O N  S U M M A R Y
+MOMA — Iteration-by-Iteration Table
+Iter Individual x f₁ (shuffles) f₂ (stability) Operation Outcome
+0 P1 3 3.0 2.90 Initial population Archived
+0 P2 6 6.0 3.80 Initial population Archived
+0 P3 9 9.0 4.70 Initial population Archived
+0 P4 12 12.0 5.60 Initial population Archived
+1 P1 (local search) 2 2.0 2.60 Hill-climb, score = +0.7 Improved → replaces P1
+1 P4 (local search) 11 11.0 5.30 Hill-climb, score = +0.7 Improved → replaces P4
+2 O1 = avg(P1,P2) 4 4.0 3.20 Crossover Non-dominated → archived
+2 O2 = avg(P3,P4) 10 10.0 5.00 Crossover Non-dominated → archived
+2 O1 (local search) 3 3.0 2.90 Hill-climb, score = +0.7 Improved → replaces O1
+How the optimal set is decided: Hill-climbing accepts a local move only if score=−Δf₁+Δf₂ is positive — a net improvement combining fewer shuffles and better stability; crossover offspring that are non-
+dominated are always kept and archived alongside the population.
+8-point archive = {2,3,4,6,9,10,11,12} spans shuffles 2–12 (stability 2.6–5.6) — double the resolution of the plain 4-member NSGA-II population, illustrating the memetic edge that local search adds on top of global 
+search.
+Iterations to fully solve: Local search found an improving move in every step shown (score=+0.7 each time); MOMA is considered converged once hill-climbing can no longer find a positive-score neighbor for any individual.
+MOMA · Iteration Table 74
+
+PAGE 76
+M O M A  ·  V I S U A L I Z A T I O N
+Pareto Front: Solutions in Objective Space
+Gray = the initial 4-member NSGA-II population. Teal = the 2 points hill-climbing improved in iteration 1 (replacing P1 and P4). Amber = the 2 new crossover offspring from iteration 2. The final 8-point 
+archive has double the resolution of the original 4-member population.
+MOMA · Pareto Front 75
+
+PAGE 77
+S Y N T H E S I S
+All Multiobjective Heuristics — Comparison
+Algorithm Full Form Inspiration Diversity Convergence Archive? Key Parameters
+MOPSO Multi-Obj. PSO Bird / fish swarms Good Fast Yes w, c₁, c₂
+MOGWO Multi-Obj. GWO Grey wolf pack Good Fast Yes α,β,δ leaders
+MOABC Multi-Obj. ABC Honey bee colony Very Good Medium Yes limit, φ
+MOACO Multi-Obj. ACO Ant foraging Good Medium Yes α, β, ρ
+MOSA Multi-Obj. SA Metal annealing Excellent Slow Yes T₀, α (cooling)
+MODE Multi-Obj. DE Evolutionary genetics Good Very Fast Yes F, CR
+MO-TLBO Multi-Obj. TLBO Classroom teaching Good Medium Yes None (T_F auto)
+MOBA Multi-Obj. Bat Bat echolocation Good Fast Yes f, A, r
+MOMA Multi-Obj. Memetic EA + local search Excellent Very Fast Yes NSGA-II + hill-climb
+All nine heuristics share the same backbone: Pareto dominance for selection and an external archive (with crowding-distance-based pruning) to preserve front diversity. They differ mainly 
+in how new candidate solutions are generated.
+Comparison 76
+
+PAGE 78
+S Y N T H E S I S
+Iterations Required to Reach a Stable Front
+Algorithm Archive growth (0→1→2) First decisive event What “converged” looks like
+Constrained NSGA-II 2 → 3 → 5 E removed at Gen 1 (dominated by B) A generation produces zero new non-dominated points
+MOPSO 3 → 6 → 9 — (curve is monotonic; no removals) Archive size & hypervolume plateau across generations
+MOGWO 5 → 6 → 6 Omega wolves converge to δ at iter 1 Leaders stop changing and omegas stop moving
+MOABC 3 → 3 → 3 (2 replacements) S3 replaced at iter 1 A full round produces zero replacements
+MOACO 2 non-dom routes stable R3 pheromone starts decaying at iter 1 Dominated-route pheromone effectively reaches 0
+MOSA 2 → 3 → 4 (archive) — (both moves accepted; no rejections yet) Dominated-move acceptance rate → 0 as T→0
+MODE 4 → 8 → 11 — (no target ever dominated) Archive hypervolume stops growing
+MO-TLBO 4 → 7 → 10 — (T_F shrinking each round) Class mean stops moving; T_F draws change nothing
+MOBA 3 → 6 → 9 — (both extremes still expanding) Loudness → 0 and bats stop moving
+MOMA 4 → 6 → 8 P1 improved by hill-climb at iter 1 Hill-climb finds no positive-score neighbor left
+Two iterations is enough to see each algorithm's decision rule fire at least once; full practical convergence (row 4) typically needs tens to hundreds of generations depending on problem size and the "Convergence" 
+speed shown in the comparison table.
+Iterations Required 77
+
+PAGE 79
+R E C A P
+Key Takeaways — Part 4
+Constraint Handling: Deb's feasibility rules: feasible beats infeasible; both feasible → 
+Pareto dominance; both infeasible → lower CV wins.
+Constrained NSGA-II: Feasibility-first crowded comparison; non-dominated sorting runs 
+only among feasible solutions.
+MOPSO: Archive-guided pbest / gbest steer particle velocity toward the trade-off curve.
+MOGWO: α, β, δ leaders are re-selected from the archive each round; omega wolves 
+encircle their average.
+MOABC: Employed / onlooker / scout bees combine greedy dominance with diversity-
+seeking exploration.
+MOACO: Two pheromone matrices reward non-dominated routes and let dominated 
+ones evaporate away.
+MOSA: Non-dominated neighbors are always accepted; dominated ones face a 
+Boltzmann acceptance test.
+MODE: Mutation + crossover generate trials that replace a target only when they 
+dominate it.
+MO-TLBO: A crowding-selected "teacher" and a shrinking teaching factor pull the class 
+toward the front.
+MOBA: Frequency-driven velocity exploits toward the best region while loudness decay 
+shifts the balance.
+MOMA: NSGA-II global search plus hill-climbing local search sharpens the final front.
+Part 4 Summary 78
+
+PAGE 80
+B E Y O N D  T H E  A L G O R I T H M S
+Where Constrained MOEAs Are Used in Practice
+Engineering Design
+Structural sizing, aerodynamic shape and antenna design 
+under stress, weight and manufacturing constraints.
+Energy Systems
+Unit commitment, renewable dispatch and microgrid 
+sizing trading cost against emissions and reliability.
+Machine Learning
+Feature selection, neural architecture search and 
+hyperparameter tuning trading accuracy against 
+complexity.
+Logistics & Supply Chain
+Vehicle routing, warehouse layout and inventory policy 
+trading cost against service level.
+Healthcare
+Radiotherapy planning and drug-dosage scheduling 
+trading efficacy against toxicity.
+Finance
+Portfolio optimization trading expected return against 
+risk under budget constraints.
+Applications 79
+
+PAGE 81
+C A S E  S T U D Y  1  ·  E N G I N E E R I N G  D E S I G N
+Constrained Truss-Bridge Sizing
+PROBLEM
+● Choose member cross-sections x for a steel truss bridge
+● f₁: minimize total structural mass (cost driver)
+● f₂: minimize maximum joint deflection (serviceability)
+● Constraints: max stress per member ≤ yield limit; deflection ≤ code limit
+HOW THE ALGORITHMS ARE APPLIED
+● Constrained NSGA-II is the industry default: infeasible designs (over-stressed members) are pushed out of the population immediately via feasibility-first ranking
+● MOMA is favored for final refinement — its local search fine-tunes member sizes once NSGA-II has found the right topology region
+● Result: a Pareto front of bridges from “light but flexible” to “heavy but stiff,” letting the engineer pick a design against the project's deflection code
+Case Study · Engineering 80
+
+PAGE 82
+C A S E  S T U D Y  2  ·  M A C H I N E  L E A R N I N G
+Feature Selection & Hyperparameter Tuning
+PROBLEM
+● Decision vector x: which features to keep + key hyperparameters
+● f₁: minimize model complexity (feature count / training time)
+● f₂: maximize validation accuracy (or minimize error)
+● Constraint: inference latency ≤ real-time budget (e.g. 50 ms)
+HOW THE ALGORITHMS ARE APPLIED
+● MOGWO and MOPSO are common because features/hyperparameters form a continuous or binary-encoded search space they handle natively
+● The latency constraint is folded in via Deb's feasibility rules exactly as in Constrained NSGA-II — an over-latency model is simply discarded first
+● The resulting front lets a team pick “small & fast” vs. “large & accurate” models for different deployment tiers (edge device vs. cloud)
+Case Study · Machine Learning 81
+
+PAGE 83
+C A S E  S T U D Y  3  ·  E N E R G Y  S Y S T E M S
+Smart-Grid Generation Dispatch
+PROBLEM
+● Decision vector x: power output of each generator / renewable source per hour
+● f₁: minimize total fuel & operating cost
+● f₂: minimize CO₂ emissions
+● Constraints: demand must be met each hour; each unit within its min/max output; ramp -rate limits
+HOW THE ALGORITHMS ARE APPLIED
+● MODE is popular for continuous generator-output variables — fast convergence matters because dispatch is often re-solved every few minutes
+● MOACO is used instead when the decision is which discrete set of units to commit (unit commitment), a combinatorial problem
+● The Pareto front is presented to grid operators as a cost-vs-emissions curve, often re-solved on a rolling horizon as demand forecasts update
+Case Study · Energy 82
+
+PAGE 84
+C A S E  S T U D Y  4  ·  S U P P L Y  C H A I N
+Multi-Depot Vehicle Routing
+PROBLEM
+● Decision vector x: the route each vehicle follows to serve a set of customers
+● f₁: minimize total distance / fuel cost
+● f₂: maximize on-time delivery rate (service level)
+● Constraints: vehicle capacity; customer delivery time windows
+HOW THE ALGORITHMS ARE APPLIED
+● MOACO is a natural fit — routing is inherently combinatorial, and the pheromone trails directly encode “good partial routes” the way they encode good TSP tours
+● A route that misses a time window becomes infeasible and is filtered by feasibility-first comparison before any distance/service trade-off is even considered
+● Dispatchers use the resulting front to balance fuel budget against customer-service commitments on a day-to-day basis
+Case Study · Logistics 83
+
+PAGE 85
+P R A C T I C A L  G U I D A N C E
+Choosing the Right Algorithm
+If your problem is… Prefer Why
+Continuous, smooth, need speed MODE Very fast convergence, few control choices
+Continuous, many local optima MOSA or MOABC Strong diversity, escapes local optima
+Discrete / combinatorial (routing, scheduling) MOACO Pheromone model matches combinatorial structure
+Few parameters to tune, quick baseline MO-TLBO Parameter-free by design
+Need the best final front, compute is available MOMA Global + local search combined
+Hard constraints must never be violated Constrained NSGA-II (as a wrapper) Feasibility-first comparison applies to any base MOEA
+Rule of thumb: start with Constrained NSGA-II as a reliable baseline, then swap in a specialized heuristic (MODE, MOACO, …) onceyou know whether your search space is 
+continuous or combinatorial.
+Decision Guide 84
+
+PAGE 86
+E V A L U A T I N G  R E S U L T S
+Performance Metrics for MOEAs
+Hypervolume (HV) The volume of objective space dominated by the archive, bounded by a reference point. Higher is better — it rewards both 
+convergence and spread simultaneously.
+Inverted Generational Distance (IGD) Average distance from points on the true Pareto front to the nearest point in the obtained archive. Lower is better; needs a 
+known/approximated true front.
+Generational Distance (GD) Average distance from the obtained archive to the nearest point on the true front — measures convergence only, not spread.
+Spacing / Spread Measures how evenly distributed the archive's points are. Lower spacing = more uniform coverage of the trade-off curve.
+Worked hypervolume example (minimize both): archive points A=(6,50) and B=(10,30); reference point r=(12,60) chosen worse than every archive point.
+HV = area dominated by A up to r, plus area dominated by B up to r, minus their overlap = (12−6)×(60−50) + (12−10)×(60−30) − (12−10)×(60−50) = 60 + 60 − 20 = 100. A larger HV means the archive dominates more of 
+the objective space — exactly why it rewards both convergence and spread together.
+Performance Metrics 85
+
+PAGE 87
+D E B U G G I N G  C H E C K L I S T
+Common Pitfalls in Constrained MOEAs
+1
+Comparing objectives on different scales — Normalize objectives before computing crowding distance or hypervolume, or one objective will dominate diversity decisions.
+2
+Archive growing without bound — Cap archive size and prune by crowding distance each iteration — an unbounded archive slows every later generation.
+3 Treating a slightly-infeasible solution as “close enough” — Deb's rules are strict: any CV > 0 loses to any feasible solution, by design — soft constraints need penalty terms 
+instead.
+4
+Declaring convergence too early — Track hypervolume or IGD over generations; a flat front for a handful of generations does not guarantee global convergence.
+5 Using one algorithm for every problem shape — Match the heuristic to the search space (see the decision guide) — no single MOEA dominates on every problem (No-Free-
+Lunch).
+Pitfalls & Debugging 86
+
+PAGE 88
+P R A C T I C E  P R O B L E M  1
+Apply Deb's Feasibility Rules
+QUESTION
+Given g(x): x₁+x₂ ≤ 60. Compare three candidates using Deb's rules: A(x ₁=25,x₂=40, f₁=50,f₂=30), B(x₁=20,x₂=30, f₁=45,f₂=35), C(x₁=15,x₂=25, f₁=40,f₂=32). Both 
+objectives are to be maximized. Which solution(s) belong on the feasible Pareto front?
+GUIDED SOLUTION
+● Step 1 — CV: A: 25+40=65>60 → CV=5 (infeasible). B: 20+30=50≤60 → CV=0. C: 15+25=40≤60 → CV=0.
+● Step 2 — By Deb's rules, A is infeasible so it loses to both B and C automatically, regardless of its objective values.
+● Step 3 — Compare B(45,35) vs C(40,32): B has both f₁ and f₂ higher → B dominates C.
+● Answer: the feasible Pareto front is {B} only — C is feasible but dominated, and A is discarded as infeasible.
+Practice Problem 1 87
+
+PAGE 89
+P R A C T I C E  P R O B L E M  2
+Trace One MOPSO Velocity Update
+QUESTION
+A particle is at x=8 with v=2. Its pbest is at x=5 and the swarm's gbest is at x=14. Using w=0.6, c₁r₁=0.8, c₂r₂=0.5, compute the new velocity and new position.
+GUIDED SOLUTION
+● v_new = w·v + c₁r₁(pbest−x) + c₂r₂(gbest−x)
+● v_new = 0.6×2 + 0.8×(5−8) + 0.5×(14−8)
+● v_new = 1.2 + 0.8×(−3) + 0.5×6 = 1.2 − 2.4 + 3.0 = 1.8
+● x_new = x + v_new = 8 + 1.8 = 9.8
+● Answer: v_new = 1.8, x_new = 9.8 — the pull toward gbest (+3.0) outweighs the pull toward pbest (−2.4), so the particle moves toward the swarm's better region.
+Practice Problem 2 88
+
+PAGE 90
+P R A C T I C E  P R O B L E M  3
+Check Dominance for DE Selection
+QUESTION
+A DE target is X=(size=10, gain=5.0) [size minimize, gain maximize]. Its trial vector evaluates to U=(size= 9, gain=5.2). Should MODE replace the target with the 
+trial? What if instead U=(size=9, gain=4.8)?
+GUIDED SOLUTION
+● Case 1 — U=(9, 5.2): size 9<10 (better, minimize) AND gain 5.2>5.0 (better, maximize) → U dominates X on both objectives → replace the target.
+● Case 2 — U=(9, 4.8): size 9<10 (better) but gain 4.8<5.0 (worse) → neither dominates the other → non-dominated — keep the target X and add U to the archive instead.
+● Takeaway: MODE only overwrites a target when the trial wins on every objective; a genuine trade-off point is preserved, not discarded.
+Practice Problem 3 89
+
+PAGE 91
+Q U I C K  R E V I S I O N
+Formula Cheat-Sheet
+Algorithm / Concept Core Formula
+Constraint violation CV(x) = Σmax(0,gᵢ(x)) + Σ|hⱼ(x)|
+MOPSO velocity v = wv + c₁r₁(pbest−x) + c₂r₂(gbest−x)
+MOGWO position X_new = (X_α+X_β+X_δ)/3
+MOABC neighbor x_new = xᵢ + φ(xᵢ−x_k)
+MOACO pheromone τ_new = (1−ρ)τ_old + Q/f(route)
+MOSA acceptance P = exp(−ΔE/T),  Tₖ₊₁ = αTₖ
+MODE mutation V = X_r1 + F(X_r2−X_r3)
+MO-TLBO teacher phase X_new = X + r(X_teacher − T_F·X_mean)
+MOBA velocity v = v + (x_best−x)fᵢ,  fᵢ = f_min+(f_max−f_min)β
+MOMA local move accept if −Δf₁+Δf₂ > 0
+Cheat Sheet 90
+
+PAGE 92
+Q&A
+Frequently Asked Questions
+Q: Why use an archive instead of just the population?
+A: The population size is fixed, but the true Pareto front can have far more points than fit in one generation — the archive accumulates the best ones found across all iterations.
+Q: Does a bigger archive always mean a better result?
+A: No. An unbounded archive can include redundant, closely-clustered points; crowding-distance pruning keeps it both diverse and a manageable size.
+Q: Can these algorithms guarantee the true Pareto front?
+A: No metaheuristic guarantees global optimality. They provide good approximations; hypervolume/IGD against a known front (when available) is how you judge quality.
+Q: Which algorithm should I try first?
+A: Constrained NSGA-II — it's the most widely validated, has the fewest surprises, and works as a solid baseline before trying aspecialized heuristic.
+Q&A 91
+
+PAGE 93
+G E T T I N G  H A N D S- ON
+Software Tools & Libraries
+Tool Language Notes
+pymoo Python Widely used; NSGA-II/III, MOEA/D, constraint handling, built-in metrics (HV, IGD)
+Platypus Python Lightweight MOEA framework, easy to script new problems quickly
+jMetal / jMetalPy Java / Python Long-standing research framework with many algorithms & quality indicators
+MOEA Framework Java Broad algorithm library plus statistical comparison tooling
+PlatEMO MATLAB GUI-driven platform popular for benchmarking large algorithm sets
+Start with pymoo for coursework and prototyping — it has direct support for constrained problems (feasibility-first comparison built in) and reference implementations of every 
+algorithm covered today.
+Tools & Libraries 92
+
+PAGE 94
+B I G  P I C T U R E
+Part 4 Concept Map
+Constrained
+Multiobjective
+Optimization
+Constraint Handling
+Deb's rules, CV, penalties, repair
+Feasibility-First MOEA
+Constrained NSGA-II
+Swarm Heuristics
+MOPSO · MOGWO · MOABC · 
+MOACO · MOBA
+Physics / Evolution
+MOSA · MODE
+Learning-Inspired / Hybrid
+MO-TLBO · MOMA
+Concept Map 93
+
+PAGE 95
+F U R T H E R  R E A D I N G
+References
+● Deb, K., Pratap, A., Agarwal, S., & Meyarivan, T. (2002). A fast and elitist multiobjective genetic algorithm: NSGA-II. IEEE Transactions on Evolutionary Computation.
+● Coello Coello, C. A., & Lechuga, M. S. (2002). MOPSO: A proposal for multiple objective particle swarm optimization.
+● Mirjalili, S., Saremi, S., Mirjalili, S. M., & Coelho, L. dos S. (2016). Multi-objective grey wolf optimizer: A novel algorithm for multi-criterion optimization.
+● Akbari, R., Hedayatzadeh, R., Ziarati, K., & Hassanizadeh, B. (2012). A multi-objective artificial bee colony algorithm.
+● Xue, F., Sanderson, A. C., & Graves, R. J. (2003). Pareto-based multi-objective differential evolution.
+● Rao, R. V., & Patel, V. (2013). Multi-objective optimization of two stage thermoelectric cooler using a modified teaching-learning-based optimization algorithm.
+● Deb, K. (2001). Multi-Objective Optimization Using Evolutionary Algorithms. Wiley.
+● Coello Coello, C. A., Lamont, G. B., & Van Veldhuizen, D. A. (2007). Evolutionary Algorithms for Solving Multi-Objective Problems (2nd ed.). Springer.
+References 94
+
+PAGE 96
+H O M E W O R K
+Assignment for This Module
+TASKS
+● Implement Constrained NSGA-II (or use pymoo) on a bi-objective problem of your choice with at least one inequality constraint
+● Run any two of the nine heuristics covered today on the same problem and compare their archives after 20 generations
+● Report hypervolume and spacing for each run, and discuss which algorithm produced the better trade -off and why
+● Submit: source code, a plotted Pareto front comparison, and a one-page write-up
+Due date: [insert date]   ·   Submission: [insert portal / email]
+Assignment 95
+
+PAGE 97
+L O O K I N G  A H E A D
+Coming Up in Part 5
+● Many-objective optimization (4+ objectives) and why Pareto dominance alone starts to break down
+● Decomposition-based methods — MOEA/D and reference-point approaches (NSGA-III)
+● Indicator-based algorithms — hypervolume-driven selection (e.g. SMS-EMOA)
+● Surrogate-assisted MOEAs for expensive simulation-based objectives
+● Hands-on lab: benchmarking your Part 4 implementation against NSGA-III on a many-objective test suite
+Preview · Part 5 96
+
+PAGE 98
+THANK YOU
+Questions & discussion welcome.
+[Your Name]
+[email@institution.edu]
+[Department / Institution]
+Thank You 97

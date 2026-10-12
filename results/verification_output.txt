@@ -1,0 +1,12 @@
+{
+  "modules": 37,
+  "population_study_jobs_checked": 90,
+  "main_jobs_checked": 1196,
+  "summary_groups": 134,
+  "stochastic_trial_counts": "all 10",
+  "budgets": "verified",
+  "raw_objectives_and_metrics": "recomputed from stored decisions",
+  "figures": "exist",
+  "docx": "valid XML and embedded media",
+  "errors": []
+}

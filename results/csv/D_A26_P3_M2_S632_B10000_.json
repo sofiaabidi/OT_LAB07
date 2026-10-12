@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 26,
+  "algorithm": "MOSA",
+  "problem": "P3",
+  "objectives": 2,
+  "seed": 632,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.4932956778273903,
+  "IGD": 0.02901015849398513,
+  "Spacing": 0.031073446512957324,
+  "runtime": 0.1934635409998009,
+  "front_size": 29,
+  "feasible_fraction": 1.0,
+  "file": "D_A26_P3_M2_S632_B10000_"
+}

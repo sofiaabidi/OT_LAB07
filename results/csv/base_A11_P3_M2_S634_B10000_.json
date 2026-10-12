@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 11,
+  "algorithm": "MOGA",
+  "problem": "P3",
+  "objectives": 2,
+  "seed": 634,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.525791914021526,
+  "IGD": 0.012073176019422616,
+  "Spacing": 0.01144976506542207,
+  "runtime": 0.3791176249997079,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "base_A11_P3_M2_S634_B10000_"
+}

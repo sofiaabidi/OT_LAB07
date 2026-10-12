@@ -1,0 +1,202 @@
+{
+  "algorithm_number": 2,
+  "algorithm": "Epsilon-Constraint",
+  "problem": "P5",
+  "objectives": 2,
+  "seed": 630,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 1.134222561069574,
+  "IGD": 0.24553739976109965,
+  "Spacing": 0.30781122958157037,
+  "runtime": 0.6176376659996095,
+  "front_size": 11,
+  "feasible_fraction": 1.0,
+  "file": "D_A02_P5_M2_S630_B10000_",
+  "solves": [
+    {
+      "success": false,
+      "message": "Positive directional derivative for linesearch",
+      "x": [
+        0.1,
+        0.2
+      ],
+      "f": [
+        157.0,
+        2.4999999999999994e-05
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        0.01,
+        0.05428835231092197
+      ],
+      "f": [
+        4.261635656407375,
+        0.01250000001448941
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": false,
+      "message": "Iteration limit reached",
+      "x": [
+        0.01,
+        0.04898979485567249
+      ],
+      "f": [
+        3.8456988961702905,
+        0.017010345435984994
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": false,
+      "message": "Iteration limit reached",
+      "x": [
+        0.01,
+        0.04898958418781342
+      ],
+      "f": [
+        3.8456823587433533,
+        0.017010564883558878
+      ],
+      "cv": 8.60046047548313e-06
+    },
+    {
+      "success": false,
+      "message": "Iteration limit reached",
+      "x": [
+        0.010000000000385312,
+        0.0489897956526706
+      ],
+      "f": [
+        3.845698958882821,
+        0.017010344605123226
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": false,
+      "message": "Iteration limit reached",
+      "x": [
+        0.0100000000000003,
+        0.048989753055352435
+      ],
+      "f": [
+        3.8456956148452814,
+        0.017010388978058844
+      ],
+      "cv": 1.7064897978374702e-06
+    },
+    {
+      "success": false,
+      "message": "Iteration limit reached",
+      "x": [
+        0.01,
+        0.048989801564529714
+      ],
+      "f": [
+        3.8456994228155827,
+        0.017010338447593965
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": false,
+      "message": "Iteration limit reached",
+      "x": [
+        0.010000000000000014,
+        0.04898980156451029
+      ],
+      "f": [
+        3.8456994228140635,
+        0.01701033844761417
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        0.0600000000102649,
+        0.02
+      ],
+      "f": [
+        9.420000001611589,
+        0.041666666659538255
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": false,
+      "message": "Iteration limit reached",
+      "x": [
+        0.01,
+        0.048989801564573644
+      ],
+      "f": [
+        3.845699422819031,
+        0.017010338447548203
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": false,
+      "message": "Iteration limit reached",
+      "x": [
+        0.010000000000000009,
+        0.04898980156442741
+      ],
+      "f": [
+        3.845699422807555,
+        0.017010338447700522
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": false,
+      "message": "Iteration limit reached",
+      "x": [
+        0.01,
+        0.0489898015645026
+      ],
+      "f": [
+        3.845699422813454,
+        0.017010338447622213
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": false,
+      "message": "Iteration limit reached",
+      "x": [
+        0.01,
+        0.04898980156454634
+      ],
+      "f": [
+        3.8456994228168875,
+        0.017010338447576646
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": false,
+      "message": "Iteration limit reached",
+      "x": [
+        0.010000000000000004,
+        0.048989801564594176
+      ],
+      "f": [
+        3.845699422820644,
+        0.01701033844752681
+      ],
+      "cv": 0.0
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 16,
+  "algorithm": "SPEA2",
+  "problem": "P4",
+  "objectives": 2,
+  "seed": 633,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.9348490815619118,
+  "IGD": null,
+  "Spacing": 0.014230899278574896,
+  "runtime": 1.3294544580003276,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "base_A16_P4_M2_S633_B10000_"
+}

@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 32,
+  "algorithm": "IBEA",
+  "problem": "P3",
+  "objectives": 2,
+  "seed": 636,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.20627880573465157,
+  "IGD": 0.3353229887453168,
+  "Spacing": 0.015008937076325184,
+  "runtime": 1.5798134169999685,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "D_A32_P3_M2_S636_B10000_"
+}

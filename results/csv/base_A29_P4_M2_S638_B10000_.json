@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 29,
+  "algorithm": "MOBA",
+  "problem": "P4",
+  "objectives": 2,
+  "seed": 638,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.9324286874331474,
+  "IGD": null,
+  "Spacing": 0.012924054150719221,
+  "runtime": 0.5430867080003736,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "base_A29_P4_M2_S638_B10000_"
+}

@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 32,
+  "algorithm": "IBEA",
+  "problem": "P14",
+  "objectives": 2,
+  "seed": 635,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.8310996435753458,
+  "IGD": 0.016554488211462406,
+  "Spacing": 0.022269265886389337,
+  "runtime": 1.5550835840003856,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "base_A32_P14_M2_S635_B10000_"
+}

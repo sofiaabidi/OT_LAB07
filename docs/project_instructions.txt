@@ -1,0 +1,512 @@
+# COMPLETE PROJECT INSTRUCTIONS — LAB ASSIGNMENT 7
+
+## 1. Your Objective
+
+Read the entire attached document, **Lab Assignment 7 — Multiobjective Optimization: 37 Algorithms, Trade-offs and Applications**, and complete the assignment as a well-organized, reproducible, tested Python project.
+
+Do not merely provide a plan, example code, pseudocode, or a report template. Implement the project, run the experiments, inspect the outputs, fix errors, and generate the deliverables.
+
+Work incrementally in phases, but continue through all phases until the requirements have been completed or a genuine blocker is identified. Do not claim that any implementation, test, experiment, or deliverable is complete unless you have actually verified it.
+
+I will upload this project to GitHub myself later. **Do not publish anything to GitHub or require GitHub credentials.** Prepare the folder so that it is ready for me to upload.
+
+## 2. Student Information and Assigned Algorithms
+
+The last two digits of my roll number are **63**.
+
+Calculate my three Task C algorithms using the exact formulas in the assignment:
+
+- Algorithm 1: `((R - 1) % 37) + 1`
+- Algorithm 2: `((R + 11) % 37) + 1`
+- Algorithm 3: `((R + 23) % 37) + 1`
+
+For R = 63, the assigned algorithms are:
+
+1. **Algorithm 26 — MOSA (Multiobjective Simulated Annealing)**
+2. **Algorithm 1 — Weighted Sum**
+3. **Algorithm 13 — NPGA (Niched Pareto Genetic Algorithm)**
+
+Give these three algorithms the additional study cards, formulas, parameter analysis, numerical hand traces, sensitivity studies, and other requirements specified under Task C.
+
+However, implement and evaluate **all 37 algorithms**, not just these three.
+
+## 3. Project Location and Folder Structure
+
+Create one main folder in the current working directory named:
+
+`Lab_Assignment_7_MOO`
+
+Put all project deliverables inside this folder. The final PDF report must be directly inside the main folder, alongside the source-code archive and README.
+
+Use a clean structure similar to:
+
+Lab_Assignment_7_MOO/
+- `Lab_Assignment_7_Report.pdf`
+- `README.md`
+- `requirements.txt`
+- `run_all.py`
+- `submission_code.zip`
+- `src/`
+  - `moo_utils.py`
+  - `problems/`
+  - `algorithms/`
+  - `experiments/`
+- `tests/`
+- `results/`
+  - `csv/`
+  - `tables/`
+  - `implementation_log.csv`
+- `figures/`
+- `docs/`
+  - `algorithm_notes.md`
+  - `viva_questions.md`
+  - `references.md`
+- `data/`
+- `.gitignore`
+
+You may adjust this layout if necessary, but keep it understandable, modular, and easy to run.
+
+The PDF must be at the top level of the main folder, not hidden inside a nested report directory.
+
+Include the runnable source code and required supporting files in `submission_code.zip`. Avoid including virtual environments, caches, or unnecessary temporary files in the archive.
+
+Keep the PDF, README, code, figures, experimental results, references, and ZIP consistent with one another.
+
+## 4. Programming Language and Restrictions
+
+Use **Python 3.10 or later** throughout.
+
+Follow the assignment's coding rules:
+
+- Use NumPy, Matplotlib, and the Python standard library for the implementations.
+- The single-objective or linear-programming subproblems for classical Algorithms 1–7 may use `scipy.optimize` where the assignment explicitly permits it.
+- The scalarization, weight sweeps, epsilon sweeps, deviation variables, preference logic, and priority handling must still be implemented by you.
+- Respect the assignment's explicit allowance for loading the breast-cancer dataset with scikit-learn or using a supplied CSV, but code the 5-NN classifier and five-fold cross-validation yourself.
+- Do not use `pymoo`, `Platypus`, `DEAP`, `jMetalPy`, `inspyred`, optimization solvers from other libraries, or equivalent prebuilt optimizers.
+- Do not use prebuilt multiobjective optimization implementations from online repositories.
+- Do not use a machine-learning library to replace a component the assignment requires you to implement from scratch.
+
+Implement the algorithms' core mechanisms yourself. Do not disguise library calls as original implementations.
+
+You may use AI-assisted coding during development, but produce readable, commented implementations that I can inspect and explain. Do not copy code that you cannot explain.
+
+## 5. Phase One — Analyse the Entire Assignment
+
+Before implementing, inspect every section of the attached assignment, including:
+
+- The coding rules and permitted exceptions.
+- All 37 algorithms in the catalogue.
+- All 14 problems, P1–P14.
+- Tasks A, B, C, D, E and F.
+- The evaluation metrics.
+- The final submission requirements.
+
+Create a requirements checklist and map each item to the code module, test, experiment, result file, figure, or PDF section that will satisfy it.
+
+Do not overlook a requirement simply because it is lengthy.
+
+Use the attached assignment as the authoritative specification. If another relevant lecture document is available, inspect it as well. If the assignment does not provide enough information to reproduce a particular lecture-specific detail, identify the gap and use a clearly documented, technically defensible interpretation. Do not invent lecture content or silently change the assignment.
+
+If you discover conflicting formulas, ambiguous definitions, or inconsistent numerical examples in the provided material, flag them, investigate the issue, and document the resolution. Do not silently replace the specified problem with a different benchmark.
+
+## 6. Phase Two — Shared Utilities and Problem Definitions
+
+Create `src/moo_utils.py` with tested implementations of:
+
+- Pareto dominance.
+- Fast non-dominated sorting.
+- Crowding distance.
+- Two-objective hypervolume and an appropriate Monte Carlo estimate for three or more objectives.
+- Inverted Generational Distance (IGD).
+- Spacing.
+- Objective normalization.
+- Constraint violation calculations.
+- Shared functions for maintaining non-dominated solution sets.
+- Reproducible random-number handling.
+
+Implement all 14 problems, P1–P14, from the assignment with functions that return objective values and constraint violations.
+
+Respect minimization conventions during dominance checks. Convert maximization objectives appropriately without losing their original interpretation in the report.
+
+Include tests for the shared utilities and manually verifiable examples. Test the car Pareto-front example and Deb's constrained-dominance rules as specified.
+
+For each problem, document the decision variables, encoding, objectives, bounds, constraints, objective normalization, hypervolume reference point, and termination rule.
+
+Verify objective formulas and constraints against the attached document. Do not invent missing supplier data or replace specified constants with arbitrary values.
+
+## 7. Phase Three — Implement All 37 Algorithms
+
+Implement every algorithm in the assignment catalogue as a separate, clearly named Python module.
+
+The catalogue is:
+
+1. Weighted Sum
+2. Epsilon-Constraint
+3. Benson's Method
+4. Weight Metric
+5. Value Function
+6. Goal Programming
+7. Lexicographic
+8. TOPSIS
+9. VIKOR
+10. VEGA
+11. MOGA
+12. NSGA
+13. NPGA
+14. NSGA-II
+15. NSGA-III
+16. SPEA2
+17. PESA-II
+18. MOEA/D
+19. MOEA/D-DE
+20. MOEA/D-ACO
+21. Constrained NSGA-II
+22. MOPSO
+23. MOGWO
+24. MOABC
+25. MOACO
+26. MOSA
+27. MODE
+28. MO-TLBO
+29. MOBA
+30. MOMA
+31. RVEA
+32. IBEA
+33. SMS-EMOA
+34. HypE
+35. R-NSGA-II
+36. MGDA
+37. GradNorm
+
+Follow each algorithm's actual defining mechanism. In particular, do not implement one generic evolutionary algorithm and give its files 37 different names.
+
+Each module should provide a consistent interface appropriate to the algorithm, including initialization, objective evaluation, iteration or update, and a run function. Classical optimization methods and ranking methods may use an appropriate interface rather than being forced into an evolutionary loop.
+
+Each module must include:
+
+- A description of the algorithm and its main steps.
+- Its equations and important parameters.
+- Default parameter values.
+- Random-seed support where applicable.
+- Constraint-handling behaviour.
+- A function to run the algorithm.
+- A unit test of its defining mechanism.
+- Clear documentation of limitations and implementation decisions.
+
+For TOPSIS and VIKOR, implement the ranking methodology correctly rather than presenting them as population-based optimizers. For MGDA and GradNorm, implement the gradient-based mechanisms specified for P13.
+
+Use each algorithm's designated test problems from the catalogue. All 37 algorithms must have their own identifiable implementation and test results.
+
+## 8. Phase Four — Testing and Reproducibility
+
+Create automated tests for the shared utilities, problem functions, and algorithm implementations.
+
+At minimum, verify:
+
+- Pareto dominance and non-dominated sorting.
+- Crowding distance.
+- Constraint feasibility and Deb's comparison rules.
+- Objective normalization and the evaluation metrics.
+- Algorithm-specific selection, update, archive, ranking, decomposition, or preference mechanisms.
+- The assigned algorithms' hand-trace calculations.
+- Validity of discrete solutions such as the P8 tours.
+- Correct bounds and constraints for generated solutions.
+- Reproducible results when the same seed is used.
+
+For stochastic algorithms, run **10 independent trials** and report the mean and standard deviation as required. Use fixed and documented seeds.
+
+Use equal function-evaluation budgets for fair algorithm comparisons, following the assignment's suggested budget of 10,000 evaluations where practical. Do not give one algorithm more evaluations simply to make its results look better.
+
+If a full evaluation budget is too computationally expensive for an initial smoke test, use a smaller budget during development, then run the specified experiment or document precisely why it remains incomplete. Never label a reduced-budget result as a full-budget experiment.
+
+Run the test suite and fix failures before finalizing the report.
+
+## 9. Phase Five — Complete Task A
+
+Task A requires all 37 implementations.
+
+For every algorithm:
+
+- Run it on at least two of its designated test problems, or one if only one is designated.
+- Include the obtained Pareto front where applicable.
+- Plot the obtained front and the true front wherever known.
+- Calculate HV, IGD, and Spacing where appropriate and where the true front is available.
+- Record runtime and evaluation budget.
+- Include tests of the algorithm's defining mechanism.
+
+Create `results/implementation_log.csv` with these columns:
+
+- Algorithm number.
+- Algorithm name.
+- Problems tested.
+- Evaluation budget.
+- HV.
+- IGD.
+- Spacing.
+- Runtime.
+- Test status.
+- Implementation status: works, partly works, or not done.
+- Notes and limitations.
+
+For ranking or preference-based methods that do not generate a Pareto front themselves, report the appropriate results, rankings, input preferences, and supporting tests instead of fabricating evolutionary metrics.
+
+Ensure that results in the CSV files match those used in the figures, tables, and report.
+
+## 10. Phase Six — Complete Task B
+
+Create a comprehensive comparison of all 37 algorithms.
+
+For each algorithm, document:
+
+- What the algorithm does, in your own explanatory wording.
+- At least four advantages.
+- At least four disadvantages.
+- Situations where it is a suitable choice.
+- Situations where it should be avoided.
+
+Discuss relevant factors, including convergence, diversity, speed, computational cost, non-convex fronts, disconnected fronts, constraints, variable types, number of objectives, sensitivity to parameters, memory use, and required preference information.
+
+The assignment requires at least two advantages and two disadvantages for every algorithm to be supported by results from your experiments. Provide traceable evidence, with figure or table references and actual measured values, wherever the algorithm's behaviour can be evaluated experimentally.
+
+Do not invent numerical evidence. If a disadvantage or advantage is not directly demonstrated by the chosen experiment, distinguish the experimentally supported findings from a reasoned theoretical explanation.
+
+Group algorithms by family and include a comparative discussion of their approaches to convergence, diversity, constraints, and non-convex fronts.
+
+Store the comparison table in a machine-readable CSV or similarly usable file and include the complete comparison in the PDF report.
+
+## 11. Phase Seven — Complete Task C for My Three Assigned Algorithms
+
+Give Task C special attention.
+
+### A. Algorithm 26 — MOSA
+
+Prepare a detailed study card covering:
+
+- Full form and the algorithm's historical background.
+- The original publication year and authors, supported by reliable references.
+- The problem the algorithm was designed to address.
+- Its core concept in five lines or fewer.
+- A clear flow diagram.
+- Numbered steps and relevant equations.
+- Every important parameter and the consequences of making it too small or too large.
+- Convergence, diversity, constraints, non-convex fronts, and many-objective behaviour.
+- Time-complexity analysis.
+
+### B. Algorithm 1 — Weighted Sum
+
+Prepare the same study-card structure, adapted to the classical weighted-sum method. Explain the scalarization function, weight selection, the process of sweeping weights to build a front, and its limitations on non-convex Pareto fronts.
+
+Include the relevant formulas and show how changing the weights changes the resulting solutions.
+
+### C. Algorithm 13 — NPGA
+
+Prepare the same study-card structure, adapted to the Niched Pareto Genetic Algorithm. Explain Pareto tournament selection, the comparison set, niche-count tie-breaking, relevant parameters, and diversity behaviour.
+
+### D. Hand Traces
+
+For each of the three algorithms, produce the required hand calculations.
+
+- Use a small, transparent instance.
+- Show all input values and intermediate calculations.
+- Show two complete iterations or two weight settings for Weighted Sum, as appropriate under the assignment.
+- Use the population size and comparison procedure specified for the trace.
+- Include enough intermediate values that another person can independently verify every step.
+- Add automated tests demonstrating that the code reproduces the same trace where applicable.
+
+Make the trace deterministic, documenting any random draws or fixed choices.
+
+### E. Sensitivity Studies
+
+For each assigned algorithm, vary its most important parameter over three justified values and conduct 10 runs per setting as required.
+
+Report the effect on relevant metrics and behaviour through figures, tables, and written interpretation. Include means and standard deviations where appropriate.
+
+Save raw sensitivity results to CSV files.
+
+## 12. Phase Eight — Complete Task D
+
+Perform the required head-to-head comparisons using equal evaluation budgets and 10 independent runs.
+
+### Comparison 1: Continuous Bi-Objective Problems
+
+Compare applicable algorithms on P3 and P5. Present combined Pareto-front plots, a ranked results table, HV and Spacing mean ± standard deviation, and IGD where the true front is known.
+
+Explain the ranking using actual experimental evidence.
+
+### Comparison 2: Many-Objective Optimization
+
+On P10 with five objectives, compare:
+
+- NSGA-II
+- NSGA-III
+- MOEA/D
+- RVEA
+- HypE
+
+Explain what changes as the number of objectives increases and why NSGA-II may lose selection pressure.
+
+Report relevant metrics, uncertainty across trials, runtimes, and limitations.
+
+### Comparison 3: Discrete Routing
+
+On P8, compare:
+
+- MOEA/D-ACO
+- MOACO
+- NSGA-II
+- MOMA
+
+Use valid permutation-based solutions and the appropriate crossover and mutation operators. Report distance and travel-time trade-offs, valid-tour checks, and comparisons with the nearest-neighbour baselines specified in the assignment.
+
+Also complete the assignment's requirements for the classical methods, preference methods, TOPSIS, VIKOR, MGDA, and GradNorm when they are applicable to their specified comparisons.
+
+Save all raw experiment results and figures.
+
+## 13. Phase Nine — Complete Task E
+
+Select six problems from P1–P14.
+
+For each one, identify:
+
+- The two most suitable algorithms.
+- One algorithm that is a poor choice.
+- The reasons, considering convexity, number of objectives, variable type, constraints, decision-maker preferences, and computational budget.
+- Supporting results from Task A or Task D.
+
+At least one case must involve a many-objective problem and at least one must involve constraints. Back at least three recommendations with actual experimental results, as required.
+
+Clearly distinguish results-based conclusions from theoretical reasoning.
+
+## 14. Phase Ten — Complete Task F and Viva Preparation
+
+Create `docs/viva_questions.md` containing clear, technically accurate questions and answers for all the viva questions in the assignment.
+
+Also prepare additional questions covering:
+
+- The core mechanism of each of the 37 algorithms.
+- Important equations and parameters.
+- Why the implementation uses particular data structures.
+- How constraints are handled.
+- Differences between convergence and diversity.
+- The meaning and limitations of HV, IGD, and Spacing.
+- Why ranking methods differ from optimizers.
+- What the assigned algorithms' hand traces demonstrate.
+- How to modify a parameter and predict its effect.
+
+Answers must be consistent with the actual code. Include concise explanations suitable for an oral viva, plus worked numerical examples for important concepts.
+
+Do not state that I have mastered or verified a concept; provide the explanations and exercises needed for me to prepare.
+
+## 15. Phase Eleven — Generate the Complete PDF Report
+
+Generate a polished, readable PDF named:
+
+`Lab_Assignment_7_Report.pdf`
+
+Save it directly inside `Lab_Assignment_7_MOO/`, alongside `README.md` and `submission_code.zip`.
+
+Use a professional academic-report layout with a title page, table of contents, numbered sections, page numbers, legible equations, captions, cross-references, and clear tables.
+
+The PDF must cover:
+
+1. Title page and assignment details.
+2. Executive overview and objectives.
+3. Methodology, environment, coding restrictions, and reproducibility.
+4. Formulations for the problems used, including decision variables, objectives, constraints, encoding, normalization, hypervolume reference points, and termination rules.
+5. Shared utility implementations and their verification.
+6. Task A: all 37 algorithms, testing methodology, implementation log, experimental results, and figures.
+7. Task B: the complete 37-algorithm comparison, including the required advantages, disadvantages, evidence, and family-level discussion.
+8. Task C: complete study cards, equations, flow diagrams, hand traces, sensitivity experiments, tables, and figures for MOSA, Weighted Sum, and NPGA.
+9. Task D: every required head-to-head comparison, plots, rankings, metrics, and interpretation.
+10. Task E: six algorithm-selection case studies.
+11. Task F: viva preparation highlights.
+12. Discussion of findings, limitations, reproducibility, and conclusions.
+13. References.
+
+The report must include real outputs from the implemented code, not placeholder figures or mock results.
+
+Use readable figure sizes and avoid splitting tables in ways that make them impossible to understand. Include sufficient discussion to explain what each important result means.
+
+Do not include thousands of lines of source code in the main report. Use concise illustrative snippets only when they clarify an implementation. Keep the complete source code in the project folder.
+
+If the report becomes very long, maintain readability through a sensible appendix structure, but do not omit required content merely to shorten it.
+
+Validate the finished PDF by opening or rendering its pages and checking that the contents are present, the equations and plots are readable, and the layout has no clipping, blank pages, missing figures, or broken tables.
+
+## 16. References and Technical Accuracy
+
+The assignment itself is the primary source for the required implementations and problem definitions.
+
+Where Task C requires original publication details, author names, publication years, or historical claims, use reliable references when research access is available. Keep a bibliography with titles, authors, years, publication details, and URLs or DOIs where verified.
+
+Do not invent references, author names, publication years, results, or experimental observations.
+
+If external information is unavailable, document what could not be verified rather than fabricating it.
+
+## 17. README and Running Instructions
+
+Create a complete `README.md` containing:
+
+- Project overview.
+- Python version and dependencies.
+- Installation instructions.
+- Folder structure.
+- How to run unit tests.
+- How to run an individual algorithm.
+- How to run all experiments.
+- How to regenerate the plots and tables.
+- How to regenerate the PDF report.
+- Random seeds and evaluation budgets.
+- Current implementation status and known limitations.
+- A description of the three Task C algorithms.
+
+Create `requirements.txt` listing only the dependencies genuinely needed by the project.
+
+Provide reliable commands that work from the project root, preferably using a virtual environment. Avoid undocumented absolute paths or machine-specific assumptions.
+
+Create a `.gitignore` that excludes virtual environments, bytecode, caches, temporary files, and other unnecessary generated material. Keep the required source files, PDF, results, figures, README, and submission archive available for my later GitHub upload.
+
+## 18. Final Verification and Packaging
+
+Before finishing:
+
+1. Run the full test suite.
+2. Run the required experiments.
+3. Verify that all 37 algorithm modules exist and implement their stated mechanisms.
+4. Verify the three Task C algorithms and hand traces.
+5. Confirm that CSV files contain the results referenced in the report.
+6. Confirm that every embedded figure exists and displays correctly.
+7. Verify that the PDF opens and contains the required sections.
+8. Confirm the README instructions are consistent with the actual project.
+9. Build `submission_code.zip` from the runnable source and necessary supporting files.
+10. Inspect the ZIP contents and confirm that it extracts into a usable project structure.
+11. Leave the complete project in the single `Lab_Assignment_7_MOO` folder.
+
+Do not push to GitHub.
+
+At the end, provide a concise completion summary that lists:
+
+- The project folder location.
+- The PDF report path.
+- The ZIP archive path.
+- The main code and results locations.
+- The number of algorithms implemented and tested.
+- Which assignment requirements remain incomplete, if any.
+- Any test failures or limitations that remain.
+
+## 19. Non-Negotiable Rules
+
+- Do not stop after generating a plan.
+- Do not substitute pseudocode for required runnable implementations.
+- Do not create 37 files that all call the same generic optimizer.
+- Do not fabricate results, plots, tests, citations, or completed work.
+- Do not silently omit Tasks A–F.
+- Do not conceal errors or incomplete experiments.
+- Do not use prohibited optimization libraries.
+- Do not change the specified objective functions, constraints, or algorithm definitions without identifying and documenting a genuine ambiguity or error.
+- Keep all deliverables in the requested project folder.
+- Prioritize correctness, reproducibility, explainability, and compliance over superficial completeness.
+
+If the work is too large to complete in one uninterrupted pass, divide it into manageable phases, save working files after each phase, and continue from the saved state. Do not discard working implementations or restart unnecessarily.
+
+**Begin by inspecting the attached assignment and current working directory. Then implement, test, run, document, generate the PDF, and package the complete project.**

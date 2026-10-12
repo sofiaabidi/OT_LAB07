@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 27,
+  "algorithm": "MODE",
+  "problem": "P5",
+  "objectives": 2,
+  "seed": 636,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 1.1814783679145773,
+  "IGD": 0.014656274486460797,
+  "Spacing": 0.018610185626188307,
+  "runtime": 0.27441766699985237,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "D_A27_P5_M2_S636_B10000_"
+}

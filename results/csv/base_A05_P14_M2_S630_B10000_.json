@@ -1,0 +1,33 @@
+{
+  "algorithm_number": 5,
+  "algorithm": "Value Function",
+  "problem": "P14",
+  "objectives": 2,
+  "seed": 630,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 45,
+  "HV": 0.3290471711667035,
+  "IGD": 0.3530232177431687,
+  "Spacing": 0.0,
+  "runtime": 0.0050517090003268095,
+  "front_size": 1,
+  "feasible_fraction": 1.0,
+  "file": "base_A05_P14_M2_S630_B10000_",
+  "solves": [
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        14.52513841115343,
+        56.14526486181272
+      ],
+      "f": [
+        1.8000000988994243,
+        -12.000003360228007
+      ],
+      "cv": 0.0
+    }
+  ]
+}

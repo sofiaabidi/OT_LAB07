@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 12,
+  "algorithm": "NSGA",
+  "problem": "P7",
+  "objectives": 2,
+  "seed": 638,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.6875852196876528,
+  "IGD": 0.012795927437108135,
+  "Spacing": 0.010465942674431449,
+  "runtime": 0.474073750000116,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "base_A12_P7_M2_S638_B10000_"
+}

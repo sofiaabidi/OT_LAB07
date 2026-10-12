@@ -1,0 +1,33 @@
+{
+  "algorithm_number": 7,
+  "algorithm": "Lexicographic",
+  "problem": "P7",
+  "objectives": 2,
+  "seed": 630,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 38,
+  "HV": 0.10999999999830055,
+  "IGD": 0.707106781174626,
+  "Spacing": 0.0,
+  "runtime": 0.004924750000100175,
+  "front_size": 1,
+  "feasible_fraction": 1.0,
+  "file": "base_A07_P7_M2_S630_B10000_",
+  "solves": [
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        69.99999999898026,
+        20.0
+      ],
+      "f": [
+        -55.99999999918421,
+        -24.0
+      ],
+      "cv": 0.0
+    }
+  ]
+}

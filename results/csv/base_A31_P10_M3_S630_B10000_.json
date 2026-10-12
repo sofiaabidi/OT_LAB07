@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 31,
+  "algorithm": "RVEA",
+  "problem": "P10",
+  "objectives": 3,
+  "seed": 630,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.6495773925781252,
+  "IGD": 0.11109265763773894,
+  "Spacing": 0.10444723229465876,
+  "runtime": 0.5430838329998551,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "base_A31_P10_M3_S630_B10000_"
+}

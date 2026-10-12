@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 24,
+  "algorithm": "MOABC",
+  "problem": "P6",
+  "objectives": 2,
+  "seed": 635,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 1.0156137241141732,
+  "IGD": 0.011138628124000379,
+  "Spacing": 0.007783181112653095,
+  "runtime": 1.556735375000244,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "base_A24_P6_M2_S635_B10000_"
+}

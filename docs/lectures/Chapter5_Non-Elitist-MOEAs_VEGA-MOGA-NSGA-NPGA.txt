@@ -1,0 +1,970 @@
+
+PAGE 1
+C H A P T E R  5  ·  M U L T I O B J E C T I V E  O P T I M I Z A T I O N  ( P A R T  2 )
+Non-Elitist MOEAs
+VEGA  ·  MOGA  ·  NSGA  ·  NPGA
+A worked, formula-first tour of the four algorithms that first attempted Pareto-based evolutionary search 
+— with full numerical iterations, real engineering trade-off problems, and the case for elitism.
+Instructor Name
+Department of Computer Science & Engineering
+Evolutionary Computation · Lecture 5B
+Chapter 5 · Non-Elitist MOEAs 1
+
+PAGE 2
+ROADMAP
+What We Will Cover Today
+Roadmap 2
+01
+Foundations
+Pareto dominance, elitism vs. non-elitism, and the 
+shared diversity (niching) formula every method below 
+reuses.
+02
+VEGA (1985)
+Vector Evaluated GA — objective-wise sub-population 
+selection.
+03
+MOGA (1993)
+Fonseca & Fleming's dominance-rank fitness with 
+fitness sharing.
+04
+NSGA (1994)
+Srinivas & Deb's non-dominated sorting into fronts.
+05
+NPGA (1994)
+Horn, Nafpliotis & Goldberg's Pareto tournament 
+selection.
+06
+Comparison & limits
+Side-by-side complexity/diversity trade-offs and why 
+elitism (NSGA-II, SPEA2) followed.
+
+PAGE 3
+FOUNDATIONS
+Quick Refresher: GA Vocabulary Used Today
+Foundations 3
+Population / Individual
+A population is the set of candidate solutions kept each generation. Each 
+individual is one solution, encoded as a chromosome — a vector of genes. Every 
+example today uses REAL-VALUED genes (the decision variable's actual number, 
+e.g. x = 33.3), not binary strings.
+Generation
+One full cycle: evaluate objectives → select parents → crossover → mutate → 
+new population. "Iteration" and "generation" are used interchangeably in this 
+lecture.
+Crossover (rate pc) & Mutation (rate pm)
+Crossover combines two parents' genes into a child. MOGA, NSGA and the case 
+study use arithmetic crossover: child = average(parent1, parent2), rounded if the 
+variable must be an integer (e.g. a turbine count). VEGA's example uses copy-
+based crossover instead (a child copies one parent unchanged) — you'll see why 
+that distinction matters when you get there. Mutation randomly perturbs a gene 
+to keep exploring.
+Selection operators (differ by algorithm!)
+Truncation — keep the top-k by fitness (VEGA). Roulette-wheel / proportional —
+probability of being chosen is proportional to fitness (MOGA, NSGA). Tournament 
+— compare a small random group and keep the best (NPGA).
+Notation used throughout: N = population size,  k = number of objectives,  n = number of decision variables (see the Dimensionality slide shortly).
+
+PAGE 4
+FOUNDATIONS
+Recap: Pareto Dominance & Optimality
+Foundations 4
+● A solution x dominates y (written x ≻ y) if x is no worse than y in every objective, 
+and strictly better in at least one.
+● For a minimization problem with objectives f1 … fk: x ≻ y  ⇔ fm(x) ≤ fm(y) for 
+all m,  and  fm(x) < fm(y) for at least one m.
+● For a MAXIMIZATION objective, flip the inequality: higher is better, so use fm(x) 
+≥ fm(y) (strict > for at least one). Several examples ahead (NSGA, NPGA) 
+maximize directly — just apply the right direction per objective; mixing 
+‘minimize cost’ and ‘maximize reliability’ in the same problem is completely 
+normal.
+● A solution is Pareto-optimal if no other feasible solution dominates it.
+● The set of all Pareto-optimal solutions in objective space is the Pareto front.
+● MOEAs approximate this front with a population, using dominance instead of a 
+single scalar fitness.
+Dominance test
+Minimize:  fm(x) ≤ fm(y)      Maximize:  fm(x) ≥ fm(y)      
+(strict on at least one m)
+Objective Space: minimize f1=x and f2=1/x
+Grey curve = the true Pareto front (dense sample)
+0
+0.5
+1
+1.5
+2
+2.5
+3
+3.5
+0.084 0.584 1.084 1.584 2.084 2.584 3.084
+f2 (minimize)
+f1 (minimize)
+Dominated (same f1, worse f2)
+
+PAGE 5
+FOUNDATIONS
+Elitism vs. Non-Elitism: Definitions
+Foundations 5
+Elitism
+● Guarantees that the best solutions found so far survive into the next 
+generation, usually via an external archive or by mixing parents with 
+offspring before selection.
+● Never loses a non-dominated solution once found.
+● Basis of modern methods: NSGA-II, SPEA2, PESA-II, MOEA/D.
+Non-Elitism (this lecture)
+● Selection acts only on the current generation's population — nothing is 
+archived.
+● A good, non-dominated solution can vanish forever if genetic drift, 
+crossover, or mutation removes it.
+● Historically first (1985–1994): VEGA, MOGA, NSGA, NPGA — the subject 
+of today's lecture.
+Key consequence:  non-elitist methods can converge, then regress — the Pareto approximation is not monotonically improving generation to generation.
+
+PAGE 6
+FOUNDATIONS
+Diversity Preservation: The Sharing Function
+Foundations 6
+● MOGA, NSGA and NPGA all fight genetic drift the same way: fitness sharing 
+(niching) — solutions clustered near others are penalized so the population spreads 
+out.
+● dij is the distance between individuals i and j in (normalized) objective space.
+● Before computing dij, each objective is normalized to [0,1] with min–max scaling, so 
+objectives on different scales (dollars vs. a 0–1 reliability score) contribute equally to 
+distance.
+● σshare is the niche radius — a tunable hyperparameter (its value differs across the 
+worked examples ahead purely to illustrate its effect; a common heuristic is roughly 
+the typical spacing between neighboring solutions).
+Normalize first
+f'm(x) = (fm(x) − fm_min) / (fm_max − fm_min)
+Sharing function
+sh(dij) = 1 − (dij / σshare)²   if dij < σshare, else 0
+Niche count:  NC(i) = Σj sh(dij)
+Shared fitness:  Fshared(i) = F(i) / NC(i)
+Reading the curve
+0
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+0.8
+0.9
+1
+0 0.2σ 0.4σ 0.6σ 0.8σ 0.9σ σ
+sh(dij)
+● At d = 0 (identical solutions): sh = 1 → maximum crowding penalty.
+● At d ≥ σshare: sh = 0 → no penalty, solutions are 'different enough'.
+
+PAGE 7
+FOUNDATIONS
+Decision Variables: From 1 to 2 to n Dimensions
+Foundations 7
+A candidate solution is a decision vector  x = (x1, x2, …, xn) ∈ ℝⁿ
+Every objective still takes the WHOLE vector:  f1(x), f2(x), …, fk(x)  — n never changes k, the number of objectives.
+Aspect n = 1 (scalar) n = 2 (vector) n = general (n genes)
+Chromosome x = x1  (one gene) x = (x1, x2)  (two genes) x = (x1, …, xn)  (n genes)
+Used in this lecture VEGA, MOGA, NPGA (e.g. wingspan x) NSGA (x1 = agriculture, x2 = industry) Case study extension (n fields, n warehouses, …)
+Crossover child = average(parent1, parent2) — one common 
+choice (VEGA's example ahead instead copies a 
+parent unchanged, since blending isn't the only 
+option)
+single-point: swap x1 or x2 between parents, or 
+average both genes
+pick cut point c ∈ {1..n−1}: genes 1..c from parent A, 
+c+1..n from parent B (or mutate each gene 
+independently — “uniform crossover”)
+Mutation perturb the one gene perturb x1 and/or x2, each with probability pm perturb EACH of the n genes independently, each 
+with probability pm
+Decision-space distance d(xi,xj) = |xi − xj| d(xi,xj) = √[(xi1−xj1)²+(xi2−xj2)²] d(xi,xj) = √[Σ l=1..n (xi,l − xj,l)²]   (Euclidean norm)
+Don't confuse the two dimensions in this lecture: n = number of DECISION variables (the chromosome length, varies by problem)vs. k = number of OBJECTIVES (always 2 in our examples). 
+The sharing distance dij used in MOGA/NSGA/NPGA is computed in k-dimensional OBJECTIVE space — it stays 2-D even when n grows.
+
+PAGE 8
+VEGA · CONCEPT
+VEGA: Vector Evaluated Genetic Algorithm
+VEGA · Concept 8
+Full form: Vector Evaluated Genetic Algorithm     Proposed by: Schaffer (1985)
+Core Idea
+Split the mating pool into k equal sub-populations (k = number of objectives). 
+Each sub-population is selected using ONE objective only, then all sub-
+populations are shuffled back together before crossover and mutation.
+Algorithm Steps
+1.  Evaluate every objective f1…fk for each individual
+2.  Split the population into k equal sub-populations
+3.  Select sub-population m using objective fm only (proportional selection)
+4.  Shuffle all sub-populations back into one mating pool
+5.  Apply crossover and mutation
+6.  Repeat until the stopping criterion is met
+Selection probability (per sub-population m)
+P(i, m) = fm(xi) / Σj fm(xj)
+Individual i's share of pool m is proportional to fm(xi).
+(Worked examples below use the simpler top-k TRUNCATION 
+version of this same idea.)
+Advantages
+● Simple extension of a standard GA
+● Trivial to implement
+● Fast — one pass per objective per 
+generation
+Disadvantages
+● Poor diversity — drifts to extremes
+● No elitism: best solutions can vanish
+● Cannot represent balanced 
+compromise solutions
+Best used when: teaching MOO basics or quickly locating extreme (single-objective-best) 
+solutions.
+Avoid when: a diverse, well-spread Pareto front or balanced trade-offs are required.
+Complexity: O(kN) per generation   |   Parameters: population size N, pc, pm
+
+PAGE 9
+VEGA · APPLIED PROBLEM
+Real-Life Problem: Aircraft Wing Design
+VEGA · Applied Problem 9
+Scenario
+An aerospace engineer is sizing the wing of a regional aircraft. A longer wingspan changes two 
+things at once: it lowers fuel burn per flight, but it also allows a wider cabin cross-section and 
+hence more passenger capacity. The engineer needs a spread of good wingspan choices, not 
+just one number.
+Decision Variable
+x = wingspan, restricted to the practical range 10 m ≤ x ≤ 50 m. This is the n = 1 case from the 
+Dimensionality slide: a single-gene chromosome.
+Objective Functions
+f1(x) = 1000 / x        — minimize fuel consumption
+f2(x) = x² / 100      — maximize passenger capacity
+MOEA Approach
+● Split the population: half the mating pool is chosen by f1, half by f2.
+● Shuffle the two halves together, then apply crossover + mutation.
+● Track whether the population keeps any wingspan values between the two extremes.
+Trade-off
+Two conflicting goals — improving one worsens the other. 
+No single x optimizes both.
+
+PAGE 10
+VEGA · WORKED EXAMPLE
+Iteration 1 — Objective-wise Selection
+VEGA · Worked Example 10
+● Initial population: x = {10, 20, 30, 40}. Evaluate both objectives for every individual, then select the best 2 individuals u nder f1 and the best 2 under f2 (VEGA runs these 
+selections independently, in parallel sub-populations).
+● Because f1 = 1000/x is minimized by the LARGEST x, and f2 = x² /100 is maximized also by the LARGEST x, both sub-selections pull toward the same extreme here.
+x f1(x) = 1000/x f2(x) = x²/100 Rank under f1 Rank under f2
+10 100 1 4th (worst) 4th (worst)
+20 50 4 3rd 3rd
+30 33.3 9 2nd — selected 2nd — selected
+40 25 16 1st — selected 1st — selected
+Sub-population under f1 → {40, 30}.   Sub-population under f2 → {40, 30}.   Merged mating pool = {40, 30, 40, 30}. The individual x = 20 is already eliminated after one generation.
+
+PAGE 11
+VEGA · WORKED EXAMPLE
+Iteration 2 — Crossover Reshuffles, Then Selection Converges
+VEGA · Worked Example 11
+● Mating pool from Iteration 1: {40, 30, 40, 30}. With only ONE gene per individual (n = 1), this simplified crossover reproduc es a whole parent unchanged in each child 
+rather than blending values — so the offspring are still drawn only from {40, 30}; nothing new is created. (Contrast this with MOGA's blend crossover later, which DOES 
+create brand-new intermediate values like x=12.)
+● The population entering Gen 2 is therefore still two 40s and two 30s — same multiset, just re-shuffled. The real shift happens at the NEXT selection step: applying 
+VEGA's objective-wise selection to {40,40,30,30} picks the top 2 under f1 AND the top 2 under f2 — and since both objectives already favor the larger x, the top-2 under 
+EACH objective are now simply the two existing 40s. The merged mating pool becomes four 40s.
+Step Population Best f1 (x) Best f2 (x) Diversity
+Gen 0 (initial) {10, 20, 30, 40} 40 → 25.0 40 → 16.0 High
+Gen 1 (after selection) {40, 30, 40, 30} 40 → 25.0 40 → 16.0 Low
+Gen 2 (after crossover, before re-
+selection)
+{40, 40, 30, 30} 40 → 25.0 40 → 16.0 Very low
+Observation: no intermediate value (like 35) ever survives in this multiset — VEGA's selection pressure is so strong here that the population simply shifts its 40-vs-30 PROPORTION 
+each generation until only 40s remain by generation 3. The middle of the trade-off curve was never a member of the population to begin with, let alone selected.
+
+PAGE 12
+VEGA · RESULT
+Iteration Table & Final (Poor) Result
+VEGA · Result 12
+Iter. Population Best f1 Best f2 Diversity Note
+0 {10,20,30,40} 25.0 (x=40) 16.0 (x=40) High Initial random 
+population
+1 {40,30,40,30} 25.0 16.0 Low Extremes 
+selected
+2 {40,40,30,30} 25.0 16.0 Very low Converging to 
+extremes
+3 {40,40,40,40} 25.0 16.0 None Complete loss of 
+diversity
+True Front vs. What VEGA Actually Finds
+Grey curve = true Pareto front (dense sample)
+0
+5
+10
+15
+20
+25
+13.6 33.6 53.6 73.6 93.6
+f2 = capacity·100 (maximize)
+f1 = fuel (minimize)
+Lost mid-range solution Surviving extreme (VEGA's answer)
+Result: VEGA converges to x = 40 (f1 = 25, f2 = 16) — a single point ON the true front, but only one of infinitely many. The balanced compromise near x = 30 (f1 = 
+33.3, f2 = 9) is permanently lost by generation 3. VEGA finds A point on the front, but never the SPREAD of it.
+
+PAGE 13
+VEGA · SECOND EXAMPLE
+Applying VEGA to a Different Trade-off: Portfolio Allocation
+VEGA · Second Example 13
+MOO Type: Financial Risk vs. Return
+● Scenario: an investor chooses x = percentage of a portfolio held in equities (0–100%). More equity raises expected return but also raises risk.
+● Objectives: f1(x) = x² / 500  (minimize risk)     f2(x) = 2 + x/10  (maximize return).
+● Population {20, 40, 60, 80}: evaluate, split by objective, and watch the same extreme -seeking pattern appear in a completely different domain.
+x (% equity) f1 = risk f2 = return Selected under f1 (low risk) Selected under f2 (high return)
+20 0.8 4 Yes (lowest risk) No
+40 3.2 6 — —
+60 7.2 8 — —
+80 12.8 10 No Yes (highest return)
+Takeaway: the mating pool becomes {20, 80, 20, 80} after one generation — VEGA again jumps straight to the two extremes (safest vs. most aggressive) and never proposes 
+a genuinely balanced 40–60% allocation. The failure mode is structural to VEGA, not specific to any one problem.
+
+PAGE 14
+MOGA · CONCEPT
+MOGA: Multi-Objective Genetic Algorithm
+MOGA · Concept 14
+Full form: Multi-Objective Genetic Algorithm     Proposed by: Fonseca & Fleming (1993)
+Core Idea
+Rank each individual by how many other individuals dominate it (not by raw 
+objective value), turn rank into fitness, then apply fitness sharing so crowded 
+ranks don't collapse onto one point.
+Algorithm Steps
+1.  Evaluate all objectives for every individual
+2.  rank(i) = 1 + (number of individuals that dominate i)
+3.  Assign raw fitness F(i) = 1 / rank(i)
+4.  Compute pairwise distance dij and apply the sharing function
+5.  Divide: Fshared(i) = F(i) / NC(i)
+6.  Select, crossover, and mutate using Fshared
+Rank-based fitness
+F(i) = 1 / rank(i)
+Fshared(i) = F(i) / NC(i)   (NC from the sharing formula)
+Advantages
+● Dominance-based ranking is fairer 
+than VEGA's split
+● Sharing actively maintains diversity
+● Clearly better spread than VEGA
+Disadvantages
+● Still non-elitist — rank leaders can be 
+lost
+● Needs the niche radius σshare tuned 
+by hand
+● Slower per generation than VEGA
+Best used when: moderate diversity is needed and you want to teach dominance-rank 
+fitness.
+Avoid when: very fast convergence is required, or elitism is mandatory.
+Complexity: O(kN²) per generation   |   Parameters: niche radius σshare, population size
+
+PAGE 15
+MOGA · APPLIED PROBLEM
+Real-Life Problem: Wind Farm Layout
+MOGA · Applied Problem 15
+Scenario
+A renewable-energy company is deciding how many turbines to install in a new wind farm. 
+Adding turbines increases total construction and maintenance cost, but the energy captured 
+grows more slowly than linearly (wake losses), giving a genuine sub-linear trade-off curve.
+Decision Variable
+x = number of turbines, an integer with 5 ≤ x ≤ 20.
+Objective Functions
+f1(x) = 10x                — minimize total cost
+f2(x) = 100·√x            — maximize energy output
+MOEA Approach
+● Compute dominance rank for every candidate layout.
+● Apply fitness sharing across the (mostly rank-1) population.
+● Select the least-crowded, highest-fitness layouts to breed.
+Trade-off
+Two conflicting goals — improving one worsens the other. 
+No single x optimizes both.
+
+PAGE 16
+MOGA · WORKED EXAMPLE
+Setting Up the Ranking & Sharing Numbers
+MOGA · Worked Example 16
+● Population x = {5, 10, 15, 20}. Because f1 rises with x while f2 also rises with x, NO layout dominates another — every layout is Rank 1 (all trade off cost for 
+energy).
+x f1 = 10x (cost) f2 = 100√x (energy) Dominance Rank
+5 50 223.6 1 (non-dominated)
+10 100 316.2 1 (non-dominated)
+15 150 387.3 1 (non-dominated)
+20 200 447.2 1 (non-dominated)
+Since every individual shares rank 1, raw fitness F(i) = 1/1 = 1 for all four — MOGA cannot yet tell them apart.
+This is exactly why fitness SHARING matters here: it is the only thing that will separate crowded layouts (e.g. x=10, x=15, close together) from isolated ones (x=5, 
+x=20) on the next slide.
+
+PAGE 17
+MOGA · WORKED EXAMPLE
+Iteration 1 — Normalize, then Share Fitness
+MOGA · Worked Example 17
+● Step 1 — normalize each objective to [0,1] using min–max over the population, so cost (∼50–200) and energy (∼224–447) contribute equally to distance.
+● Step 2 — compute Euclidean distance dij between every pair in normalized space, then apply sh(dij) = 1 − (dij/σshare)² with σsha re = 0.5.
+● Step 3 — niche count NC(i) = 1 (self) + Σ sh(dij); shared fitness = F(i) / NC(i), with F(i) = 1 for all (all Rank 1).
+x Normalized (f1′, f2′) Niche Count NC(i) Shared Fitness = 1 / NC(i)
+5 (0.00, 0.00) 1.000  (isolated) 1.000
+10 (0.33, 0.41) 1.151 0.869
+15 (0.67, 0.73) 1.417  (most crowded) 0.706
+20 (1.00, 1.00) 1.266 0.790
+Reading the result: x = 15 sits between two neighbors (x=10 and x=20) in normalized space, so it accumulates the most sharing penalty and drops to the lowest shared fitness (0.706) 
+— exactly the crowding effect sharing is designed to detect.
+
+PAGE 18
+MOGA · WORKED EXAMPLE
+Iteration 2 — Selection, Crossover & a New Layout
+MOGA · Worked Example 18
+● Roulette-wheel selection (recall: probability of being chosen ≈ its own fitness ÷ total fitness) on the shared fitness values favors x=5 and x=20 slightly, but does NOT 
+eliminate the crowded middle — sharing only softens their fitness, it doesn't remove them from the gene pool.
+● Crossover between x=10 and x=15 introduces a NEW candidate: average = 12.5, rounded DOWN to x=12 since turbine count must be a whole number. Crossover 
+between x=15 and x=20 similarly gives average 17.5 → x=17. The population becomes {5, 12, 17, 20}.
+x f1 = 10x f2 = 100√x Rank Note
+5 50 223.6 1 Unchanged, isolated (kept)
+12 120 346.4 1 New — fills the 5
+ 20 gap
+17 170 412.3 1 New — fills the 5
+ 20 gap
+20 200 447.2 1 Unchanged, isolated (kept)
+Because sharing continually penalizes clustering rather than deleting individuals outright, MOGA lets crossover keep proposing intermediate layouts (x=12, x=17) — this is the 
+structural reason MOGA out-performs VEGA on diversity.
+
+PAGE 19
+MOGA · RESULT
+Iteration Table & Final Pareto Front
+MOGA · Result 19
+Iter. Population Shared Fitness 
+(approx.)
+Diversity Note
+0 {5,10,15,20} 1.00 / 0.87 / 0.71 / 
+0.79
+High Initial — all rank 1
+1 {5,10,15,20} sharing computed High Niche penalty 
+applied
+2 {5,12,17,20} recomputed, spread 
+out
+High Crossover fills the 
+gaps
+3 {5,12,17,20} stable High Converged, well 
+spread
+True Front vs. What MOGA Finds
+Grey curve = true Pareto front (dense sample)
+0
+50
+100
+150
+200
+250
+300
+350
+400
+450
+38 88 138 188
+f2 = energy (maximize)
+f1 = cost (minimize)
+MOGA's final population
+Result: MOGA's final population {(50, 223.6), (120, 346.4), (170, 412.3), (200, 447.2)} lands EXACTLY on the true Pareto front and spans it end to end — unlike VEGA, 
+which only ever reaches two of the front's infinitely many points.
+
+PAGE 20
+MOGA · SECOND EXAMPLE
+Applying MOGA to a Different Trade-off: Structural Beam 
+Design
+MOGA · Second Example 20
+MOO Type: Mechanical — Weight vs. Deflection
+● Scenario: a structural engineer picks x = beam depth in cm (10–40). A deeper beam weighs more but deflects far less under load ( deflection falls with depth³).
+● Objectives: f1(x) = 2x  (minimize weight)     f2(x) = 5000 / x²  (minimize deflection).
+● Population {10, 20, 30, 40}: since both objectives should be minimized and one rises while the other falls, every layout is a gain non-dominated — MOGA's sharing 
+step is what will separate them.
+x (depth, cm) f1 = weight (2x) f2 = deflection (5000/x²) Rank
+10 20 50 1 (non-dominated)
+20 40 12.5 1 (non-dominated)
+30 60 5.6 1 (non-dominated)
+40 80 3.1 1 (non-dominated)
+Takeaway: exactly like the wind-farm case, all four beam depths sit on one trade-off curve. MOGA's rank fitness alone cannot separate them — only the sharing function 
+(normalizing weight and deflection, then penalizing closely-clustered depths) produces a spread final design set.
+
+PAGE 21
+NSGA · CONCEPT
+NSGA: Non-Dominated Sorting Genetic Algorithm (Original)
+NSGA · Concept 21
+Full form: Non-Dominated Sorting Genetic Algorithm     Proposed by: Srinivas & Deb (1994)
+Core Idea
+Peel the population into fronts by repeated non-dominated sorting (Front 1 = 
+non-dominated, Front 2 = dominated only by Front 1, etc.), give every front a 
+big dummy fitness gap, then share fitness within each front.
+Algorithm Steps
+1.  Sort the population into fronts F1, F2, … by dominance
+2.  Assign dummy fitness F(i) = Fmax − (rank(i) − 1)×ΔF
+3.  Within EACH front, compute sharing and get Fshared(i) = F(i) / NC(i)
+4.  Select, crossover, mutate using Fshared
+5.  Re-sort into fronts next generation
+Dummy fitness by front
+F(i) = Fmax − (rank(i) − 1) × ΔF
+Fshared(i) = F(i) / NC(i)   (sharing applied WITHIN a 
+front)
+Advantages
+● Very good diversity via within-front 
+sharing
+● The non-dominated sorting concept 
+is conceptually clean
+● Directly inspired NSGA-II
+Disadvantages
+● O(kN³) sorting cost — very slow for 
+large N
+● Still non-elitist: front 1 members can 
+be lost
+● Needs σshare tuned per front
+Best used when: teaching the historical roots of non-dominated sorting, or working with 
+small populations.
+Avoid when: large populations or fast turnaround are needed.
+Complexity: O(kN³)   |   Parameters: σshare, population size
+
+PAGE 22
+NSGA · APPLIED PROBLEM
+Real-Life Problem: Water Resource Allocation
+NSGA · Applied Problem 22
+Scenario
+A regional water authority must split a fixed water supply between agriculture and industry. 
+Every liter given to one sector is a liter not given to the other, subject to a hard supply cap —
+the classic constrained bi-objective allocation problem.
+Decision Variable
+x1 = water to agriculture, x2 = water to industry, with x1 + x2 ≤ 100 (units: million liters/day). 
+This is the n = 2 case from the Dimensionality slide: x = (x1, x2).
+Objective Functions
+f1 = x1     — maximize agricultural yield
+f2 = x2     — maximize industrial output
+MOEA Approach
+● Sort candidate allocations into non-dominated fronts.
+● Share fitness within Front 1 so the sorting doesn't collapse to one allocation.
+● Select across fronts, favoring Front 1 with high shared fitness.
+Trade-off
+Two conflicting goals — improving one worsens the other. 
+No single x optimizes both.
+
+PAGE 23
+NSGA · WORKED EXAMPLE
+Iteration 1 — Non-Dominated Sorting & Sharing
+NSGA · Worked Example 23
+● Population: A(30,70), B(50,50), C(70,30) all satisfy x1+x2=100 exactly (fully using the supply) — none dominates another, so all three are Front 1.  D(35,50) uses only 85 
+units: B(50,50) dominates D because B's x1=50 > D's x1=35 while B's x2=50 = D's x2 — so D is Front 2.
+● Dummy fitness (Fmax=100, ΔF=50): Front 1 → F=100.  Front 2 → F=50.
+● Sharing WITHIN Front 1 (min–max normalized over A,B,C; σshare=0.75): B sits exactly between A and C, so B is penalized the most.
+Solution (f1, f2) Front Niche Count (Front 1 only) Shared Fitness
+A (30,70) (30, 70) 1 1.111 100 / 1.111 = 90.0
+B (50,50) (50, 50) 1 1.222  (most crowded) 100 / 1.222 = 81.8
+C (70,30) (70, 30) 1 1.111 100 / 1.111 = 90.0
+D (35,50) (35, 50) 2 — dominated by B 1.000 (alone in front) 50 / 1.000 = 50.0
+Reading the result: A and C (the extremes of Front 1) score higher shared fitness than B (the middle) — sharing is already nudging selection toward a spread front even before 
+crossover happens.
+
+PAGE 24
+NSGA · WORKED EXAMPLE
+Iteration 2 — Crossover Produces a New Front-1 Member
+NSGA · Worked Example 24
+● Crossover between A(30,70) and B(50,50) produces a new allocation E(40,60), which also satisfies x1+x2=100 exactly. Re-check dominance: no existing point dominates 
+E, so E JOINS Front 1, and D is dropped (its parent B out-competed it).
+● Re-sharing within the new Front 1 = {A, B, C, E} (σshare=0.75 unchanged): E now sits close to BOTH A and B, so it picks up the l argest niche penalty of the generation.
+Solution (f1, f2) Niche Count Shared Fitness (F=100 for all, Front 1)
+A (30,70) (30, 70) 1.888 53.0
+B (50,50) (50, 50) 1.999  (most crowded) 50.0
+C (70,30) (70, 30) 1.111 90.0
+E (40,60) (40, 60) 2.554  (new, but crowded) 39.2
+Observation: sharing correctly punishes E for landing near A and B, even though E is brand new and non-dominated — this is exactly the mechanism that will, over more generations, 
+spread Front 1 evenly across the full trade-off line.
+
+PAGE 25
+NSGA · RESULT
+Iteration Table & Final Front
+NSGA · Result 25
+Iter. Front 1 Front 2 Best Shared 
+Fitness
+Diversity Note
+0 A, B, C D 100 High Initial sort
+1 A, B, C D 100 (sharing 
+applied)
+High B penalized for 
+crowding
+2 A, B, C, E — (D dropped) 100 Very High Crossover adds E
+3 A, B, C, E — 100 Very High Converged, 4-
+point front
+True Front vs. What NSGA Finds
+Grey curve = true Pareto front (dense sample)
+0
+20
+40
+60
+80
+100
+0 20 40 60 80 100
+f2 = industry (maximize)
+f1 = agriculture (maximize)
+NSGA's final front
+Result: NSGA converges to {A(30,70), E(40,60), B(50,50), C(70,30)} — four points sitting exactly on the true (straight-line) Pareto front x1+x2=100, evenly spread from 
+one end to the other. Best spread of the four non-elitist methods, at O(kN³) cost.
+
+PAGE 26
+NSGA · SECOND EXAMPLE
+Applying NSGA to a Different Trade-off: Production Scheduling
+NSGA · Second Example 26
+MOO Type: Manufacturing — Cost vs. Tardiness
+● Scenario: a plant manager picks x = batch size for a production run. Larger batches reduce per-unit setup cost but increase the chance an order finishes late 
+(tardiness).
+● Objectives (minimize both): f1(x) = 500/x + 20   (setup cost per unit)     f2(x) = 0.02x²  (expected tardiness, days).
+● Candidates: P(x=10), Q(x=20), R(x=30), S(x=15, badly scheduled so it is dominated).
+Solution f1 = cost f2 = tardiness Dominated by? Front
+P (x=10) 70 2 — 1
+Q (x=20) 45 8 — 1
+R (x=30) 36.7 18 — 1
+S (x=15, +5 delay penalty) 53.3 9.5 Dominated by Q (45.0, 8.0 ≤ 
+53.3, 9.5)
+2
+Takeaway: P, Q, R trade cost against tardiness cleanly (Front 1); S is a genuinely worse schedule and correctly drops to Front 2 — exactly the two-tier structure NSGA is built to 
+detect before sharing spreads Front 1 out.
+
+PAGE 27
+NPGA · CONCEPT
+NPGA: Niched Pareto Genetic Algorithm
+NPGA · Concept 27
+Full form: Niched Pareto Genetic Algorithm     Proposed by: Horn, Nafpliotis & Goldberg (1994)
+Core Idea
+Replace fitness computation entirely with Pareto tournaments: pick 2 
+candidates plus a small random comparison set. If dominance decides 
+between the 2 candidates, pick the winner; if neither dominates, break the 
+tie with niche count (pick the LESS crowded one).
+Algorithm Steps
+1.  Pick 2 candidates i, j at random — this is the “tournament size”, fixed at 2 
+throughout this lecture (a binary tournament)
+2.  SEPARATELY pick a comparison set of size t at random (t = 2 in every worked 
+example here) — used only to measure crowding, not to compete directly
+3.  If i dominates j (against nobody else) → select i; if j dominates i → select j
+4.  If neither dominates → compute niche count of i and j against the 
+comparison set
+5.  Select whichever of i, j has the LOWER niche count (less crowded)
+6.  Repeat to fill the mating pool
+Niche count against the comparison set
+NC(i) = Σ (over comparison set j) sh(dij)
+Lower NC(i) wins the tie-break — it is less crowded
+Advantages
+● No explicit fitness function to 
+compute — fast
+● Directly uses Pareto dominance
+● Simple to implement as a selection 
+operator
+Disadvantages
+● Needs σshare AND comparison-set 
+size tuned
+● Still non-elitist
+● Result quality depends on 
+comparison-set size
+Best used when: fast selection is the priority and moderate diversity is acceptable.
+Avoid when: maximum diversity or guaranteed elitism is required.
+Complexity: O(kN²)   |   Parameters: σshare, tournament size, comparison-set size
+
+PAGE 28
+NPGA · APPLIED PROBLEM
+Real-Life Problem: Telecom Network Design
+NPGA · Applied Problem 28
+Scenario
+A telecom operator is choosing a network topology. Cheaper topologies (fewer redundant links) 
+cost less to build, but redundancy is what makes a network resilient to failures — cost and 
+reliability trade off directly.
+Decision Variable
+x = network topology choice — a discrete design, not a formula. Unlike the earlier problems, 
+there's no closed-form f(x): each candidate topology below (A, B, C, D) is simply given directly by 
+its own (cost, reliability) outcome.
+Objective Functions
+f1 = build cost           — minimize
+f2 = reliability score  — maximize
+MOEA Approach
+● Normalize cost and reliability to a common [0,1] scale before measuring distance.
+● Run Pareto tournaments between pairs of candidate topologies.
+● Break non-dominated ties using niche count so crowded topologies lose to unique ones.
+Trade-off
+Two conflicting goals — improving one worsens the other. 
+No single x optimizes both.
+
+PAGE 29
+NPGA · WORKED EXAMPLE
+Iteration 1 — Tournament A vs. B
+NPGA · Worked Example 29
+● Candidates: A(cost=10, rel=0.80), B(cost=15, rel=0.90). Comparison set: C(cost=12, rel=0.85), D(cost=18, rel=0.95).
+● Dominance check A vs B: A is cheaper (better) but less reliable (worse) — NEITHER dominates. Tie-break by niche count.
+● Normalize cost via (cost−10)/10 and reliability via (rel−0.8)/0.2, so both axes range over [0,1] before measuring distance — this fixes the unit-mismatch that would 
+otherwise let cost dominate the distance calculation.
+Pair checked Normalized distance d sh(d), σshare = 0.5 Niche Count NC
+A 
+ C 0.320 0.590 NC(A) = 0.590 + 0 = 0.590
+A 
+ D 1.097 (≥ σshare) 0 (included above)
+B 
+ C 0.391 0.389 NC(B) = 0.389 + 0.389 = 0.778
+B 
+ D 0.391 0.389 (included above)
+Result: NC(A) = 0.590 < NC(B) = 0.778 → A is less crowded and WINS the tournament. A is copied into the mating pool.
+
+PAGE 30
+NPGA · WORKED EXAMPLE
+Iteration 2 — Tournament C vs. D
+NPGA · Worked Example 30
+● New pair drawn: C(cost=12, rel=0.85) vs D(cost=18, rel=0.95), with comparison set now A(10, 0.80), B(15, 0.90).
+● Dominance check: C is cheaper but less reliable than D — again NEITHER dominates, so niche count decides.
+● Same normalization as before: (cost−10)/10, (rel−0.8)/0.2, σshare = 0.5.
+Pair checked Normalized distance d sh(d) Niche Count NC
+C 
+ A 0.320 0.590 NC(C) = 0.590 + 0.389 = 0.979
+C 
+ B 0.391 0.389 (included above)
+D 
+ A 1.097 (≥ σshare) 0 NC(D) = 0 + 0.389 = 0.389
+D 
+ B 0.391 0.389 (included above)
+Result: NC(D) = 0.389 < NC(C) = 0.979 → D is far less crowded (it's isolated near the high-reliability corner) and WINS. D is copied into the mating pool.
+
+PAGE 31
+NPGA · RESULT
+Selection Table & Final Diverse Set
+NPGA · Result 31
+Round Candidates Comparison Set Dominance? Niche Counts Winner
+1 A, B C, D No A=0.590, 
+B=0.778
+A
+2 C, D A, B No C=0.979, 
+D=0.389
+D
+3 A, C B, D No A=0.000, 
+C=0.390
+A
+4 B, D A, C No B=0.390, 
+D=0.000
+D
+True Front vs. What NPGA Selects
+Grey curve = true Pareto front (dense sample)
+0
+0.2
+0.4
+0.6
+0.8
+1
+9.36 11.36 13.36 15.36 17.36
+f2 = reliability (maximize)
+f1 = cost (minimize)
+Selected into mating pool Lost tournaments
+Result: all four candidates A, C, B, D actually lie ON the true trade-off front — none is dominated. But repeated tournaments only ever pick the LESS CROWDED ones: 
+A(10, 0.80) and D(18, 0.95) survive into the mating pool, while the entirely valid B(15, 0.90) and C(12, 0.85) are still at r isk of being under-sampled.
+
+PAGE 32
+NPGA · SECOND EXAMPLE
+Applying NPGA to a Different Trade-off: Supply Chain Network
+NPGA · Second Example 32
+MOO Type: Logistics — Cost vs. Lead Time
+● Scenario: a retailer chooses among candidate warehouse networks. Fewer, larger warehouses cost less to run but increase average delivery lead time; more, 
+smaller warehouses cost more but deliver faster.
+● Objectives (minimize both): f1 = annual operating cost ($M), f2 = average lead time (days).
+● Candidates: W1(cost=8, lead=5), W2(cost=12, lead=3). Comparison set: W3(cost=9, lead=4.5), W4(cost=14, lead=2).
+Tournament Dominance? Normalized niche count (min–max over 
+all 4, σshare=0.5)
+Winner
+W1 vs W2 (comparison: W3, W4) No (cost vs. lead-time trade-off) NC(W1)=0.778, NC(W2)=0.111 W2 (less crowded)
+W3 vs W4 (comparison: W1, W2) No NC(W3)=0.778, NC(W4)=0.111 W4 (less crowded)
+Takeaway: the same normalize-then-niche-count machinery applies unchanged to a logistics problem — NPGA doesn't care what the objectives mean physically, only how 
+candidates are distributed in normalized objective space. Notice W1 and W3 (both close to the cheap-but-slow corner) keep losing to whichever of W2/W4 is currently more 
+isolated.
+
+PAGE 33
+SYNTHESIS
+Non-Elitist MOEAs — Side-by-Side Comparison
+Synthesis 33
+Method Full Form Selection 
+Mechanism
+Diversity Convergence Complexity Elitist? Key Parameter(s)
+VEGA Vector Evaluated 
+GA
+Objective-wise sub-
+population split
+Poor Medium O(kN) No pc, pm
+MOGA Multi-Objective GA Dominance rank + 
+fitness sharing
+Good Medium O(kN²) No σshare
+NSGA Non-Dominated 
+Sorting GA
+Front sorting + 
+within-front 
+sharing
+Very Good Medium O(kN³) No σshare
+NPGA Niched Pareto GA Pareto tournament 
++ niche count tie-
+break
+Good Fast O(kN²) No σshare, 
+tournament size
+● Diversity mechanism improves from VEGA (none) → NPGA/MOGA (sharing) → NSGA (sharing + explicit fronts), but so does computational cost.
+● All four are non-elitist: every one of them can, and eventually does, discard a good solution once found — the subject of the next two slides.
+
+PAGE 34
+SYNTHESIS
+Complexity vs. Diversity Trade-off
+Synthesis 34
+Per-Generation Cost (N = 100, k = 2)
+200
+20,000 20,000
+20,00,000
+VEGA
+O(kN)
+MOGA
+O(kN²)
+NPGA
+O(kN²)
+NSGA
+O(kN³)
+Qualitative Diversity Achieved
+Score: 1 = Poor, 2 = Fair, 3 = Good, 4 = Very Good (matches the Diversity column two slides back)
+1
+3 3
+4
+VEGA MOGA NPGA NSGA
+
+PAGE 35
+SYNTHESIS
+Why We Need Elitist MOEAs
+Synthesis 35
+! Loss of best solutions
+Every method above can drop a non-dominated solution once 
+selection, crossover, or mutation removes it — nothing preserves it.
+! Slow, oscillating convergence
+With no memory of past good solutions, the approximation quality 
+can regress between generations instead of improving 
+monotonically.
+! Computational cost
+NSGA's within-front sharing costs O(kN³) per generation —
+prohibitive once N grows past a few hundred.
+! Diversity vs. convergence tension
+Stronger sharing (small σshare) fights crowding but also fights 
+convergence toward the true front — tuning is delicate and problem-
+specific.
+The fix: Elitist MOEAs — NSGA-II, SPEA2, PESA-II, MOEA/D — merge parents with offspring before selection, so a non-dominated solution, once found, is never lost 
+again.
+
+PAGE 36
+CASE STUDY
+One Problem, Four Algorithms: Smart Irrigation Scheduling
+Case Study 36
+● Scenario: a farm manager sets x = irrigation events per week (1–10). More irrigation raises water cost but also raises crop yield with diminishing returns — a single 
+shared trade-off curve, run through all four algorithms so their final populations can be compared directly.
+● All four algorithms start from the SAME initial population {2, 4, 6, 8, 10} — this is what lets us compare their final results apples-to-apples below.
+f1(x) = 5x  (minimize water used)          f2(x) = 100·√x  (maximize crop yield)
+Algorithm Final selected set (x) Diversity Why
+VEGA {2, 10} only Poor Objective-wise split 
+collapses to the two 
+extremes
+MOGA {2, 4, 6, 8, 10} Good Sharing keeps 
+crowded x=4,6,8 
+alive
+NSGA {2, 4, 6, 8, 10} Very Good Front + within-front 
+sharing spreads 
+evenly
+NPGA {2, 6, 10} Moderate Tournament luck 
+skips some mid-
+range values
+Final Populations vs. the True Front
+Grey curve = true Pareto front (dense sample)
+0
+50
+100
+150
+200
+250
+300
+1.4 11.4 21.4 31.4 41.4 51.4
+f2
+f1
+MOGA & NSGA (full spread) NPGA (partial spread) VEGA (extremes only)
+Same math, same problem, four different final populations — the diversity mechanism (or its absence) is the only thing that changed.
+
+PAGE 37
+CASE STUDY · EXTENSION
+Generalizing the Case Study: n Decision Variables
+Case Study · Extension 37
+● Scale the irrigation problem up: a cooperative manages n fields, each with its own irrigation frequency. The decision vector is now x = (x1, x2, …, xn) — one gene per 
+field — instead of the single x used earlier.
+General n-field objectives
+f1(x) = 5 · Σ i=1..n  xi        (total water used across all n fields — minimize)
+f2(x) = 100 · Σ i=1..n  √xi   (total crop yield across all n fields — maximize)
+n Example chromosome x f1(x) = 5·Σxi f2(x) = 100·Σ√xi
+1 (2) 5·(2) = 10 100·(1.414) = 141.4  — matches the single-
+field slide exactly
+2 (2, 6) 5·(2+6) = 40 100·(1.414+2.449) = 386.3
+3 (2, 6, 10) 5·(2+6+10) = 90 100·(1.414+2.449+3.162) = 702.5
+What actually changes as n grows: the chromosome gets longer (n genes instead of 1), crossover picks a cut point among n−1 positions (or mutates gene-by-gene), and mutation 
+perturbs each of the n genes independently. What does NOT change: the sharing formula sh(dij), niche count, and dummy-fitness formulas — they all operate in k = 2 dimensional 
+OBJECTIVE space, exactly as before, no matter how large n is.
+
+PAGE 38
+REFERENCE
+Key Formula Cheat-Sheet
+Reference 38
+Pareto dominance
+Min: fm(x)≤fm(y)   Max: 
+fm(x)≥fm(y)   (strict on ≥1 
+objective)
+VEGA selection probability
+P(i,m) = fm(xi) / Σj fm(xj)
+MOGA rank fitness
+F(i) = 1 / rank(i)
+Sharing function
+sh(dij) = 1 − (dij/σshare)²  if 
+dij<σshare, else 0
+Niche count
+NC(i) = Σj sh(dij)
+Shared fitness
+Fshared(i) = F(i) / NC(i)
+NSGA dummy fitness
+F(i) = Fmax − (rank(i)−1) × ΔF
+NPGA tournament rule
+Dominance decides first; else 
+pick lower NC(i) vs. comparison 
+set
+
+PAGE 39
+WRAP -UP
+Key Takeaways — Non-Elitist MOEAs
+Wrap-up 39
+VEGA (1985) Simple objective-wise split. Fast, but converges hard to the extremes — the balanced middle of the trade-off is lost.
+MOGA (1993) Dominance-rank fitness plus sharing. A genuine step up in diversity, at O(kN²) cost.
+NSGA (1994) Explicit non-dominated fronts plus within-front sharing. Best diversity of the four, but O(kN³) is expensive.
+NPGA (1994) Pareto tournaments with niche-count tie-breaks. Fast selection, good diversity, no explicit fitness needed.
+All four are non-elitist — the best solutions found can still be lost. Next lecture: Elitist MOEAs (NSGA-II, NSGA-III, SPEA2, PESA-II, MOEA/D).
+
+PAGE 40
+PRACTICE
+Test Your Understanding
+Practice 40
+Problem
+A population contains x = {0, 1, 2} for a bi-objective minimization problem with f1(x) = (x−1)² and f2(x) = (x+1)². Using MOGA-style dominance ranking, 
+determine which individuals are non-dominated (Rank 1), and identify any that are dominated.
+x f1(x) = (x−1)² f2(x) = (x+1)² Dominated by?
+0 1 1 —
+1 0 4 —
+2 1 9 Dominated by x=0  (1≤1 and 1≤9, with 
+1<9)
+Answer: Front 1 (non-dominated) = {x=0, x=1}. x=2 is dominated by x=0 since x=0 matches it on f1 (1=1) and strictly beats it on f2 (1<9). Note x=0 and x=1 do NOT dominate 
+each other — each wins on a different objective.
+
+PAGE 41
+REFERENCE
+References & Coming Up Next
+Reference 41
+Key References
+● Schaffer, J. D. (1985). Multiple objective optimization with vector evaluated genetic algorithms. 
+Proc. 1st ICGA.
+● Fonseca, C. M. & Fleming, P . J. (1993). Genetic algorithms for multiobjective optimization: 
+formulation, discussion and generalization. Proc. 5th ICGA.
+● Srinivas, N. & Deb, K. (1994). Multiobjective optimization using nondominated sorting in 
+genetic algorithms. Evolutionary Computation, 2(3).
+● Horn, J., Nafpliotis, N. & Goldberg, D. E. (1994). A niched Pareto genetic algorithm for 
+multiobjective optimization. Proc. IEEE CEC.
+● Deb, K. (2001). Multi-Objective Optimization Using Evolutionary Algorithms. Wiley.
+Coming Up: Part 3
+● NSGA-II — fast non-dominated sorting + crowding 
+distance
+● NSGA-III — reference-point based, many-objective 
+problems
+● SPEA2 — strength Pareto with an external archive
+● PESA-II — hypergrid-based selection
+● MOEA/D — decomposition into scalar subproblems
+
+PAGE 42
+?
+Questions?
+Chapter 5 · Non-Elitist MOEAs — VEGA · MOGA · NSGA · NPGA
+Q&A 42

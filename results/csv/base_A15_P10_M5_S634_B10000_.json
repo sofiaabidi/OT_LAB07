@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 15,
+  "algorithm": "NSGA-III",
+  "problem": "P10",
+  "objectives": 5,
+  "seed": 634,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.9975253588867192,
+  "IGD": 0.31181102098282026,
+  "Spacing": 0.2937751756355299,
+  "runtime": 0.7832032090000212,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "base_A15_P10_M5_S634_B10000_"
+}

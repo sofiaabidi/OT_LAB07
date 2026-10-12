@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 34,
+  "algorithm": "HypE",
+  "problem": "P10",
+  "objectives": 5,
+  "seed": 634,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.7372329711914066,
+  "IGD": 0.38643817520471757,
+  "Spacing": 0.3078780809167,
+  "runtime": 4.7494082080002045,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "base_A34_P10_M5_S634_B10000_"
+}

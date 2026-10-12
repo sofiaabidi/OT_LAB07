@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 30,
+  "algorithm": "MOMA",
+  "problem": "P8",
+  "objectives": 2,
+  "seed": 635,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.9239145079913226,
+  "IGD": null,
+  "Spacing": 8.012344526598183e-18,
+  "runtime": 0.818593707999753,
+  "front_size": 4,
+  "feasible_fraction": 1.0,
+  "file": "D_A30_P8_M2_S635_B10000_"
+}

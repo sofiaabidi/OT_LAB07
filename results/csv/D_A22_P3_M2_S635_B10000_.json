@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 22,
+  "algorithm": "MOPSO",
+  "problem": "P3",
+  "objectives": 2,
+  "seed": 635,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.5296137737257444,
+  "IGD": 0.011537406463704453,
+  "Spacing": 0.01627165365581087,
+  "runtime": 0.31217337499992937,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "D_A22_P3_M2_S635_B10000_"
+}

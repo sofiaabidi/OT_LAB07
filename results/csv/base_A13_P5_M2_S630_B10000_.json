@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 13,
+  "algorithm": "NPGA",
+  "problem": "P5",
+  "objectives": 2,
+  "seed": 630,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 1.1810131120093619,
+  "IGD": 0.012800118929771299,
+  "Spacing": 0.02138676894857654,
+  "runtime": 0.8001307090003138,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "base_A13_P5_M2_S630_B10000_"
+}

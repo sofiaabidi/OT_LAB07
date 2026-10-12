@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 19,
+  "algorithm": "MOEA/D-DE",
+  "problem": "P3",
+  "objectives": 2,
+  "seed": 636,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.0,
+  "IGD": 2.3974892988288414,
+  "Spacing": 0.0,
+  "runtime": 1.5776615830000082,
+  "front_size": 1,
+  "feasible_fraction": 1.0,
+  "file": "base_A19_P3_M2_S636_B10000_"
+}

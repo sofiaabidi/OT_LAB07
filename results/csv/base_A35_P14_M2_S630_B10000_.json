@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 35,
+  "algorithm": "R-NSGA-II",
+  "problem": "P14",
+  "objectives": 2,
+  "seed": 630,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.8570497239819331,
+  "IGD": 0.008918782397464742,
+  "Spacing": 0.014471241763546184,
+  "runtime": 0.8106782919999205,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "base_A35_P14_M2_S630_B10000_"
+}

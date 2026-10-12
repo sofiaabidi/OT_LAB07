@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 13,
+  "algorithm": "NPGA",
+  "problem": "P3",
+  "objectives": 2,
+  "seed": 635,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.34136854652490706,
+  "IGD": 0.1371466105664548,
+  "Spacing": 0.029005746363026965,
+  "runtime": 0.7216022090001388,
+  "front_size": 30,
+  "feasible_fraction": 1.0,
+  "file": "D_A13_P3_M2_S635_B10000_"
+}

@@ -1,0 +1,1253 @@
+
+PAGE 1
+NON-DOMINATED · DIVERSE · CONVERGED
+CHAPTER 5  ·  MULTIOBJECTIVE OPTIMIZATION  ·  PART 3
+Elitist MOEAs
+NSGA-II  •  NSGA-III  •  SPEA2  •  PESA-II  •  MOEA/D  •  MOEA/D-DE  •  MOEA/D-ACO
+[Your Name]
+[Department]
+[Institution]
+
+PAGE 2
+≡
+PART 3 OUTLINE
+What We Will Cover Today
+1 What is Elitism?
+2 NSGA-II — Fast Non-Dominated Sorting + Crowding Distance
+3 NSGA-III — Many-Objective Optimization
+4 SPEA2 — Strength Pareto Evolutionary Algorithm 2
+5 PESA-II — Pareto Envelope-Based Selection Algorithm II
+6 MOEA/D — Decomposition-Based MOEA
+7 MOEA/D-DE — MOEA/D with Differential Evolution
+8 MOEA/D-ACO — MOEA/D with Ant Colony Optimization
+9 Complexity Comparison (All MOO Algorithms)
+10 Comparison, Applications & Practice
+OUTLINE CH. 5 · ELITIST MOEAs
+
+PAGE 3
+E
+FOUNDATIONAL CONCEPT
+Elitism: Preserving the Best Solutions
+DEFINITION
+Elitism means keeping the best solutions from the previous generation so they are never lost while evolving the population.
+WHY ELITISM?
+• Prevents loss of good solutions
+• Speeds up convergence
+• Improves diversity
+HOW DOES IT WORK?
+• Combine parent and offspring populations
+• Select the best solutions for the next generation
+EXAMPLES:  NSGA-II, NSGA-III, SPEA2, PESA-II, MOEA/D
+HISTORICAL CONTEXT:  Introduced in the late 1990s to overcome the limitations of earlier non-elitist MOEAs.
+ELITISM CH. 5 · ELITIST MOEAs
+
+PAGE 4
+1
+ALGORITHM 1 OF 7 — ELITIST MOEA
+NSGA-II: Non-Dominated Sorting GA II
+FULL FORM
+Non-Dominated Sorting Genetic Algorithm II
+PROPOSED BY
+Deb, Pratap, Agarwal & Meyarivan (2002)  [1]
+CATEGORY
+Elitist MOEA
+CORE IDEA
+Fast non-dominated sorting + crowding distance + elitism. Solutions are ranked into Pareto fronts, and a crowding distance measure preserves diversity along 
+each front.
+KEY FORMULAS
+Non-Dom. Sort np = 0 → Front 1;  for each q ∈ Sp, decrement nq;  nq = 0 → next frontComplexity: O(kN²)  vs.  O(kN³) for classic NSGA
+Crowding Dist. d_i = Σ(m=1→M)  [ f_m(i+1) − f_m(i−1) ] / [ f_m^max − f_m^min ]Boundary solutions: d = ∞
+Crowded Comparison Prefer lower rank (better front); if tied, prefer higher crowding distance (better diversity)
+VISUAL FLOW
+Parents + Offspring → Non-Dominated Sort → Crowding Distance → Select Best N
+NSGA-II CH. 5 · ELITIST MOEAs
+
+PAGE 5
+1
+NSGA-II
+Step-by-Step Algorithm
+1 Initialize population P₀ randomly
+2 Evaluate all objectives for every individual
+3
+Fast Non-Dominated Sorting: rank solutions into fronts F₁, F₂, …
+4 Crowding Distance: compute for each solution in a front
+5
+Selection: crowded-comparison tournament based on rank + crowding distance
+6 Crossover and Mutation: create offspring population Qⱼ
+7 Combine: Rⱼ = Pⱼ ∪ Qⱼ (parents + offspring)
+8 Elitist Selection: sort Rⱼ by front & crowding distance; select the best N 
+solutions
+9 Repeat steps 3–8 until stopping criteria are met
+NSGA-II CH. 5 · ELITIST MOEAs
+
+PAGE 6
+1
+NSGA-II
+Advantages, Disadvantages & When to Use
+✅
+  Advantages
+• Fast: O(kN²) vs O(kN³) for classic NSGA
+• Elitism preserves the best solutions found
+• Crowding distance keeps solutions diverse
+• No extra diversity parameter (like niche radius) needed
+❌
+  Disadvantages
+• Crowding distance struggles beyond ~3 objectives
+• Diversity mechanism is less precise than an archive-based method
+• Convergence can stall on complex, deceptive landscapes
+✓  Best Used When
+• Problems with 2 (or up to ~3) objectives
+• A fast, easy-to-implement elitist MOEA is needed
+• General-purpose benchmark or teaching use
+⚠
+  Avoid When
+• Many-objective problems (4+ objectives) — prefer NSGA-III
+• An explicit solution archive is required — prefer SPEA2
+PARAMETERS:  Population size N, crossover prob. pᴄ, mutation prob. pⱼ     |     COMPLEXITY:  O(kN²) per generation (k = objectives, N = population size)
+NSGA-II CH. 5 · ELITIST MOEAs
+
+PAGE 7
+1
+NSGA-II — BEFORE WE SOLVE IT
+Problem Setup & Input Parameters
+D = 1
+Decision variable dimension N = 4Population size M = 2Objectives (f₁, f₂) n = 2Generations run
+DECISION VARIABLE(S)
+• x = beam thickness, the single design variable (D = 1)
+• Domain: x ∈ [1, 5] metres, continuous
+• Encoding: a real number (no binary string needed for D = 1)
+WHERE RANDOMNESS ENTERS
+• Initial population P₀ = {1,2,3,4} sampled (here, evenly) from the domain 
+[1,5]
+• Tournament selection picks 2 random individuals; the 
+crowded-comparison operator decides the winner
+• Crossover blends two random parents (here x=1 and x=3 → raw blend 
+x=2.2)
+• Mutation adds a small random perturbation δ~U(−0.3,+0.3) to the 
+offspring (2.2 → 2.3)
+PARAMETERS USED HERE:  N = 4    |    pᴄ = 0.9 (crossover prob.)    |    pⱼ = 1/D = 1.0 (mutation prob.)    |    Tournament size = 2
+NSGA-II CH. 5 · ELITIST MOEAs
+
+PAGE 8
+1
+NSGA-II — WORKED NUMERICAL (ITERATION 1)
+Real-Life Problem: Bridge Design
+Scenario
+A civil engineer designs a bridge beam. Decision variable x = beam thickness (1–5 m). Objectives: minimize cost f₁(x) = x²  and  maximize load capacity f₂(x) = 100 − (x−3)² 
+(capacity peaks at x = 3 m).
+Initial Population & Evaluation
+• x = [1, 2, 3, 4]
+• x=1: f₁=1, f₂=96
+• x=2: f₁=4, f₂=99
+• x=3: f₁=9, f₂=100
+• x=4: f₁=16, f₂=99
+Step 1: Non-Dominated Sorting
+• Check x=4 vs x=2: x=2 has lower cost (4<16) AND 
+equal/higher capacity (99=99) → x=2 dominates 
+x=4
+• Check x=4 vs x=3: x=3 has lower cost (9<16) AND 
+higher capacity (100>99) → x=3 dominates x=4
+• x=1, x=2, x=3 are mutually non-dominated (each 
+trades cost for capacity)
+Step 2: Crowding Distance
+• Result: Front 1 = {1, 2, 3},  Front 2 = {4}  (x=4 is the 
+dominated point, not x=1!)
+• Front 1 boundaries x=1 and x=3 (sorted by cost) → 
+d = ∞
+• x=2 (interior):  d = |9−1|/(9−1) + 
+|100−96|/(100−96) = 1 + 1 = 2
+NSGA-II CH. 5 · ELITIST MOEAs
+
+PAGE 9
+1
+NSGA-II — WORKED NUMERICAL (ITERATION 2)
+Bridge Design — Selection, Crossover & Convergence
+Selection
+• Tournament favors the two boundary solutions (d = 
+∞)
+• Parents chosen: x=1 and x=3 (both Front 1, both 
+maximal crowding distance)
+Crossover & Mutation
+• Crossover (blend, rand=0.6): 1 + 0.6×(3−1) = 2.2
+• Mutation: 2.2 → 2.3
+• Offspring x=2.3: f₁ = 5.29, f₂ = 99.51
+Combine & Re-sort
+• Combine parents + offspring → 5 solutions {1, 2, 
+2.3, 3, 4}
+• x=2.3 also dominates x=4 (lower cost AND higher 
+capacity) → Front 1 = {1, 2, 2.3, 3}
+• Select best 4 → all of Front 1 survives; x=4 is 
+discarded — converged (n=2)
+NSGA-II CH. 5 · ELITIST MOEAs
+
+PAGE 10
+1
+NSGA-II — CONVERGENCE SUMMARY
+Iteration-by-Iteration Table
+n = 2  iterations to converge
+Iter. Population Front 1 Dominated New Offspring Crowding (interior) Notes
+0 [1, 2, 3, 4] [1, 2, 3] x=4 — x=2: d=2 Initial; x=4 dominated by x=2 & x=3
+1 [1, 2, 2.3, 3, 4] [1, 2, 2.3, 3] x=4 x=2.3 (f₁=5.29,f₂=99.51) x=2: 1.41, x=2.3: 0.88 Crossover+mutation; x=4 now doubly dominated
+2 [1, 2, 2.3, 3] [1, 2, 2.3, 3] — (x=4 discarded) — unchanged Converged
+★ OPTIMAL PARETO-OPTIMAL RESULT   Pareto front = {(1, 96), (4, 99), (5.29, 99.51), (9, 100)}  — x=4 (16,99) is the point that was actually dominated and eliminated, not x=1.
+NSGA-II CH. 5 · ELITIST MOEAs
+
+PAGE 11
+1
+NSGA-II — OBJECTIVE SPACE
+Pareto Front: Bridge Design
+n = 2  iterations shown
+1 8.5 16
+96
+98
+100
+f₁ — Cost  (minimize →)
+f₂ — Load Capacity  (maximize) x=4 (dominated)
+x=1
+x=2
+x=2.3
+x=3 Final Pareto front
+Dominated solution
+x=4 (cost 16, capacity 99) is dominated by both x=2 and x=3 — same or worse capacity at much higher cost — so it is eliminated. x=1, x=2, x=2.3, x=3 remain a genuine trade-off: each lowers cost only by 
+accepting lower capacity.
+NSGA-II CH. 5 · ELITIST MOEAs
+
+PAGE 12
+2
+ALGORITHM 2 OF 7 — ELITIST, MANY-OBJECTIVE MOEA
+NSGA-III: Non-Dominated Sorting GA III
+FULL FORM
+Non-Dominated Sorting Genetic Algorithm III
+PROPOSED BY
+Deb & Jain (2014)  [2]
+CATEGORY
+Elitist, Many-Objective MOEA
+CORE IDEA
+Extends NSGA-II with reference points spread on a hyperplane to maintain diversity when there are three or more objectives, where crowding distance alone 
+becomes unreliable.
+KEY FORMULAS
+Reference Pts. H = C(M + p − 1, p)(M = objectives, p = divisions per objective axis)
+Association Each solution → its nearest reference line/point (perpendicular distance)
+Non-dominated sorting itself is identical to NSGA-II; the diversity mechanism is what changes.
+VISUAL FLOW
+Reference Points → Non-Dominated Sort → Associate to Niche → Fill Each Niche
+NSGA-III CH. 5 · ELITIST MOEAs
+
+PAGE 13
+2
+NSGA-III
+Step-by-Step Algorithm
+1
+Generate reference points, uniformly distributed on a normalized hyperplane
+2
+Perform non-dominated sorting (identical procedure to NSGA-II)
+3 Normalize objectives and compute perpendicular distance of each solution to 
+every reference line
+4
+Niche Preservation: associate each solution with its nearest reference point
+5 Fill each niche by selecting the solutions closest to under-represented reference 
+points
+6 Repeat until the next generation of size N is filled
+NSGA-III CH. 5 · ELITIST MOEAs
+
+PAGE 14
+2
+NSGA-III
+Advantages, Disadvantages & When to Use
+✅
+  Advantages
+• Scales to many objectives (5, 10, 15+)
+• Reference points give structured, guaranteed diversity
+• Retains NSGA-II's elitism and fast sorting
+❌
+  Disadvantages
+• Requires choosing the number/structure of reference points
+• More complex to implement than NSGA-II
+• Reference-point design can bias the front for irregular Pareto shapes
+✓  Best Used When
+• 3 or more objectives (many-objective optimization)
+• A structured, evenly-spread Pareto front is required
+⚠
+  Avoid When
+• Only 2 objectives — NSGA-II is simpler and sufficient
+PARAMETERS:  Number of reference points H, divisions p, pᴄ, pⱼ     |     COMPLEXITY:  O(kN²) per generation
+NSGA-III CH. 5 · ELITIST MOEAs
+
+PAGE 15
+2
+NSGA-III — BEFORE WE SOLVE IT
+Problem Setup & Input Parameters
+D = 3
+Decision variable dimension N = 6Population size M = 3Objectives (cost, mileage, safety) H = 3Reference points (p = 1 division)
+DECISION VARIABLE(S)
+• x = (x₁, x₂, x₃) — engine size, weight, aerodynamic index (D = 3)
+• Domain: each xᵢ ∈ [0, 1], normalized design parameters
+• H = C(M+p−1, p) = C(3+1−1, 1) = 3 reference points on the normalized 
+hyperplane
+WHERE RANDOMNESS ENTERS
+• Initial 6 designs sampled uniformly at random in the [0,1]³ cube
+• Crossover/mutation on (x₁,x₂,x₃) same random mechanics as NSGA-II
+• Reference-point generation itself (Das–Dennis) is deterministic, NOT 
+random
+• Association of each design to its nearest reference point is a deterministic 
+distance calculation
+PARAMETERS USED HERE:  N = 6    |    H = 3 (p = 1)    |    pᴄ = 0.9    |    pⱼ = 1/D ≈ 0.33
+NSGA-III CH. 5 · ELITIST MOEAs
+
+PAGE 16
+2
+NSGA-III — WORKED NUMERICAL (ITERATION 1)
+Real-Life Problem: Car Design (3 Objectives)
+Scenario — setup with real numbers
+6 designs, each reduced to a normalized deviation-from-ideal vector f=(f₁,f₂,f₃) for (cost, mileage-loss, safety-loss) — lower is better on all 3. 3 reference directions: r₁=(1,0,0), 
+r₂=(0.577,0.577,0.577), r₃=(0,0,1).
+Step 1 — Non-Dominated Sort
+• Evaluate 6 designs, e.g. Design 1 f=(0.85, 0.10, 0.08)
+• No design beats another in all 3 objectives → all 6 
+land in Front 1
+Step 2 — Perpendicular Distance (Design 1)
+• To r₁: proj=(0.85,0,0), diff=(0,0.10,0.08) → d=√
+(0.01+0.0064)=0.128
+• To r₂: f·r₂=0.594 → diff=(0.51,−0.24,−0.26) → 
+d=√0.385=0.620
+• To r₃: proj=(0,0,0.08), diff=(0.85,0.10,0) → 
+d=√0.7325=0.856
+Result
+• Smallest distance is to r₁ (d=0.128) → Design 1 
+associates with reference point R1
+• Same perpendicular-distance calculation repeats for 
+the other 5 designs
+NSGA-III CH. 5 · ELITIST MOEAs
+
+PAGE 17
+2
+NSGA-III — WORKED NUMERICAL (ITERATION 2)
+Car Design — Association & Niche Filling
+Step 3 — Associate All 6 Designs
+• R1a=(0.85,.10,.08)→r₁ (d=0.128);  
+R1b=(0.78,.15,.10)→r₁ (d=0.180)
+• R2a=(0.35,.38,.33)→r₂ (d=0.036);  
+R2b=(0.30,.42,.36)→r₂ (d=0.085)
+• R3a=(0.12,.10,.80)→r₃ (d=0.156);  
+R3b=(0.08,.09,.86)→r₃ (d=0.120)
+Step 4 — Niche Filling
+• Niche counts: r₁=2, r₂=2, r₃=2 — exactly balanced
+• Population size (6) equals total niche slots → all 6 
+designs retained, no tie-break needed
+Result (n = 3 generations)
+• Population converges to a well-distributed 3-D 
+Pareto front
+• Each of the 3 reference directions is represented by 
+exactly 2 designs
+• No single objective dominates the spread
+NSGA-III CH. 5 · ELITIST MOEAs
+
+PAGE 18
+2
+NSGA-III — CONVERGENCE SUMMARY
+Iteration-by-Iteration Table
+n = 3  iterations to converge
+Iteration Population Front 1 Reference Points Niche Count Selected
+0 6 solutions All 3 (2,2,2) All
+1 6 solutions All 3 (2,2,2) 6 best
+2 6 solutions All 3 (2,2,2) 6 best
+3 6 solutions All 3 (2,2,2) Converged
+★ OPTIMAL PARETO-OPTIMAL RESULT   3-D Pareto front with 6 well-distributed car designs, two per reference direction (cost, mileage, safety) — niche counts balanced at (2, 
+2, 2).
+NSGA-III CH. 5 · ELITIST MOEAs
+
+PAGE 19
+2
+NSGA-III — OBJECTIVE SPACE (ILLUSTRATIVE)
+Pareto Front: Car Design (2-D Projection)
+n = 3  iterations shown
+15 42.5 70
+40
+54
+68
+f₁ — Cost  (minimize →)
+f₂ — Mileage  (maximize)
+R1a
+R1b
+R2a
+R2b
+R3a
+R3b
+Reference dir. 1 (cost-weighted)
+Reference dir. 2 (balanced)
+Reference dir. 3 (mileage-weighted)
+Illustrative 2-D projection (raw cost vs. mileage, safety f₃ omitted for a readable view) — a different, more intuitive scale than the normalized deviation vectors used in the reference-point math above, but 
+the same 6 designs and the same R1/R2/R3 groupings. All sit in Front 1; color shows which reference point anchors each pair.
+NSGA-III CH. 5 · ELITIST MOEAs
+
+PAGE 20
+3
+ALGORITHM 3 OF 7 — ELITIST, ARCHIVE-BASED MOEA
+SPEA2: Strength Pareto Evolutionary Algorithm 2
+FULL FORM
+Strength Pareto Evolutionary Algorithm 2
+PROPOSED BY
+Zitzler, Laumanns & Thiele (2001)  [3]
+CATEGORY
+Elitist MOEA
+CORE IDEA
+Maintains an external archive of non-dominated solutions. Fitness combines a dominance-based “strength” term with a density (nearest-neighbor) term for 
+fine-grained diversity.
+KEY FORMULAS
+Strength S(i) = | { j : i ≻ j } |   (how many solutions i dominates)
+Raw Fitness R(i) = Σ (j ≺ i)  S(j)   (sum of strengths of i's dominators)
+Density D(i) = 1 / (σᵢᵏ + 2)   (σᵢᵏ = distance to k-th nearest neighbor)
+Final Fitness F(i) = R(i) + D(i)   (lower is better)
+VISUAL FLOW
+Compute Strength → Raw Fitness → Density → Update Archive
+SPEA2 CH. 5 · ELITIST MOEAs
+
+PAGE 21
+3
+SPEA2
+Step-by-Step Algorithm
+1 Initialize population and an empty external archive
+2
+Compute Strength S(i) for every individual in population + archive
+3
+Compute Raw Fitness R(i) by summing strengths of dominators
+4 Compute Density D(i) using k-th nearest-neighbor distance
+5 Combine: Final Fitness F(i) = R(i) + D(i)
+6
+Environmental Selection: copy all non-dominated individuals (F < 1) into the 
+archive; truncate by density if archive overflows, or fill with best-ranked 
+dominated solutions if it is under-full
+7
+Apply tournament selection, crossover and mutation to generate offspring
+8 Repeat until stopping criteria are met
+SPEA2 CH. 5 · ELITIST MOEAs
+
+PAGE 22
+3
+SPEA2
+Advantages, Disadvantages & When to Use
+✅
+  Advantages
+• External archive preserves elite non-dominated solutions
+• Strength + density fitness gives excellent diversity
+• Fine-grained density estimation (k-th nearest neighbor) is very accurate
+❌
+  Disadvantages
+• Archive management adds implementation overhead
+• More computationally complex than NSGA-II
+• k-th nearest-neighbor computation can be costly for large populations
+✓  Best Used When
+• High diversity along the Pareto front is critical
+• 2–3 objective problems needing a precise, curated archive
+⚠
+  Avoid When
+• A simple, quick-to-implement algorithm is preferred
+PARAMETERS:  Population size, archive size, neighbor parameter k     |     COMPLEXITY:  O(kN²) per generation
+SPEA2 CH. 5 · ELITIST MOEAs
+
+PAGE 23
+3
+SPEA2 — BEFORE WE SOLVE IT
+Problem Setup & Input Parameters
+D = 1
+Decision variable dimension N = 5Population size (A–E) M = 2Objectives (risk, return) |Archive| = 3Final archive size
+DECISION VARIABLE(S)
+• x = fraction allocated to the risky asset (D = 1)
+• Domain: x ∈ [0, 1]; portfolios A–E are 5 sampled allocations
+• k = 1 for the k-th nearest-neighbor density term
+WHERE RANDOMNESS ENTERS
+• Initial 5 portfolios (A–E) sampled at random across the risk–return space
+• Binary tournament selection draws mating parents at random from 
+population ∪ archive
+• Crossover/mutation perturbs the allocation fraction x by a small random 
+amount
+• Strength S(i), Raw Fitness R(i) and Density D(i) themselves are computed 
+deterministically once the population is fixed
+PARAMETERS USED HERE:  N = 5    |    Archive size = 3    |    k = 1    |    pᴄ = 0.9    |    pⱼ = 1.0
+SPEA2 CH. 5 · ELITIST MOEAs
+
+PAGE 24
+3
+SPEA2 — WORKED NUMERICAL (ITERATION 1)
+Real-Life Problem: Portfolio Optimization
+Scenario — setup with real numbers
+Minimize risk f₁, maximize return f₂. Candidate portfolios: A(5,8), B(8,12), C(10,15), D(6,7), E(12,14).
+Step 1 — Strength & Raw Fitness
+• A dominates D → S(A)=1;  C dominates E → S(C)=1;  
+S(B)=0 (B trades cost for return — dominates no 
+one)
+• R(D)=S(A)=1,  R(E)=S(C)=1,  R(A)=R(B)=R(C)=0
+Step 2 — Density (Discarded Side)
+• σᴰ¹ = dist(D→A) = √[(6−5)²+(7−8)²] = √2 = 1.414 → 
+D(D)=1/(1.414+2)=0.293
+• σᴱ¹ = dist(E→C) = √[(12−10)²+(14−15)²] = √5 = 
+2.236 → D(E)=1/(2.236+2)=0.236
+Running Total
+• F(D) = R(D)+D(D) = 1 + 0.293 = 1.293
+• F(E) = R(E)+D(E) = 1 + 0.236 = 1.236
+• Both ≥ 1 — D and E are on track to be discarded
+SPEA2 CH. 5 · ELITIST MOEAs
+
+PAGE 25
+3
+SPEA2 — WORKED NUMERICAL (ITERATION 2)
+Portfolio Optimization — Density & Selection
+Step 3 — Density (Archive Side)
+• σᴬ¹=dist(A→D)=√2=1.414 → D(A)=1/3.414=0.293
+• σᴮ¹=dist(B→C)=√[(10−8)²+(15−12)²]=√13=3.606 → 
+D(B)=1/5.606=0.178
+• σᶜ¹=dist(C→E)=√5=2.236 → D(C)=1/4.236=0.236
+Step 4 — Final Fitness
+• F(A)=0+0.293=0.293
+• F(B)=0+0.178=0.178
+• F(C)=0+0.236=0.236  — all three < 1
+Environmental Selection (n = 2)
+• A, B, C copied into the archive (F < 1)
+• D (F=1.293), E (F=1.236) discarded (F ≥ 1)
+• Archive converges to {A, B, C}
+SPEA2 CH. 5 · ELITIST MOEAs
+
+PAGE 26
+3
+SPEA2 — CONVERGENCE SUMMARY
+Iteration-by-Iteration Table
+n = 2  iterations to converge
+Iter. Population Archive Strength Raw Fitness Density Final Fitness Selected
+0 A,B,C,D,E A,B,C A=1,B=1 D=1,E=1 D=.29,E=.24 A=.29,B=.18,C=.24 A,B,C
+1 A,B,C A,B,C A=1,B=1 D=1,E=1 D=.29,E=.24 A=.29,B=.18,C=.24 A,B,C
+2 A,B,C A,B,C A=1,B=1 D=1,E=1 D=.29,E=.24 A=.29,B=.18,C=.24 Converged
+★ OPTIMAL PARETO-OPTIMAL RESULT   Pareto-optimal archive = A(5,8), B(8,12), C(10,15) — lowest-risk to highest-return portfolios on the non-dominated frontier.
+SPEA2 CH. 5 · ELITIST MOEAs
+
+PAGE 27
+3
+SPEA2 — OBJECTIVE SPACE
+Pareto Front: Portfolio Optimization
+n = 2  iterations shown
+5 8.5 12
+7
+11
+15
+f₁ — Risk  (minimize →)
+f₂ — Return  (maximize)
+A
+B
+C
+D (dominated)
+E (dominated)
+Archive (Final Fitness < 1)
+Discarded (dominated)
+SPEA2's strength + density fitness keeps A, B, C in the external archive (Final Fitness < 1) while D and E are discarded — the amber curve traces the risk–return frontier.
+SPEA2 CH. 5 · ELITIST MOEAs
+
+PAGE 28
+4
+ALGORITHM 4 OF 7 — ELITIST, GRID-BASED MOEA
+PESA-II: Pareto Envelope-Based Selection II
+FULL FORM
+Pareto Envelope-Based Selection Algorithm II
+PROPOSED BY
+Corne, Jerram, Knowles & Oates (2001)  [4]
+CATEGORY
+Elitist MOEA
+CORE IDEA
+Diversity is maintained with a hyper-grid over objective space instead of crowding distance or an archive-density metric — solutions in less-crowded grid cells 
+are preferred.
+KEY FORMULAS
+Grid Squeeze squeeze(cell) = number of solutions currently occupying that hyperbox
+Selection Rule Prefer individuals from cells with the lowest squeeze factor (least crowded)
+VISUAL FLOW
+Build Hyper-Grid → Place Solutions → Count Per Cell → Favor Sparse Cells
+PESA-II CH. 5 · ELITIST MOEAs
+
+PAGE 29
+4
+PESA-II
+Step-by-Step Algorithm
+1
+Divide the objective space into hyperboxes (a regular grid)
+2
+Evaluate population and place each solution into its grid cell
+3
+Count the number of solutions per cell (the “squeeze factor”)
+4
+Preferentially select parents/survivors from less-crowded cells
+PESA-II CH. 5 · ELITIST MOEAs
+
+PAGE 30
+4
+PESA-II
+Advantages, Disadvantages & When to Use
+✅
+  Advantages
+• Grid-based diversity is simple and intuitive
+• Very fast: O(kN) per generation
+• Scales well to many objectives
+❌
+  Disadvantages
+• Grid size/resolution needs careful tuning
+• Less precise diversity control than crowding distance or density
+• Fixed grid can misrepresent irregularly-shaped fronts
+✓  Best Used When
+• Many objectives and fast results are needed
+• Computational budget is limited
+⚠
+  Avoid When
+• High-precision diversity control is required
+PARAMETERS:  Number of grid divisions per objective     |     COMPLEXITY:  O(kN) per generation
+PESA-II CH. 5 · ELITIST MOEAs
+
+PAGE 31
+4
+PESA-II — BEFORE WE SOLVE IT
+Problem Setup & Input Parameters
+D = 2
+Decision variable dimension N = 5Population size (A–E) M = 2Objectives (cost, coverage) 4 cellsGrid divisions (by cost)
+DECISION VARIABLE(S)
+• x = (x, y) — sensor placement coordinates on the site (D = 2)
+• Domain: illustrative site grid, each candidate placed into one of 4 
+cost-based cells
+• 5 candidate placements A–E map directly to (cost, coverage) pairs
+WHERE RANDOMNESS ENTERS
+• Initial 5 placements (A–E) sampled at random across the site
+• Crossover/mutation perturbs (x,y) coordinates by a small random offset
+• Grid squeeze factor (solutions per cell) is a deterministic count once 
+positions are fixed
+• Selection among equally-sparse cells, if tied, breaks ties at random
+PARAMETERS USED HERE:  N = 5    |    Grid divisions = 4 cells    |    pᴄ = 0.9    |    pⱼ = 1.0
+PESA-II CH. 5 · ELITIST MOEAs
+
+PAGE 32
+4
+PESA-II — WORKED NUMERICAL (ITERATION 1)
+Real-Life Problem: Sensor Placement
+Scenario — setup with real numbers
+Minimize cost f₁, maximize coverage f₂. Candidate placements: A(1,1), B(2,2.2), C(2.3,2.4), D(3.5,3.5), E(5,4.5). All 5 are genuinely non-dominated (higher cost always buys higher 
+coverage) — Front 1 = {A,B,C,D,E}. Site divided into a 4-cell grid by cost.
+Step 1 — Check Non-Dominance
+• A(1,1)→B(2,2.2): B costs more but covers more → 
+trade-off, non-dominated
+• Every pair moves the same way: no design beats 
+another in both cost AND coverage
+• So all 5 candidates are Pareto-optimal — PESA-II's 
+job is choosing a diverse subset, not filtering 
+dominance
+Step 2 — Grid Assignment (by cost)
+• Cell 1 [1,2): A(1,1)
+• Cell 2 [2,3): B(2,2.2), C(2.3,2.4)
+• Cell 3 [3,4): D(3.5,3.5)
+• Cell 4 [4,5]: E(5,4.5)
+Running Total — Squeeze Factor
+• squeeze(Cell 1)=1, squeeze(Cell 3)=1, squeeze(Cell 
+4)=1
+• squeeze(Cell 2)=2 — B and C share a cell, so it is 
+crowded
+PESA-II CH. 5 · ELITIST MOEAs
+
+PAGE 33
+4
+PESA-II — WORKED NUMERICAL (ITERATION 2)
+Sensor Placement — Crowding-Based Selection
+Step 3 — Crowding-Based Selection
+• Cell 2 (squeeze=2) → lower selection priority
+• Cells 1, 3, 4 (squeeze=1) → higher priority
+• Select A, D, E (one per sparse cell)
+Step 4 — Prune Redundant Cell
+• B and C both occupy Cell 2, close together in cost 
+AND coverage
+• They add little new diversity beyond A/D/E — 
+archive keeps the 3 corner-spanning designs and 
+drops B, C
+Result (n = 3)
+• Diverse Pareto front spanning the full 
+cost–coverage trade-off
+• B and C are pruned for redundancy, NOT because 
+they are dominated — all 5 were valid Pareto points
+PESA-II CH. 5 · ELITIST MOEAs
+
+PAGE 34
+4
+PESA-II — CONVERGENCE SUMMARY
+Iteration-by-Iteration Table
+n = 3  iterations to converge
+Iteration Population Grid Cells Crowding Selected
+0 A, B, C, D, E 4 Cell 2: 2 A, D, E
+1 A, D, E 3 Cell 1: 1 A, D, E
+2 A, D, E 3 Cell 1: 1 A, D, E
+3 A, D, E 3 Cell 1: 1 Converged
+★ OPTIMAL PARETO-OPTIMAL RESULT   Selected archive = A(1,1), D(3.5,3.5), E(5,4.5) — all 5 candidates were genuinely non-dominated; PESA-II keeps these 3 as the most 
+diverse, corner-spanning subset and prunes the crowded B/C pair.
+PESA-II CH. 5 · ELITIST MOEAs
+
+PAGE 35
+4
+PESA-II — OBJECTIVE SPACE
+Pareto Front: Sensor Placement
+n = 3  iterations shown
+1 3 5
+1
+2.75
+4.5
+f₁ — Cost  (minimize →)
+f₂ — Coverage  (maximize)
+A
+B (pruned)
+C (pruned)
+D
+ESelected (sparse grid cell)
+Pruned (crowded cell)
+All 5 points lie on the same non-dominated trade-off curve — B and C are pruned only because they crowd the same grid cell, not because they are dominated. PESA-II's amber selection (A, D, E) spans the 
+full cost–coverage range with even spacing.
+PESA-II CH. 5 · ELITIST MOEAs
+
+PAGE 36
+5
+ALGORITHM 5 OF 7 — ELITIST, DECOMPOSITION-BASED MOEA
+MOEA/D: MOEA Based on Decomposition
+FULL FORM
+Multi-Objective Evolutionary Algorithm Based on Decomposition
+PROPOSED BY
+Zhang & Li (2007)  [5]
+CATEGORY
+Elitist MOEA
+CORE IDEA
+Decomposes the multiobjective problem into N scalar single-objective subproblems using weight vectors, and optimizes them together, sharing information 
+among neighboring subproblems.
+KEY FORMULAS
+Weighted Sum g(x|λ) = Σ(i=1→k) λᵢ fᵢ(x)
+Tchebycheff g(x|λ) = maxᵢ [ λᵢ · | fᵢ(x) − zᵢ* | ]     (z* = ideal point)
+Boundary Intersection PBI: g(x|λ) = d₁ + θ·d₂   (d₁ = projection onto λ, d₂ = perpendicular distance)A third decomposition option, alongside Weighted Sum & Tchebycheff
+Neighborhood B(i) = the T weight vectors closest to λᵢ (defines who i shares information with)
+VISUAL FLOW
+Weight Vectors → Decompose to Subproblems → Neighbor Mating → Update Solutions
+MOEA/D CH. 5 · ELITIST MOEAs
+
+PAGE 37
+5
+MOEA/D
+Step-by-Step Algorithm
+1
+Initialize N weight vectors λ₁, …, λⱼ spread across objective space
+2
+Compute neighborhoods B(i): the T closest weight vectors to each λᵢ
+3 Initialize population x₁, …, xⱼ and the ideal point z*
+4
+For each subproblem i: select mating parents from its neighborhood B(i)
+5
+Generate an offspring via crossover/mutation on the selected parents
+6 Update the ideal point z* if the offspring improves it
+7
+Update neighboring solutions if the offspring improves their subproblem value
+8 Update the external archive of non-dominated solutions; repeat until 
+convergence
+MOEA/D CH. 5 · ELITIST MOEAs
+
+PAGE 38
+5
+MOEA/D
+Advantages, Disadvantages & When to Use
+✅
+  Advantages
+• Decomposition turns MOO into simpler scalar subproblems
+• Fast and highly scalable to many objectives
+• Neighborhood-based mating focuses search efficiently
+❌
+  Disadvantages
+• Performance is sensitive to weight-vector distribution
+• Neighborhood size T needs careful tuning
+• Struggles with highly irregular / disconnected Pareto fronts
+✓  Best Used When
+• Many-objective, large-scale optimization problems
+• A decomposition-friendly aggregation (weighted sum/Tchebycheff) fits the 
+problem
+⚠
+  Avoid When
+• Simple 2-objective problems where NSGA-II suffices
+PARAMETERS:  Weight vectors λ, neighborhood size T     |     COMPLEXITY:  O(kNT) per generation
+MOEA/D CH. 5 · ELITIST MOEAs
+
+PAGE 39
+5
+MOEA/D — BEFORE WE SOLVE IT
+Problem Setup & Input Parameters
+D = 1
+Decision variable dimension N = 3Subproblems / population size M = 2Objectives (cost, latency) T = 2Neighborhood size
+DECISION VARIABLE(S)
+• x = resource allocation level (D = 1)
+• Domain: x ∈ {0, 1, 2}, a small discrete allocation scale
+• 3 weight vectors λ₁=(1,0), λ₂=(0.5,0.5), λ₃=(0,1) each define one 
+subproblem
+WHERE RANDOMNESS ENTERS
+• Initial population x₁,x₂,x₃ randomly assigned, one per subproblem
+• Mating parent for each subproblem drawn at random from its 
+neighborhood B(i)
+• Crossover/mutation on x introduces a small random perturbation before 
+rounding to the allocation scale
+• Weight vectors λ themselves are fixed (evenly spread), not random
+PARAMETERS USED HERE:  N = 3    |    T = 2    |    pᴄ = 0.9    |    pⱼ = 1.0
+MOEA/D CH. 5 · ELITIST MOEAs
+
+PAGE 40
+5
+MOEA/D — WORKED NUMERICAL (ITERATION 1)
+Real-Life Problem: Cloud Resource Allocation
+Scenario — setup with real numbers
+Minimize cost f₁ AND minimize latency f₂ (lower is better on both). x ∈ {0,1,2}. Three weight vectors: λ₁=(1,0), λ₂=(0.5,0.5), λ₃=(0,1). Ideal point from all evaluated x: z*=(0,0).
+Step 1 — Boundary Subproblems
+• Subproblem 1 (λ₁, min f₁): x=0 → f₁=0, f₂=4  (best 
+possible f₁)
+• Subproblem 3 (λ₃, min f₂): x=2 → f₁=4, f₂=0  (best 
+possible f₂)
+Step 2 — Tchebycheff Setup (Subproblem 2)
+• g(x|λ) = maxᵢ[ λᵢ·|fᵢ(x)−zᵢ*| ],  λ₂=(0.5,0.5), z*=(0,0)
+• Need to test all 3 candidate x values to find the 
+minimum g
+Running Total
+• x=0: f=(0,4) → g=max(0.5×0, 0.5×4)=max(0, 2.0)=2.0
+• x=2: f=(4,0) → g=max(0.5×4, 0.5×0)=max(2.0, 0)=2.0
+MOEA/D CH. 5 · ELITIST MOEAs
+
+PAGE 41
+5
+MOEA/D — WORKED NUMERICAL (ITERATION 2)
+Cloud Resource Allocation — Tchebycheff & Update
+Step 3 — Test x=1 for Subproblem 2
+• x=1: f=(1,1) → g=max(0.5×|1−0|, 0.5
+×|1−0|)=max(0.5, 0.5)=0.5
+• Compare: g(0)=2.0,  g(1)=0.5,  g(2)=2.0  →  x=1 is 
+the minimum
+Step 4 — Neighborhood Update
+• Subproblem 2 accepts x=1 (lowest Tchebycheff 
+value found)
+• Subproblems 1 and 3 show no further improvement 
+over their boundary solutions → unchanged
+Result (n = 2)
+• Pareto front: (0,4), (1,1), (4,0)
+• Each weight vector anchors one trade-off point
+MOEA/D CH. 5 · ELITIST MOEAs
+
+PAGE 42
+5
+MOEA/D — CONVERGENCE SUMMARY
+Iteration-by-Iteration Table
+n = 2  iterations to converge
+Iter. Subproblem λ x f₁ f₂ Tcheby. Improved
+0 1 (1,0) 0 0 4 0 —
+0 2 (0.5,0.5) 1 1 1 0.5 —
+0 3 (0,1) 2 4 0 0 —
+1 1 (1,0) 0 0 4 0 No
+1 2 (0.5,0.5) 1 1 1 0.5 Yes
+1 3 (0,1) 2 4 0 0 No
+2 2 (0.5,0.5) 1 1 1 0.5 Converged
+★ OPTIMAL PARETO-OPTIMAL RESULT   Pareto front = (0, 4), (1, 1), (4, 0) — one non-dominated solution recovered per weight vector, spanning the cost–latency trade-off.
+MOEA/D CH. 5 · ELITIST MOEAs
+
+PAGE 43
+5
+MOEA/D — OBJECTIVE SPACE
+Pareto Front: Cloud Resource Allocation
+n = 2  iterations shown
+0 2 4
+0
+2
+4
+f₁ — Cost  (minimize →)
+f₂ — Trade-off Obj.  
+(lower=better)
+λ₁=(1,0)
+λ₂=(0.5,0.5)
+λ₃=(0,1)
+Pareto front (1 point per subproblem)
+Each weight vector λ decomposes the problem into a scalar subproblem that anchors one point on the front — together the 3 subproblems trace the full cost–latency curve with no extra dominance filtering 
+needed.
+MOEA/D CH. 5 · ELITIST MOEAs
+
+PAGE 44
+6
+ALGORITHM 6 OF 7 — ELITIST MOEA/D VARIANT
+MOEA/D-DE: MOEA/D with Differential Evolution
+FULL FORM
+MOEA/D with Differential Evolution
+PROPOSED BY
+Li & Zhang (2009)  [6]
+CATEGORY
+Elitist MOEA/D Variant
+CORE IDEA
+Replaces MOEA/D's standard crossover/mutation with a Differential Evolution (DE) operator, which is far more effective for continuous, real-valued decision 
+variables.
+KEY FORMULAS
+DE Mutation V = X_a + F · (X_b − X_c)
+DE Crossover U_j = V_j   if rand < CR,   else  U_j = X_i,j
+VISUAL FLOW
+Select 3 Vectors → DE Mutation → DE Crossover → MOEA/D Update
+MOEA/D-DE CH. 5 · ELITIST MOEAs
+
+PAGE 45
+6
+MOEA/D-DE
+Advantages, Disadvantages & When to Use
+✅
+  Advantages
+• Better performance on continuous decision spaces
+• Faster convergence than standard MOEA/D crossover
+• Retains all decomposition + neighborhood benefits of MOEA/D
+❌
+  Disadvantages
+• Requires tuning DE parameters F (scale factor) and CR (crossover rate)
+• Less suited to discrete/combinatorial variables
+✓  Best Used When
+• Continuous multiobjective optimization problems
+⚠
+  Avoid When
+• Discrete or combinatorial decision variables
+PARAMETERS:  Scale factor F, crossover rate CR, weight vectors, neighborhood T     |     COMPLEXITY:  O(kNT) per generation
+MOEA/D-DE CH. 5 · ELITIST MOEAs
+
+PAGE 46
+6
+MOEA/D-DE — BEFORE WE SOLVE IT
+Problem Setup & Input Parameters
+D = 1
+Decision variable dimension N = 4Population (2 subproblems + 2 neighbors) M = 2Objectives (size, gain) T = 3Neighborhood size (r1,r2,r3)
+DECISION VARIABLE(S)
+• x = antenna arm length (D = 1)
+• Domain: x ∈ [5, 25]
+• Population: x_A=12 (→λₐ), x_B=18 (→λᵦ), plus neighbors x_C=8, x_D=15
+WHERE RANDOMNESS ENTERS
+• Initial population x_A,x_B,x_C,x_D seeded at random within [5,25]
+• r1, r2, r3 for DE mutation V=X_r1+F·(X_r2−X_r3) are chosen uniformly at 
+random from the neighborhood
+• Crossover applies U_j=V_j only if rand<CR, else keeps the parent's value — 
+a per-dimension random coin flip
+• F and CR are fixed control parameters here, NOT random — only r1,r2,r3 
+and the crossover mask are stochastic
+PARAMETERS USED HERE:  N = 4    |    F = 0.5–0.6    |    CR = 0.9    |    T = 3
+MOEA/D-DE CH. 5 · ELITIST MOEAs
+
+PAGE 47
+6
+MOEA/D-DE — WORKED NUMERICAL (ITERATION 1)
+Real-Life Problem: Antenna Design
+Scenario — setup with real numbers
+Minimize antenna size f₁(x)=x, maximize signal gain f₂(x)=2x+10, for arm-length x∈[5,25]. Two subproblems: λₐ=(0.8,0.2) favors small size, λᵦ=(0.2,0.8) favors high gain. 
+Scalarized cost: g(x|λ)=λ₁f₁(x)−λ₂f₂(x). Population: x_A=12 (→λₐ), x_B=18 (→λᵦ), plus neighbors x_C=8, x_D=15.
+Initial Evaluation (Iter. 0)
+• gₐ(x)=0.4x−2,  gᵦ(x)=−1.4x−8
+• x_A=12: f₁=12,f₂=34 → gₐ=0.4(12)−2=2.8
+• x_B=18: f₁=18,f₂=46 → gᵦ=−1.4(18)−8=−33.2
+Step 1 — DE Mutation (Subproblem a)
+• Pick r1=x_C=8, r2=x_D=15, r3=x_B=18,  F=0.5
+• V = 8 + 0.5(15−18) = 8−1.5 = 6.5  →  U=6.5 
+(crossover accepted)
+• Evaluate: f₁=6.5, f₂=23 → gₐ(U)=0.4(6.5)−2=0.6
+Step 2 — DE Mutation (Subproblem b)
+• Pick r1=x_D=15, r2=x_B=18, r3=x_C=8,  F=0.6
+• V = 15 + 0.6(18−8) = 15+6 = 21  →  U=21
+• Evaluate: f₁=21, f₂=52 → gᵦ(U)=−1.4(21)−8=−37.4
+MOEA/D-DE CH. 5 · ELITIST MOEAs
+
+PAGE 48
+6
+MOEA/D-DE — WORKED NUMERICAL (ITERATION 2)
+Antenna Design — Selection & Convergence
+Selection after Iteration 1
+• gₐ(U)=0.6 < gₐ(x_A)=2.8 → accept: x_A ← 6.5
+• gᵦ(U)=−37.4 < gᵦ(x_B)=−33.2 → accept: x_B ← 21
+Step 3 — Iter. 2 Mutation (Subproblem a)
+• r1=x_C=8, r2=x_D=15, r3=x_B=21,  F=0.5
+• V = 8 + 0.5(15−21) = 8−3 = 5  →  U=5 (domain 
+minimum)
+• gₐ(U)=0.4(5)−2=0 < gₐ(6.5)=0.6 → accept: x_A ← 5
+Step 4 — Iter. 2 Mutation (Subproblem b)
+• r1=x_D=15, r2=x_B=21, r3=x_C=8,  F=0.6
+• V = 15 + 0.6(21−8) = 15+7.8 = 22.8  →  U=22.8
+• gᵦ(U)=−39.92 < gᵦ(21)=−37.4 → accept: x_B ← 22.8 
+— converged (n=2)
+MOEA/D-DE CH. 5 · ELITIST MOEAs
+
+PAGE 49
+6
+MOEA/D-DE — CONVERGENCE SUMMARY
+Iteration-by-Iteration Table
+n = 2  iterations to converge
+Iter. Subprob. Base x r1, r2, r3 F Trial U g(x) before g(U) x after
+0 a 12 — — — 2.8 — 12 (init)
+0 b 18 — — — −33.2 — 18 (init)
+1 a 12 8, 15, 18 0.5 6.5 2.8 0.6 6.5
+1 b 18 15, 18, 8 0.6 21 −33.2 −37.4 21
+2 a 6.5 8, 15, 21 0.5 5 0.6 0.0 5
+2 b 21 15, 21, 8 0.6 22.8 −37.4 −39.92 22.8 (Converged)
+★ OPTIMAL PARETO-OPTIMAL RESULT   Pareto front (n = 2 iterations) = (5, 20) and (22.8, 55.6) — subproblem a reaches the exact boundary optimum x=5; subproblem b 
+closes in on the (25, 60) boundary, together spanning the antenna size–gain trade-off.
+MOEA/D-DE CH. 5 · ELITIST MOEAs
+
+PAGE 50
+6
+MOEA/D-DE — OBJECTIVE SPACE
+Pareto Front: Antenna Design
+n = 2  iterations shown
+5 15 25
+20
+40
+60
+f₁ — Antenna Size  (minimize →)
+f₂ — Signal Gain  (maximize)
+x=12 (initial)
+x=18 (initial)
+x=5 (n=2)
+x=22.8 (n=2)
+DE-refined solution after n=2
+Initial random guess (iter. 0)
+f₁ and f₂ rise together (bigger antenna = more size AND more gain), so every x on this line is Pareto-optimal; DE's job is to push each subproblem's solution to its own best trade-off point. After n=2 iterations, 
+subproblem a reaches the true boundary optimum (5,20) and subproblem b closes in on (22.8, 55.6).
+MOEA/D-DE CH. 5 · ELITIST MOEAs
+
+PAGE 51
+7
+ALGORITHM 7 OF 7 — ELITIST MOEA/D VARIANT
+MOEA/D-ACO: MOEA/D with Ant Colony Optimization
+FULL FORM
+MOEA/D with Ant Colony Optimization
+PROPOSED BY
+Ke, Zhang & Battiti (2013)  [7]
+CATEGORY
+Elitist MOEA/D Variant
+CORE IDEA
+Replaces MOEA/D's genetic offspring generation with Ant Colony Optimization, using pheromone trails per subproblem — well suited to discrete / 
+combinatorial decision spaces.
+KEY FORMULAS
+Transition Prob. pᵢⱼ ∝  τᵢⱼ^α · ηᵢⱼ^β    (τ = pheromone, η = heuristic desirability)
+Pheromone Update τᵢⱼ ← (1 − ρ)·τᵢⱼ + Δτᵢⱼ     (ρ = evaporation rate)
+VISUAL FLOW
+Ants Build Routes → Evaluate Objectives → Deposit Pheromone → Evaporate & Repeat
+MOEA/D-ACO CH. 5 · ELITIST MOEAs
+
+PAGE 52
+7
+MOEA/D-ACO
+Advantages, Disadvantages & When to Use
+✅
+  Advantages
+• Well suited to combinatorial / discrete optimization
+• Pheromone memory guides the search toward good structural choices
+• Inherits MOEA/D's decomposition and scalability
+❌
+  Disadvantages
+• Slower convergence than DE- or GA-based offspring generation
+• Requires tuning α, β, ρ (pheromone influence & evaporation)
+✓  Best Used When
+• Discrete, combinatorial multiobjective problems (e.g. routing, scheduling)
+⚠
+  Avoid When
+• Continuous decision variables — prefer MOEA/D-DE
+PARAMETERS:  α (pheromone weight), β (heuristic weight), ρ (evaporation rate)     |     COMPLEXITY:  O(kNT) per generation
+MOEA/D-ACO CH. 5 · ELITIST MOEAs
+
+PAGE 53
+7
+MOEA/D-ACO — BEFORE WE SOLVE IT
+Problem Setup & Input Parameters
+D = 4
+Tour length (cities visited) N = 3Ant colony size M = 2Objectives (distance, time) 2 routesCandidate routes tracked (R1, R2)
+DECISION VARIABLE(S)
+• x = a tour (ordered visit sequence) over 4 cities — a discrete, 
+combinatorial variable (D = 4 positions)
+• R1 = (40, 70), R2 = (55, 50): the two evaluated (distance, time) outcomes
+• τ(R1), τ(R2) = pheromone strength on each candidate route, both 
+initialized to 1.0
+WHERE RANDOMNESS ENTERS
+• Each ant samples its NEXT city via roulette-wheel selection ∈ [0,1), 
+weighted by pᵢⱼ ∝ τᵢⱼᵅ·ηᵢⱼᵇ — the core stochastic step
+• 3 ants independently construct a route each iteration, so the 2-vs-1 route 
+split is a random outcome of that sampling
+• Pheromone update τ←(1−ρ)τ+Δτ is deterministic once the ants' choices 
+are known
+• Heuristic desirability η=1/distance is fixed, not random
+PARAMETERS USED HERE:  Ants = 3    |    α = 1    |    β = 1    |    ρ = 0.3    |    Δτ = 0.3
+MOEA/D-ACO CH. 5 · ELITIST MOEAs
+
+PAGE 54
+7
+MOEA/D-ACO — WORKED NUMERICAL (ITERATION 1)
+Real-Life Problem: TSP with Distance & Time
+Scenario — setup with real numbers
+Minimize distance f₁ and time f₂. Two candidate routes: R1=(40,70), R2=(55,50) — a genuine trade-off (R1 shorter, R2 faster). Both start with pheromone τ=1.0. Heuristic 
+η=1/distance: η(R1)=1/40=0.0250, η(R2)=1/55=0.0182. α=β=1, evaporation ρ=0.3, deposit Δτ=0.3 per ant that picks a non-dominated route.
+Step 1 — Transition Probability
+• pᵢ ∝ τᵢ·ηᵢ:  p(R1)∝1.0×0.0250=0.0250,  p(R2)
+∝1.0×0.0182=0.0182
+• Normalize: P(R1)=0.0250/0.0432=57.9%,  
+P(R2)=0.0182/0.0432=42.1%
+Step 2 — Ants Construct Routes
+• 3 ants sample per P(R1),P(R2): 2 ants → R1, 1 ant 
+→ R2
+• Both routes are mutually non-dominated → both 
+enter the archive
+Step 3 — Pheromone Update
+• τᵢ ← (1−ρ)·τᵢ + Δτ·(ants on i)
+• τ(R1) = 0.7(1.0) + 2(0.3) = 0.7+0.6 = 1.30
+• τ(R2) = 0.7(1.0) + 1(0.3) = 0.7+0.3 = 1.00
+MOEA/D-ACO CH. 5 · ELITIST MOEAs
+
+PAGE 55
+7
+MOEA/D-ACO — WORKED NUMERICAL (ITERATION 2)
+TSP — Reinforcement & Convergence
+Step 4 — Updated Probabilities
+• p(R1)∝1.30×0.0250=0.0325,  p(R2)
+∝1.00×0.0182=0.0182
+• Normalize: P(R1)=0.0325/0.0507=64.1%,  
+P(R2)=35.9% (R1 now favored)
+Step 5 — Ants Construct Routes Again
+• 3 ants: 2 → R1, 1 → R2 (same split, higher 
+confidence)
+• No new non-dominated route is found — archive 
+stays {R1, R2}
+Step 6 — Pheromone Update (Converged)
+• τ(R1) = 0.7(1.30) + 2(0.3) = 0.91+0.6 = 1.51
+• τ(R2) = 0.7(1.00) + 1(0.3) = 0.7+0.3 = 1.00 — 
+converged (n=2)
+MOEA/D-ACO CH. 5 · ELITIST MOEAs
+
+PAGE 56
+7
+MOEA/D-ACO — CONVERGENCE SUMMARY
+Iteration-by-Iteration Table
+n = 2  iterations to converge
+Iter. τ(R1) τ(R2) P(R1) P(R2) Ants→R1 Ants→R2 Archive
+0 1.00 1.00 57.9% 42.1% — — {R1, R2} init
+1 1.00→1.30 1.00→1.00 57.9% 42.1% 2 1 {R1, R2}
+2 1.30→1.51 1.00→1.00 64.1% 35.9% 2 1 {R1, R2} Converged
+★ OPTIMAL PARETO-OPTIMAL RESULT   Pareto front (n = 2 iterations) = R1(40, 70) and R2(55, 50) — pheromone increasingly favors the shorter route R1 (τ: 1.00→1.51), but 
+the faster route R2 is retained since it is a genuinely non-dominated trade-off, not simply outcompeted.
+MOEA/D-ACO CH. 5 · ELITIST MOEAs
+
+PAGE 57
+7
+MOEA/D-ACO — OBJECTIVE SPACE
+Pareto Front: TSP with Distance & Time
+n = 2  iterations shown
+40 60 80
+50
+65
+80
+f₁ — Total Distance  (minimize →)
+f₂ — Total Time  (lower=better)
+R3 (dominated)
+R1 (τ=1.51)
+R2 (τ=1.00)
+Archive after n=2 (non-dominated)
+Dominated route (discarded)
+R3 (50,80) is dominated by R1 on both distance and time, so it never enters the archive. R1 and R2 remain the two non-dominated routes after n=2 iterations — pheromone biases ant traffic toward R1 but 
+never eliminates the genuinely trade-off route R2.
+MOEA/D-ACO CH. 5 · ELITIST MOEAs
+
+PAGE 58
+⚖
+BRINGING IT TOGETHER
+Elitist MOEAs — Comparison Table
+Method Full Form Diversity Convergence Complexity Archive? Best For
+NSGA-II Non-Dominated Sorting GA II Very Good Very Good O(kN²) No 2 objectives
+NSGA-III Non-Dominated Sorting GA III Excellent Very Good O(kN²) No 3+ objectives
+SPEA2 Strength Pareto EA 2 Excellent Excellent O(kN²) Yes High diversity
+PESA-II Pareto Envelope-Based SA II Good Good O(kN) Yes Many obj., speed
+MOEA/D MOEA Based on Decomposition Good Very Good O(kNT) No Many objectives
+MOEA/D-DE MOEA/D + DE Good Very Fast O(kNT) No Continuous
+MOEA/D-ACO MOEA/D + ACO Good Medium O(kNT) No Discrete / combinatorial
+★ TAKEAWAY   No single elitist MOEA wins everywhere — pick NSGA-II for simplicity, NSGA-III for many objectives, SPEA2 for diversity, PESA-II for speed, and MOEA/D (or its 
+DE/ACO variants) for decomposable, large-scale problems.
+COMPARISON CH. 5 · ELITIST MOEAs
+
+PAGE 59
+Σ
+FULL-CHAPTER CONTEXT
+Computational Complexity of All MOO Algorithms
+Algorithm Per-Generation Complexity Archive? Scalability
+Weighted Sum Single-objective solver No Excellent
+ε-Constraint Single-objective solver No Good
+VEGA O(kN) No Good
+MOGA O(kN²) No Medium
+NSGA O(kN³) No Poor
+NPGA O(kN²) No Medium
+NSGA-II O(kN²) No Good
+NSGA-III O(kN²) No Excellent
+SPEA2 O(kN²) Yes Good
+PESA-II O(kN) Yes Excellent
+MOEA/D O(kNT) No Excellent
+MOEA/D-DE O(kNT) No Excellent
+MOEA/D-ACO O(kNT) No Good
+★ TAKEAWAY   Elitism (NSGA-II onward) dramatically improved both complexity (O(kN³)→O(kN²)) and scalability compared to the earliest non-elitist MOO methods (VEGA, 
+MOGA, NSGA).
+COMPLEXITY CH. 5 · ELITIST MOEAs
+
+PAGE 60
+✓
+WRAPPING UP
+Summary & Key Takeaways
+Elitism Matters
+Merging parents + offspring and keeping only the best solutions prevents loss of 
+good genes and speeds convergence.
+Diversity Mechanisms Differ
+Crowding distance (NSGA-II), reference points (NSGA-III), density/archive 
+(SPEA2), grids (PESA-II), and weight vectors (MOEA/D) all solve diversity 
+differently.
+Decomposition Scales Well
+MOEA/D and its DE/ACO variants turn a hard multiobjective problem into many 
+simple scalar subproblems — ideal for large or many-objective problems.
+Match Algorithm to Problem
+2 objectives → NSGA-II. 3+ objectives → NSGA-III / MOEA/D. Need an archive 
+→ SPEA2. Need speed → PESA-II. Continuous → MOEA/D-DE. Discrete → 
+MOEA/D-ACO.
+SUMMARY CH. 5 · ELITIST MOEAs
+
+PAGE 61
+⚙
+WHERE THESE ALGORITHMS ARE USED
+Applications Across Domains
+Engineering Design
+Bridge/beam sizing, antenna geometry, car design (cost vs. mileage vs. safety)
+Finance
+Portfolio optimization (risk vs. return) using SPEA2-style archives
+Cloud & Networking
+Resource allocation (cost vs. latency) via MOEA/D decomposition
+Logistics & Routing
+Vehicle routing / TSP with distance & time objectives via MOEA/D-ACO
+Sensor Networks
+Sensor placement (cost vs. coverage) via PESA-II grid-based diversity
+Many-Objective Systems
+Aerospace, energy-grid and manufacturing problems with 5–15 objectives via 
+NSGA-III
+APPLICATIONS CH. 5 · ELITIST MOEAs
+
+PAGE 62
+?
+SELF-CHECK
+Practice Questions
+1 Why is elitism important in multiobjective evolutionary algorithms?
+2 Walk through fast non-dominated sorting for a population of 5 solutions.
+3 Compute the crowding distance for a boundary vs. an interior solution.
+4 When would you choose NSGA-III over NSGA-II, and why?
+5 How do SPEA2's strength and density terms combine into final fitness?
+6 Explain how PESA-II's grid squeeze factor drives selection.
+7 Contrast the weighted-sum and Tchebycheff decomposition approaches in MOEA/D.
+8 Why does MOEA/D-DE suit continuous problems while MOEA/D-ACO suits discrete ones?
+PRACTICE CH. 5 · ELITIST MOEAs
+
+PAGE 63
+✦
+FURTHER READING
+References
+Citation numbers [1]–[7] match the “Proposed By” tag on each algorithm's concept slide earlier in this deck.
+[1]  K. Deb, A. Pratap, S. Agarwal, T. Meyarivan, “A Fast and Elitist Multiobjective Genetic Algorithm: NSGA-II,” IEEE Trans. Evolutionary Computation, 2002.
+[2]  K. Deb, H. Jain, “An Evolutionary Many-Objective Optimization Algorithm Using Reference-Point-Based Non-dominated Sorting Approach (NSGA-III),” IEEE TEVC, 2014.
+[3]  E. Zitzler, M. Laumanns, L. Thiele, “SPEA2: Improving the Strength Pareto Evolutionary Algorithm,” TIK-Report 103, ETH Zurich, 2001.
+[4]  D. Corne, N. Jerram, J. Knowles, M. Oates, “PESA-II: Region-based Selection in Evolutionary Multiobjective Optimization,” GECCO, 2001.
+[5]  Q. Zhang, H. Li, “MOEA/D: A Multiobjective Evolutionary Algorithm Based on Decomposition,” IEEE TEVC, 2007.
+[6]  H. Li, Q. Zhang, “Multi-objective Optimization Problems with Complicated Pareto Sets, MOEA/D and NSGA-II,” IEEE TEVC, 2009.
+[7]  L. Ke, Q. Zhang, R. Battiti, “MOEA/D-ACO: A Multiobjective Evolutionary Algorithm Using Decomposition and Ant Colony,” IEEE Trans. Cybernetics, 2013.
+REFERENCES CH. 5 · ELITIST MOEAs
+
+PAGE 64
+THANK YOU
+Questions & Discussion
+Elitist MOEAs: NSGA-II · NSGA-III · SPEA2 · PESA-II · MOEA/D · MOEA/D-DE · MOEA/D-ACO

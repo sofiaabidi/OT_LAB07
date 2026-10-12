@@ -1,0 +1,981 @@
+
+PAGE 1
+C H A P T E R  5   ·   B O N U S  M O D U L E  5 E
+Advanced Multiobjective
+Optimization
+Many-Objective · Indicator-Based · Preference-Based · Gradient-Based
+Every algorithm below is solved end-to-end: generalized steps, a real worked example with two 
+full iterations, a final Pareto/compromise table, and a verification + student-review pass.
+[Your Name]   |   [Department]   |   [Institution]
+
+PAGE 2
+R O A D M A P
+What This Deck Covers
+1
+Many-objective foundations
+Why NSGA-II breaks down at k≥3 objectives
+2
+Many-objective MOEAs
+NSGA-III (reference points) & RVEA (reference vectors)
+3
+Indicator-based MOEAs
+IBEA (ε-indicator), SMS-EMOA & HypE (hypervolume)
+4
+Preference-based MOO
+R-NSGA-II — steering search with a DM reference point
+5
+Mathematical-programming MOO
+Goal Programming, Lexicographic, TOPSIS, VIKOR
+6
+Gradient-based MOO
+MGDA & GradNorm for differentiable / multi-task models
+7
+Performance metrics
+Hypervolume, GD, IGD, Spread — with a worked example
+8
+Verification & student review
+Numerical/logical audit + ambiguity fixes
+Slide 2 Chapter 5 · Advanced MOO
+
+PAGE 3
+R E A D  T H I S  F I R S T
+Notation Guide: Same Symbol, Different Meaning
+Several standard symbols get reused across the literature for unrelated quantities. Each reuse is flagged again on its own slide, but here they are collected in one place.
+α (alpha) RVEA: fixed penalty-strength constant (≈2) in the APD formula  ·  GradNorm: fixed asymmetry hyperparameter  ·  MGDA: α*, a SOLVED optimal mixing weight (an output, not an input) — three unrelated constants, same letter.
+ε (epsilon) IBEA: names the 'ε-indicator' I(a,b)=max(aᵢ−bᵢ)  ·  Lexicographic: a small tolerance when holding a higher-priority optimum (f1(x)≥f1*−ε)  ·  R-NSGA-II: the ε-clearing radius that preserves a spread of solutions.
+d⁺, d⁻ Goal Programming: DEVIATIONAL VARIABLES — part of the decision problem (over/under-achievement of a target)  ·  TOPSIS: DISTANCES to the ideal/anti-ideal point — a computed output used only for ranking.
+r  vs.  v SMS-EMOA / HypE: r = one dominated reference POINT in objective space  ·  RVEA: v₁..v_H = reference VECTORS (directions)  ·  VIKOR: v = a scalar trade-off WEIGHT in [0,1] — three unrelated things.
+C NSGA-III: C(k+p−1,p), the binomial 'choose' function → a reference-point COUNT  ·  TOPSIS: Cᵢ, the closeness coefficient → a per-alternative score in [0,1].
+g1, g2 / target MGDA: g1,g2 are gradient VECTORS (:=∇f1,∇f2)  ·  GradNorm: g1,g2 are fixed gradient-norm MAGNITUDES (scalars); its targetᵢ is recomputed every step, unlike Goal Programming's fixed target Tᵢ.
+k  (vs. classical 'M') This deck standardizes on k = number of objectives everywhere. The original NSGA-III paper (and several textbooks) uses M for the same quantity — same meaning, different letter.
+Slide 3 Chapter 5 · Advanced MOO
+
+PAGE 4
+M O T I V A T I O N
+Why NSGA-II Isn't Enough at 3+ Objectives
+The many-objective challenge (k ≥ 3)
+• Diversity loss — as k grows, almost every solution in a random population 
+becomes mutually non-dominated, so Pareto rank alone can no longer tell 
+good from mediocre.
+• Selection pressure collapses — crowding distance (NSGA-II's tiebreaker) was 
+designed for 2–3 objectives; in 5+ dimensions it no longer reliably spreads 
+solutions.
+• Fix #1 — Decomposition: pre-place structured reference points/vectors across 
+the objective space and let each one 'claim' its nearest solution (NSGA-III, 
+RVEA).
+• Fix #2 — Indicators: replace Pareto rank with a scalar quality indicator (ε-
+indicator, hypervolume) that remains discriminating at any k (IBEA, SMS-EMOA, 
+HypE).
+At k = 3 objectives, a population of 100 random points is 
+typically
+70–95% mutually non-dominated.
+This deck's running example
+Drone design (3 obj.): wingspan & motor power → weight, cost, 
+flight time.
+Laptop design (2 obj.): weight vs. price, for indicator/preference 
+methods.
+Supplier selection (MCDA): cost, quality, delivery time.
+Production planning (LP): profit & output targets.
+Multi-task model training: two loss functions sharing parameters.
+Slide 4 Chapter 5 · Advanced MOO
+
+PAGE 5
+M A N Y- O B J E C T I V E  M O E A
+NSGA-III: Concept & Generalized Steps
+Full form: Non-Dominated Sorting Genetic Algorithm III
+Proposed by: Deb & Jain (2014)
+Core idea
+• Replace crowding distance with structured reference points on a 
+normalized hyperplane, so selection pressure survives even when almost 
+every solution is mutually non-dominated (k ≥ 3).
+Pros / Cons / When to use
+•
+ Scales cleanly to many objectives via structured reference points.
+•
+ Needs the reference-point count decided upfront; more moving parts than 
+NSGA-II.
+• Best used when: 5+ objectives.
+• Parameters: Divisions per axis p → H = C(k+p-1, p) reference points.
+Generalized steps (any n variables, k objectives)
+1.  For k objectives, generate H = C(k+p-1, p) structured reference points using p divisions per 
+axis (H grows combinatorially with k, not with n).
+2.  Initialize a population of N ≈ H individuals, each an n-dimensional decision vector 
+x=(x1,…,xn); evaluate all k objectives.
+3.  Merge parents + offspring; non-dominated sort into fronts F1, F2, ….
+4.  Compute the ideal point (per-objective min) and an estimated nadir; normalize every 
+objective vector to [0,1]^k. (Teaching simplification: we estimate nadir as the translated per-
+objective max; the original paper instead fits a hyperplane through extreme points for a more 
+robust estimate.)
+5.  Associate each individual with its nearest reference line by perpendicular distance in 
+normalized k-D space; tally niche counts.
+6.  Fill next generation front-by-front; in the last partially-accepted front, prefer individuals 
+whose reference point currently has the fewest selected members.
+Dimension handling: n (variable count) affects only evaluation cost, not selection; k (objective 
+count) drives H and every normalization step.
+Slide 5 Chapter 5 · Advanced MOO
+
+PAGE 6
+M A N Y- O B J E C T I V E  M O E A
+NSGA-III: Worked Example — Drone Design (3 objectives)
+• Vars: x1 = wingspan (m) ∈[0.6,1.4], x2 = motor power (W) ∈[100,300].  Objectives (all minimize): f1 weight=0.5+0.6x1+0.004x2 (kg) · f2 cost=20+40x1+0.3x2 ($) · f3 = −(15+0.05x2−8x1)  [≡ maximize 
+flight time].
+• Gen-0 population: D1(0.6,120)→(1.34,80,−16.2) · D2(0.8,150)→(1.58,97,−16.1) · D3(1.0,180)→(1.82,114,−16.0) · D4(1.2,200)→(2.02,1 28,−15.4) · D5(0.7,250)→(1.92,123,−21.9) · 
+D6(1.4,300)→(2.54,166,−18.8).
+Iteration 1
+• Non-dominated fronts (Gen 0): F1={D1,D5}, F2={D2,D6}, F3={D3}, F4={D4}.
+• p=2 divisions ⇒ H = C(4,2) = 6 reference points on the 3-obj hyperplane, e.g. (0,0,1), 
+(0.5,0.5,0), (0.5,0,0.5)…
+• Normalize using ideal(1.34,80,−21.9) & nadir≈(2.54,166,6.5).
+• Association (nearest ref. by ⟂-distance): D1→(0,0,1) d=0.00 · D5→(0.5,0.5,0) d=0.01 · 
+D2→(0,0,1) d=0.28 · D6→(0.5,0.5,0) d=0.48 · D3,D4→(0.5,0,0.5).
+• Niche counts: {ref(0,0,1):2, ref(0.5,0,0.5):2, ref(0.5,0.5,0):2}.
+• Front-1 = {D1,D5}, both directly advance (target pop = 4).
+Iteration 2
+• Offspring: D1′(0.65,110)→(1.33,79.0,−15.3) · D5′(0.75,240)→(1.91,122.0,−21.0) · 
+D2″(0.75,165)→(1.61,99.5,−17.25) · D3″(0.95,195)→(1.85,116.5,−17.15).
+• Combined front-1 = {D1, D5, D1′, D5′, D2″} (D3″ dominated → front-2).
+• Re-associate & sort by (niche count, then distance): D2″ , D1′ , D1 , D5 , D5′.
+• Take the top 4 → Final selection = {D2″, D1′, D1, D5}.
+Slide 6 Chapter 5 · Advanced MOO
+
+PAGE 7
+M A N Y- O B J E C T I V E  M O E A
+NSGA-III: Final Pareto Set After 2 Generations
+Design Weight (kg) Cost ($) −Flight time (min)
+D2″ 1.61 99.5 −17.25
+D1′ 1.33 79.0 −15.3
+D1 1.34 80.0 −16.2
+D5 1.92 123.0 −21.9
+Why these solutions / this outcome was selected
+• Each survivor anchors a different, under-represented reference direction, spreading the population across the light/cheap/short-flight 
+ heavy/pricey/long-flight trade-
+off instead of clustering.
+• D5 is kept despite higher weight/cost because it is the only design covering the long-flight-time direction — exactly what niche-based selection is designed to protect.
+Slide 7 Chapter 5 · Advanced MOO
+
+PAGE 8
+M A N Y- O B J E C T I V E  M O E A
+RVEA: Concept & Generalized Steps
+Full form: Reference Vector Guided Evolutionary Algorithm
+Proposed by: Cheng, Olhofer & Jin (2016)
+Core idea
+• Use unit reference vectors plus an Angle-Penalized Distance (APD) that 
+grows with generation progress — exploration early, convergence pressure 
+late.
+Pros / Cons / When to use
+•
+ Scales to many objectives; adapts vectors to the current objective ranges.
+•
+ Vector generation/adaptation adds complexity; sector-exclusive selection 
+can retain a dominated point (see result table).
+• Best used when: 5+ objectives.
+• Parameters: Number of reference vectors H; penalty exponent α; max 
+generations tmax.
+Generalized steps (any n variables, k objectives)
+1.  Generate unit reference vectors v1..vH over the k-D simplex (identical construction to 
+NSGA-III's points, then unit-normalized).
+2.  Normalize objectives every generation via ideal/nadir estimates, so raw units never bias 
+the angle calculation, for any n or k.
+3.  Assign each individual to the reference vector with the smallest angle θ to its normalized, 
+ideal-shifted objective vector.
+4.  Compute APD(x) = d(x)·[1 + α·(t/tmax)·θ(x)/γmin], where d = distance from ideal and γmin 
+= smallest angle between neighbouring vectors. (α here is a FIXED penalty-strength constant, 
+typically 2 — unrelated to GradNorm's asymmetry α or MGDA's solved α*; see the Notation 
+Guide.)
+5.  Within each vector's sector, keep only the individual with the smallest APD (elitist, one 
+survivor per sector).
+6.  Periodically adapt the reference vectors to the population's current objective ranges; 
+repeat.
+Dimension handling: Sector count H scales with k exactly as in NSGA-III; n only affects how 
+offspring are generated inside each sector.
+Slide 8 Chapter 5 · Advanced MOO
+
+PAGE 9
+M A N Y- O B J E C T I V E  M O E A
+RVEA: Worked Example — Drone Design (3 objectives) — same population as 
+NSGA-III
+• Same drone problem & Gen-0 population as the NSGA-III slide. Reference vectors reused from NSGA-III's 6 points, unit-normalized. α=2, t/tmax progresses from 0 → 1 over the 2 iterations.
+Iteration 1
+• t=0 (no angle penalty yet): normalized objectives reused from NSGA-III's ideal/nadir scaling.
+• Sector (0,0,1): only D1 assigned → survives (APD=0.877).
+• Sector (0.5,0,0.5): D3(1.068) < D4(1.278) → D3 survives.
+• Sector (0.5,0.5,0): D5(0.695) < D6(1.492) → D5 survives.
+• Gen-0 selection (t=0): {D1, D3, D5} — 3 active sectors out of 6.
+Iteration 2
+• Offspring: D1*(0.64,112)→(1.332,79.2,−15.48) · D3*(1.04,172)→(1.812,113.2,−15.28) · 
+D5*(0.74,242)→(1.912,122.2,−21.18) · D2^(0.74,162)→(1.592,98.2,−17.18) · 
+D4^(1.14,212)→(2.032,129.2,−16.48).
+• t=1 (full angle penalty): sector(0,0,1): D1(0.911)<D1*(0.970) → D1 survives.
+• Sector(0.5,0,0.5): D3(3.234)<D3*(3.304) → D3 survives. Sector(0.5,0.5,0): 
+D5(1.278)<D5*(1.482)<D4^(3.818) → D5 survives.
+• A NEW sector (0,1,0) activates: only D2^ assigned → survives by default.
+• Final RVEA selection: {D1, D5, D2^, D3}.
+Slide 9 Chapter 5 · Advanced MOO
+
+PAGE 10
+M A N Y- O B J E C T I V E  M O E A
+RVEA: Final Population After 2 Generations
+Design Weight (kg) Cost ($) −Flight time (min)
+D1 1.34 80.0 −16.2
+D5 1.92 123.0 −21.9
+D2^ 1.592 98.2 −17.18
+D3 1.82 114.0 −16.0
+Why these solutions / this outcome was selected
+• D3 survives even though D1 dominates it in ALL three objectives (1.34<1.82, 80<114, −16.2<−16.0). This is not an error: RVEA's exclusive sector partition guarantees each 
+direction keeps its own best APD solution regardless of global dominance.
+• Verification note: this is a documented diversity-first trade-off of decomposition-based selection (shared with MOEA/D) — flagged here rather than 'corrected away', 
+because it is mathematically correct behaviour of the algorithm as published.
+Slide 10 Chapter 5 · Advanced MOO
+
+PAGE 11
+I N D I C A T O R- B A S E D  M O E A
+IBEA: Concept & Generalized Steps
+Full form: Indicator-Based Evolutionary Algorithm
+Proposed by: Zitzler & Künzli (2004)
+Core idea
+• Fitness comes directly from a binary quality indicator (ε-indicator) 
+measured against every other solution — selection optimizes indicator 
+quality, not Pareto rank.
+Pros / Cons / When to use
+•
+ Directly optimizes a chosen indicator; good convergence.
+•
+ Indicator computation cost; κ must be tuned; sensitive to un-normalized 
+objective scales (see result table).
+• Best used when: Quality of the final front (by a chosen indicator) is the priority.
+• Parameters: κ (fitness scaling), indicator type.
+Generalized steps (any n variables, k objectives)
+1.  Choose an indicator I(a,b); the additive ε-indicator I(a,b)=maxᵢ(aᵢ−bᵢ) works for any k. 
+Reading it: I(a,b) large & positive ⇒ a is much worse than b in at least one objective; I(a,b) ≤ 0 
+⇒ a already weakly dominates b.
+2.  Evaluate the k-D objective vector of each of the N individuals (I is always computed in 
+objective space, independent of n).
+3.  Fitness F(i) = Σⱼ≠ᵢ −exp(−I(i,j)/κ); scale κ to the indicator's typical magnitude range in THIS 
+problem.
+4.  Environmental selection: repeatedly delete the individual with the largest (worst) F, RE-
+COMPUTING all remaining fitnesses after each deletion.
+5.  Generate offspring from survivors; repeat.
+Dimension handling: κ must be re-tuned whenever objective units/scales change — an un-
+normalized scale gap between objectives biases which solutions look 'worst' (see the 
+verification note on this module's result slide).
+Slide 11 Chapter 5 · Advanced MOO
+
+PAGE 12
+I N D I C A T O R- B A S E D  M O E A
+IBEA: Worked Example — Laptop Design (2 objectives)
+• Objectives (minimize both): weight (kg), price (×$100). κ=20 (scaled to this problem's ε range of 0–86).
+• Gen-0 population: L1(1.0,12.0) · L2(1.2,9.0) · L3(1.5,7.0) · L4(1.8,6.0) · L5(1.3,11.0) · L6(2.0,5.5).
+Iteration 1
+• Fitness F(i), higher = worse: L1=−4.05 (worst) · L5=−4.25 · L2=−4.60 · L3=−4.83 · L6=−4.84 · 
+L4=−4.87 (best).
+• Remove worst → L1 (F=−4.05). Recompute remaining 5 fitnesses.
+• New worst → L5 (F=−3.26 after recomputation). Remove L5.
+• Gen-0 survivors (target size 4): {L2, L3, L4, L6}.
+Iteration 2
+• Offspring (small perturbation toward lower weight): L2*(1.15,9.15) · L3*(1.45,7.15) · 
+L4*(1.75,6.15) · L6*(1.95,5.65).
+• Combined pool of 8 re-scored; removal order: L2* (F=−6.18) → L2 (−5.23) → L3* (−4.74) → 
+L3 (−3.77).
+• Final IBEA population (κ=20): {L4, L6, L4*, L6*}.
+Slide 12 Chapter 5 · Advanced MOO
+
+PAGE 13
+I N D I C A T O R- B A S E D  M O E A
+IBEA: Final Population After 2 Generations (κ=20)
+Design Weight (kg) Price (×$100)
+L4 1.8 6.0
+L6 2.0 5.5
+L4* 1.75 6.15
+L6* 1.95 5.65
+Why these solutions / this outcome was selected
+• Verification finding: all 4 survivors sit in the heavier/cheaper half of the front — none represents the light 1.0–1.3 kg region, even though L1/L2/L3 were part of the true 
+Pareto front.
+• Cause: price spans a wider raw range (5.5–12) than weight (1.0–2.0), so the un-normalized ε-indicator is dominated by price differences and systematically penalizes the 
+lighter, pricier designs.
+• Correction for practice: normalize every objective to [0,1] before computing I(a,b) — this is standard IBEA practice and would restore a spread across the whole front.
+Slide 13 Chapter 5 · Advanced MOO
+
+PAGE 14
+I N D I C A T O R- B A S E D  M O E A
+SMS-EMOA: Concept & Generalized Steps
+Full form: S-Metric Selection Evolutionary Multi-Objective Algorithm
+Proposed by: Beume, Naujoks & Emmerich (2007)
+Core idea
+• Steady-state (μ+1): create exactly one offspring per iteration; use each 
+solution's hypervolume CONTRIBUTION to decide who is removed, directly 
+optimizing the metric that matters most.
+Pros / Cons / When to use
+•
+ Hypervolume-based; excellent convergence AND diversity in one criterion.
+•
+ Exact hypervolume is expensive to compute as k grows.
+• Best used when: 2–3 objectives.
+• Parameters: Population size μ; reference point r.
+Generalized steps (any n variables, k objectives)
+1.  Fix a reference point r, component-wise worse than every feasible k-D objective vector.
+2.  Initialize a population of size μ; evaluate k objectives (independent of the n variables that 
+produced them).
+3.  Generate ONE offspring via variation; add it to the population (size μ+1).
+4.  Non-dominated sort the μ+1 individuals; identify the worst front.
+5.  If the worst front has >1 member, delete the one with the smallest hypervolume 
+contribution ΔHV = HV(P) − HV(P∖{i}) restricted to that front; otherwise delete its sole 
+member.
+6.  Repeat until the stopping criterion is met.
+Dimension handling: Exact hypervolume is tractable at k=2–3 (used here); its cost grows 
+exponentially with k — this is exactly why HypE's Monte-Carlo estimate exists for many-
+objective problems.
+Slide 14 Chapter 5 · Advanced MOO
+
+PAGE 15
+I N D I C A T O R- B A S E D  M O E A
+SMS-EMOA: Worked Example — Laptop Design (2 objectives) — same population 
+as IBEA
+• Same 6 laptops as IBEA. Reference point r=(2.5, 13.5) (dominated by every point). Total Gen -0 hypervolume HV₀ = 9.10.
+• Per-point HV contribution at Gen-0: L5=0.00 (dominated) · L4=0.20 · L6=0.25 · L1=0.30 · L3=0.60 · L2=0.70 (largest).
+Iteration 1
+• Offspring C1 = midpoint(L1,L2) = (1.10, 10.50).
+• Non-dominated fronts of {6 parents + C1}: Front-1 = {L1,L2,L3,L4,L6,C1}; Front-2 = {L5} (sole 
+member).
+• Worst front has exactly 1 member → remove it directly (no HV calc needed): remove L5.
+• Population after Iteration 1: {L1, L2, L3, L4, L6, C1}  (still size 6).
+Iteration 2
+• Offspring C2 = midpoint(L2,L3) = (1.35, 8.00).
+• Fronts of the 7 individuals: ALL non-dominated (single front) — must use HV contribution to 
+pick who leaves.
+• HV contributions recomputed over all 7; smallest belongs to L1 (0.30, tied-lowest) → 
+remove L1.
+• Population after Iteration 2: {L2, L3, L4, L6, C1, C2}. New total hypervolume = 9.25 (up from 
+9.10).
+Slide 15 Chapter 5 · Advanced MOO
+
+PAGE 16
+I N D I C A T O R- B A S E D  M O E A
+SMS-EMOA: Final Population — Total HV Rose 9.10 → 9.25
+Design Weight (kg) Price (×$100) HV contribution
+L2 1.2 9.0 0.225
+L3 1.5 7.0 0.300
+L4 1.8 6.0 0.200
+L6 2.0 5.5 0.250
+C1 1.1 10.5 0.300
+C2 1.35 8.0 0.150
+Why these solutions / this outcome was selected
+• Total hypervolume rose from 9.10 to 9.25 over the two iterations — direct, measurable evidence that (μ+1) hypervolume-driven selection is improving front quality, not 
+merely preserving diversity.
+• L1 was eventually dropped only once offspring C1 covered its dominated region more cheaply — the algorithm removes redundancy, not quality.
+Slide 16 Chapter 5 · Advanced MOO
+
+PAGE 17
+I N D I C A T O R- B A S E D  M O E A
+HypE: Concept & Generalized Steps
+Full form: Hypervolume Estimation Algorithm
+Proposed by: Bader & Zitzler (2011)
+Core idea
+• Exact hypervolume is too expensive for many objectives, so estimate each 
+solution's contribution via Monte-Carlo sampling inside a bounding box, 
+then remove the lowest-estimate solution each round.
+Pros / Cons / When to use
+•
+ Scales to many objectives via sampling; controllable accuracy/cost trade-
+off.
+•
+ Estimation error from finite sampling; needs enough samples S.
+• Best used when: Many objectives (k≥4) where exact hypervolume (SMS-EMOA) 
+is too slow.
+• Parameters: Number of Monte-Carlo samples S.
+Generalized steps (any n variables, k objectives)
+1.  Define a bounding box between the per-objective ideal point and a dominated reference 
+point r; its k-D volume caps achievable hypervolume for any k.
+2.  Draw S random sample points uniformly inside the box (S is independent of n; scales only 
+with desired accuracy and k).
+3.  For every sample, find which population members dominate it, and split that sample's 
+share of the box volume equally among its dominators.
+4.  Sum each individual's accumulated share across all S samples → its estimated HypE 
+fitness/contribution.
+5.  Environmental selection: repeatedly remove the lowest-estimate individual, RE-
+ESTIMATING after each removal, until population = target size.
+Dimension handling: The exactness of SMS-EMOA's hypervolume is traded for a controllable 
+sampling error that stays roughly constant as k grows — this is why HypE, unlike SMS-EMOA, is 
+recommended for k≥4.
+Slide 17 Chapter 5 · Advanced MOO
+
+PAGE 18
+I N D I C A T O R- B A S E D  M O E A
+HypE: Worked Example — Drone Design (3 objectives) — same population as 
+NSGA-III
+• Same drone Gen-0 population. Reference point r=(3.0,180,10.0), ideal=(1.34,80,−21.9), bounding-box volume ≈ 5295.4. S = 500 Monte-Carlo samples.
+Iteration 1
+• Estimated fitness (share of dominated hypervolume): D1=2261.1 (best) · D2=984.9 · 
+D5=732.5 · D3=441.3 · D4=245.0 · D6=37.4 (worst).
+• Remove D6 (37.4). Re-estimate remaining 5 with the same 500 samples.
+• New worst → D4 (249.9 after re-estimation). Remove D4.
+• Gen-0 survivors (target size 4): {D1, D2, D3, D5}.
+Iteration 2
+• Offspring: D1*(1.334,79.4,−15.66) · D2*(1.574,96.4,−15.56) · D3*(1.814,113.4,−15.46) · 
+D5*(1.914,122.4,−21.36).
+• Combined pool of 8 re-estimated; removal order: D3* (255.3) → D3 (294.8) → D5* (478.0) 
+→ D2* (665.1).
+• Final HypE population: {D1, D2, D5, D1*}.
+Slide 18 Chapter 5 · Advanced MOO
+
+PAGE 19
+I N D I C A T O R- B A S E D  M O E A
+HypE: Final Population After 2 Generations (S=500 samples)
+Design Weight (kg) Cost ($) −Flight time (min)
+D1 1.34 80.0 −16.2
+D2 1.58 97.0 −16.1
+D5 1.92 123.0 −21.9
+D1* 1.334 79.4 −15.66
+Why these solutions / this outcome was selected
+• D2 remains in the final population even though D1 dominates it outright on all three objectives.
+• Like RVEA, HypE's estimated-contribution selection does not force strict non-domination within one generation; a longer run would eventually starve D2 of its small, 
+sampling-noise-prone contribution share.
+Slide 19 Chapter 5 · Advanced MOO
+
+PAGE 20
+P R E F E R E N C E- B A S E D  M O O
+R-NSGA-II: Concept & Generalized Steps
+Full form: Reference Point-Based NSGA-II
+Proposed by: Deb, Sundar, Bhaskara & Chaudhuri (2006)
+The 'R' in R-NSGA-II stands for Reference (point) — unrelated to VIKOR's R (individual regret), covered later in this deck.
+Core idea
+• The decision-maker (DM) supplies a reference point describing a desired 
+trade-off; solutions are ranked by normalized distance to it, with an ε-
+clearing rule that preserves a SPREAD near the preference rather than 
+collapsing to one point.
+Pros / Cons / When to use
+•
+ Incorporates DM preference directly; focuses search where it matters.
+•
+ Needs a reference point and ongoing DM involvement; ε must be tuned.
+• Best used when: The decision-maker already has a preferred trade-off region.
+• Parameters: Reference point(s); clearing radius ε.
+Generalized steps (any n variables, k objectives)
+1.  DM specifies g reference points in objective space (g=1 here); works for any k (just a k-D 
+point) and any n.
+2.  Min–max normalize the population's objectives, so distance isn't dominated by whichever 
+objective has the largest raw range.
+3.  Compute Euclidean distance dᵢ from each normalized solution to the normalized reference 
+point.
+4.  Sort ascending by dᵢ; accept a solution only if it is ≥ ε away (normalized space) from every 
+already-accepted solution (ε-clearing preserves spread).
+5.  If clearing leaves fewer than the target count, backfill by pure distance order; repeat next 
+generation.
+Dimension handling: ε is a single scalar regardless of k, but should shrink as k grows, since 
+normalized-space volume grows with dimension (curse of dimensionality on the clearing 
+radius).
+Slide 20 Chapter 5 · Advanced MOO
+
+PAGE 21
+P R E F E R E N C E- B A S E D  M O O
+R-NSGA-II: Worked Example — Laptop Design (2 objectives) — same population 
+as IBEA
+• Same 6 laptops. DM reference point = (weight 1.3 kg, price $800) → (1.3, 8.0). Clearing radius ε=0.15.
+Iteration 1
+• Normalized reference point = (0.300, 0.385).
+• Distances to reference: L2=0.184 (closest) · L3=0.252 · L5=0.462 · L4=0.587 · L1=0.685 · 
+L6=0.799.
+• ε-clearing check: L2, L3, L5 are each ≥0.15 apart from the previously accepted ones → all 
+three pass.
+• Iteration-1 selection (size 3): {L2, L3, L5}.
+Iteration 2
+• Offspring = 30% mutation toward the reference point: L2*(1.23,8.70) · L3*(1.44,7.30) · 
+L5*(1.30,10.10).
+• New distances: L2*=0.128 (closest) · L3*=0.177 · L2=0.184 · L3=0.252 · L5*=0.323 · 
+L5=0.462.
+• ε-clearing over the sorted list keeps the first 3 sufficiently-spread points: {L2*, L3*, L5*}.
+Slide 21 Chapter 5 · Advanced MOO
+
+PAGE 22
+P R E F E R E N C E- B A S E D  M O O
+R-NSGA-II: Final Preference-Focused Subset
+Design Weight (kg) Price (×$100) Distance to reference
+L2* 1.23 8.70 0.128
+L3* 1.44 7.30 0.177
+L5* 1.30 10.10 0.323
+Why these solutions / this outcome was selected
+• L5* is kept even though L2* and L3* dominate it (both lighter AND cheaper) — because it is the closest available point to the DM's stated preference on the 'more 
+premium' side.
+• This illustrates R-NSGA-II's deliberate trade of strict Pareto-optimality for preference relevance: the method answers 'what's close to what I asked for', not just 'what's 
+undominated'.
+Slide 22 Chapter 5 · Advanced MOO
+
+PAGE 23
+M A T H E M A T I C A L  P R O G R A M M I N G  M O O
+Goal Programming: Concept & Generalized Steps
+Full form: Goal Programming
+Proposed by: Charnes & Cooper (1961)
+Core idea
+• Convert each objective into a GOAL with a target Tᵢ, then minimize the 
+(weighted) sum of undesired deviations from those targets — satisficing 
+rather than optimizing.
+Pros / Cons / When to use
+•
+ Intuitive target-setting; handles multiple, even conflicting, goals in one LP .
+•
+ Needs targets to be specified; can be infeasible if targets are unreachable 
+together.
+• Best used when: Clear, DM-supplied targets exist for each objective.
+• Parameters: Targets Tᵢ; deviation weights.
+Generalized steps (any n variables, k objectives)
+1.  For k goals, introduce target Tᵢ and deviational variables dᵢ⁻, dᵢ⁺ ≥ 0 with fᵢ(x) + dᵢ⁻ − dᵢ⁺ = Tᵢ 
+(works for any n inside fᵢ(x), and any k).
+2.  Decide which deviation is undesirable per goal (e.g. dᵢ⁻ if the goal is 'at least Tᵢ') and 
+penalize only those in the objective.
+3.  Add the original hard constraints (resource limits, etc.) unchanged.
+4.  Solve the resulting single-objective LP by simplex / any LP method — Goal Programming IS 
+linear programming once goals become equality constraints.
+5.  Read off deviations: 0 = goal exactly-or-over-achieved; a positive undesired deviation flags 
+a goal that could not be fully met.
+Dimension handling: Adds exactly 2k new variables (one dᵢ⁻,dᵢ⁺ pair per goal) regardless of n; 
+the problem stays an LP as long as every fᵢ(x) is linear in x.
+Slide 23 Chapter 5 · Advanced MOO
+
+PAGE 24
+M A T H E M A T I C A L  P R O G R A M M I N G  M O O
+Goal Programming: Worked Example — Production Planning
+• Vars xA,xB≥0 (units/week). Constraints: labor 2xA+3xB≤1200, material 4xA+2xB≤1400.
+• Goal 1: profit 5xA+4xB, target ≥ $1000.  Goal 2: output xA+xB, target ≥ 300 units.  Minimize d1⁻+d2⁻ (only shortfalls are pen alized).
+Iteration 1
+• Trial corner point: xA=150, xB=100.
+• Profit = 5(150)+4(100) = $1150 ≥ 1000 → d1⁻=0, d1⁺=150 (over-achieved, unpenalized).
+• Output = 150+100 = 250 < 300 → d2⁻ = 50 (shortfall), d2⁺=0.
+• Labor used=600 ✓(≤1200), Material used=800 ✓(≤1400). Total shortfall objective = 0+50 = 
+50 (not yet optimal).
+Iteration 2
+• Solve the LP exactly (simplex / HiGHS): optimum is xA=0, xB=300.
+• Profit = 5(0)+4(300) = $1200 ≥ 1000 → d1⁻=0, d1⁺=200.
+• Output = 0+300 = 300 = target exactly → d2⁻=0, d2⁺=0.
+• Labor used=900 ✓, Material used=600 ✓. Total shortfall objective = 0 — OPTIMAL, no 
+further improvement possible.
+Slide 24 Chapter 5 · Advanced MOO
+
+PAGE 25
+M A T H E M A T I C A L  P R O G R A M M I N G  M O O
+Goal Programming: Final Compromise Solution (Not a Pareto Front)
+Plan xA xB Profit ($) Output (units) Shortfall d1⁻+d2⁻
+Optimal 0 300 1200 300 0
+Why these solutions / this outcome was selected
+• Goal Programming does not produce a Pareto front — it collapses the multi-objective problem into ONE scalar (total undesired deviation) and returns a single satisficing 
+plan.
+• The optimum makes only product B, which looks counter-intuitive for a 'production mix' problem, but it is correct: it is the resource-cheapest way to hit BOTH targets 
+exactly (labor 900/1200, material 600/1400 — plenty of slack left over).
+Slide 25 Chapter 5 · Advanced MOO
+
+PAGE 26
+M A T H E M A T I C A L  P R O G R A M M I N G  M O O
+Lexicographic Method: Concept & Generalized Steps
+Full form: Lexicographic Method
+Proposed by: Classical OR method
+Core idea
+• Rank objectives strictly by DM-assigned priority; optimize the top-priority 
+objective alone, then optimize the next while holding the previous 
+optimum fixed — no weights, ever.
+Pros / Cons / When to use
+•
+ Simple once priorities are clear; no weight elicitation needed.
+•
+ Requires a STRICT ranking (no ties); gives no explicit trade-off between 
+objectives.
+• Best used when: Objectives have a clear, non-negotiable hierarchy of 
+importance.
+• Parameters: Objective ranking (priority order).
+Generalized steps (any n variables, k objectives)
+1.  Rank the k objectives strictly 1..k (if the DM can't rank two strictly, merge them via Goal 
+Programming instead).
+2.  Optimize the priority-1 objective alone, over all n decision variables, subject to the original 
+constraints only → obtain f1*.
+3.  Add the constraint f1(x) = f1* (or ≥ f1*−ε) and optimize the priority-2 objective subject to 
+this plus the original constraints.
+4.  Repeat, adding one 'hold the previous optimum' constraint per stage, until all k objectives 
+are processed.
+Dimension handling: Each stage is a full n-variable optimization; the number of sequential 
+SOLVES equals k, not n — the method scales well in variables but requires k solves in sequence.
+Slide 26 Chapter 5 · Advanced MOO
+
+PAGE 27
+M A T H E M A T I C A L  P R O G R A M M I N G  M O O
+Lexicographic Method: Worked Example — Production Planning — tie-breaking 
+example
+• Same shop as Goal Programming. Priority 1: maximize profit f1=4xA+6xB (coefficients chosen ∝ the labor constraint (2,3) on purpose — this creates a tie along the whole labor-binding edge). 
+Priority 2: maximize xA (diversify product mix) among tied optima.
+Iteration 1
+• Optimize Priority-1 alone: solver returns ONE valid vertex xA=0, xB=400, profit* = $2400.
+• Labor used = 1200 (binding), Material used = 800 (slack).
+• Because (4,6) ∝ (2,3), EVERY point on the segment 2xA+3xB=1200 with xA∈[0,225] also 
+gives profit=$2400 — a genuine tie along that whole edge.
+Iteration 2
+• Hold profit = $2400 exactly; now maximize xA (Priority-2) among the tied alternatives.
+• Optimal: xA=225, xB=250. Profit check: 4(225)+6(250)=2400 ✓.
+• Labor used=1200 (still binding), Material used=1400 (NOW also binding — fully saturated).
+Slide 27 Chapter 5 · Advanced MOO
+
+PAGE 28
+M A T H E M A T I C A L  P R O G R A M M I N G  M O O
+Lexicographic Method: Final Lexicographic Solution
+Plan xA xB Profit ($) Labor used Material used
+Iter-1 (arbitrary tie vertex) 0 400 2400 1200 800
+Iter-2 (Priority-2 tie-
+break) 225 250 2400 1200 1400
+Why these solutions / this outcome was selected
+• Because Priority-1's coefficients were proportional to the labor constraint, the whole labor-binding edge tied at profit=$2400 — exactly the situation where Priority-2 
+earns its keep.
+• Priority-2 moves the plan from an arbitrary all-B vertex to a fully resource-saturated, more balanced mix (some of both products) WITHOUT sacrificing a single dollar of 
+profit.
+Slide 28 Chapter 5 · Advanced MOO
+
+PAGE 29
+M A T H E M A T I C A L  P R O G R A M M I N G  M O O
+TOPSIS: Concept & Generalized Steps
+Full form: Technique for Order of Preference by Similarity to Ideal Solution
+Proposed by: Hwang & Yoon (1981)
+Core idea
+• Rank a GIVEN discrete set of alternatives by how close each is to an ideal 
+point and how far from an anti-ideal point, combined into one closeness 
+coefficient.
+Pros / Cons / When to use
+•
+ Produces a single ranked list; intuitive geometric idea.
+•
+ Needs weights; sensitive to normalization AND to weight choice (see result 
+table).
+• Best used when: Ranking a small, already-generated set of Pareto-optimal 
+alternatives.
+• Parameters: Criteria weights wⱼ (Σwⱼ=1).
+Generalized steps (any n variables, k objectives)
+1.  Build the m×k decision matrix from m already-generated alternatives (TOPSIS ranks a 
+GIVEN set — it does not search over decision variables itself).
+2.  Vector-normalize each column: rᵢⱼ = xᵢⱼ / √(Σxᵢⱼ²).
+3.  Apply DM weights wⱼ → weighted matrix vᵢⱼ = wⱼ·rᵢⱼ.
+4.  Determine ideal A⁺ (best per column, respecting min/max direction) and anti-ideal A⁻ 
+(worst per column).
+5.  Compute Euclidean distances dᵢ⁺, dᵢ⁻ to A⁺ and A⁻ (these are DISTANCES — a different 
+meaning from Goal Programming's dᵢ⁺,dᵢ⁻ deviational VARIABLES seen earlier); closeness Cᵢ = 
+dᵢ⁻/(dᵢ⁺+dᵢ⁻) (this Cᵢ is a per-alternative score, unrelated to NSGA-III's C(k+p−1,p) 
+combinatorial 'choose' function); rank by Cᵢ descending.
+Dimension handling: Cost scales as O(m·k) — linear in both alternatives m and criteria k; 
+independent of whatever n produced the alternatives.
+Slide 29 Chapter 5 · Advanced MOO
+
+PAGE 30
+M A T H E M A T I C A L  P R O G R A M M I N G  M O O
+TOPSIS: Worked Example — Supplier Selection (MCDA)
+• 4 suppliers × 3 criteria: Cost ($k, min), Quality (/10, max), Delivery (days, min).
+• S1(50,7,10) · S2(40,6,14) · S3(60,9,8) · S4(45,8,12).
+Iteration 1
+• Weights: Cost 0.4 / Quality 0.4 / Delivery 0.2.
+• Ideal A⁺=(0.162,0.237,0.071), Anti-ideal A⁻=(0.243,0.158,0.125) (weighted-normalized 
+space).
+• Closeness Cᵢ: S1=0.466 · S2=0.459 · S3=0.541 · S4=0.629 (best).
+• Rank: S4 > S3 > S1 > S2.
+Iteration 2
+• DM revises weights after seeing Iteration 1 (wants Quality emphasized more): Cost 0.3 / 
+Quality 0.5 / Delivery 0.2.
+• Closeness Cᵢ recomputed: S1=0.434 · S2=0.351 · S3=0.649 (now best) · S4=0.618.
+• Rank: S3 > S4 > S1 > S2 — S3 and S4 SWAP places from Iteration 1.
+Slide 30 Chapter 5 · Advanced MOO
+
+PAGE 31
+M A T H E M A T I C A L  P R O G R A M M I N G  M O O
+TOPSIS: Sensitivity: Ranking Flips With a 0.1 Weight Shift
+Supplier Cᵢ (0.4/0.4/0.2) Rank 1 Cᵢ (0.3/0.5/0.2) Rank 2
+S1 0.466 3 0.434 3
+S2 0.459 4 0.351 4
+S3 0.541 2 0.649 1
+S4 0.629 1 0.618 2
+Why these solutions / this outcome was selected
+• The winner flips from S4 to S3 from just a 0.1 shift of weight from Cost to Quality.
+• TOPSIS rankings are weight-sensitive by construction — any TOPSIS report should be paired with a sensitivity pass like this one (shown here as 'Iteration 2') before being 
+treated as final.
+Slide 31 Chapter 5 · Advanced MOO
+
+PAGE 32
+M A T H E M A T I C A L  P R O G R A M M I N G  M O O
+VIKOR: Concept & Generalized Steps
+Full form: VIseKriterijumska Optimizacija I Kompromisno Resenje
+Proposed by: Opricovic (1998)
+Core idea
+• Rank alternatives by a compromise index Q that blends GROUP utility 
+(average regret, S) with INDIVIDUAL worst-case regret (R), via a tunable 
+trade-off parameter v.
+Pros / Cons / When to use
+•
+ Explicitly balances average performance vs. worst-case regret; can propose 
+a compromise SET, not just a winner.
+•
+ Needs v chosen; more computation than TOPSIS.
+• Best used when: A compromise solution (not necessarily the 'closest to ideal') 
+is wanted.
+• Parameters: Trade-off weight v ∈[0,1] (0.5 = common default).
+Generalized steps (any n variables, k objectives)
+1.  Use the same m×k decision matrix and weights wⱼ as TOPSIS.
+2.  Compute best fⱼ* and worst fⱼ⁻ per criterion (respecting min/max direction).
+3.  Per alternative: group utility Sᵢ=Σⱼwⱼ(fⱼ*−fᵢⱼ)/(fⱼ*−fⱼ⁻) and individual regret Rᵢ=maxⱼ
+wⱼ(fⱼ*−fᵢⱼ)/(fⱼ*−fⱼ⁻).
+4.  Compromise index Qᵢ = v(Sᵢ−S*)/(S⁻−S*) + (1−v)(Rᵢ−R*)/(R⁻−R*). (This v is a scalar trade-off 
+WEIGHT — unrelated to RVEA's reference VECTORS v₁..v_H, despite the shared letter.)
+5.  Rank by Qᵢ ascending; check 'acceptable advantage' Q(2nd)−Q(1st) ≥ 1/(m−1) — if it fails, 
+propose a compromise SET instead of a single winner.
+Dimension handling: Like TOPSIS, cost is O(m·k); the acceptability threshold 1/(m−1) depends 
+only on m (alternative count), never on k.
+Slide 32 Chapter 5 · Advanced MOO
+
+PAGE 33
+M A T H E M A T I C A L  P R O G R A M M I N G  M O O
+VIKOR: Worked Example — Supplier Selection — same matrix as TOPSIS
+• Same 4 suppliers × 3 criteria matrix, weights fixed at 0.4/0.4/0.2 for both iterations (only v changes).
+• S,R values: S1(S=0.533,R=0.267) · S2(0.600,0.400) · S3(0.400,0.400) · S4(0.367,0.133).
+Iteration 1
+• v=0.5 (equal weight to group utility & individual regret).
+• Qᵢ: S1=0.607 · S2=1.000 · S3=0.571 · S4=0.000 (best).
+• Rank: S4 > S3 > S1 > S2.  Advantage check: Q(2nd)−Q(1st)=0.571 ≥ DQ=1/(4−1)=0.333 → OK, 
+S4 is a valid single winner.
+Iteration 2
+• v=0.3 (DM weights worst-case regret more heavily).
+• Qᵢ: S1=0.564 · S2=1.000 · S3=0.743 · S4=0.000 (still best).
+• Rank: S4 > S1 > S3 > S2 — S1 and S3 SWAP relative to Iteration 1. Advantage check still OK 
+(0.564 ≥ 0.333).
+Slide 33 Chapter 5 · Advanced MOO
+
+PAGE 34
+M A T H E M A T I C A L  P R O G R A M M I N G  M O O
+VIKOR: S4 Wins Under Both v — A Robust Compromise
+Supplier S (utility) R (regret) Q (v=0.5) Q (v=0.3)
+S1 0.533 0.267 0.607 0.564
+S2 0.600 0.400 1.000 1.000
+S3 0.400 0.400 0.571 0.743
+S4 0.367 0.133 0.000 0.000
+Why these solutions / this outcome was selected
+• S4 is the compromise winner under both v=0.5 and v=0.3 — a robust recommendation, unlike TOPSIS where the winner itself flipped.
+• S1 and S3 swap 2nd/3rd place as v drops, because individual worst-case regret (R) favors S1 more than the balanced group-utility view (S) does — VIKOR and TOPSIS 
+optimize genuinely different notions of 'best', so mild rank differences between the two methods are expected, not an error.
+Slide 34 Chapter 5 · Advanced MOO
+
+PAGE 35
+G R A D I E N T- B A S E D  M O O
+MGDA: Concept & Generalized Steps
+Full form: Multiple-Gradient Descent Algorithm
+Proposed by: Désidéri (2012)
+Core idea
+• For differentiable objectives, find the minimum-norm point in the convex 
+hull of the per-objective gradients — the resulting direction weakly 
+decreases every objective at once.
+Pros / Cons / When to use
+•
+ Efficient for differentiable objectives; no population needed.
+•
+ Requires gradients (differentiability); can get stuck at Pareto-STATIONARY 
+points that aren't globally optimal.
+• Best used when: Deep-learning-style multi-task optimization with a shared 
+parameter vector.
+• Parameters: Learning rate η.
+Generalized steps (any n variables, k objectives)
+1.  At current point x∈Rⁿ, compute ∇fᵢ(x)∈Rⁿ for every one of the k objectives (differentiability 
+is MGDA's core requirement, unlike the EA methods above).
+2.  Find the minimum-norm point in the convex hull of {∇f1(x),…,∇fk(x)}. Writing gᵢ := ∇fᵢ(x) as 
+shorthand, for k=2 this has closed form α*=clip[(g2−g1)·g2/‖g1−g2‖², 0,1], d*=α*g1+(1−α*)g2 
+(k>2 needs a small QP). Note: this α* is a SOLVED OUTPUT (the optimal mixing weight), unlike 
+RVEA's or GradNorm's α, which are fixed input hyperparameters — see the Notation Guide.
+3.  If ‖d*‖≈0, x is already Pareto-stationary (no direction improves one objective without 
+harming another) — stop.
+4.  Otherwise update x ← x − η·d* (weakly decreases every objective simultaneously) and 
+repeat.
+Dimension handling: Cost per step is O(n·k) for gradients plus a small O(k²) QP for α —
+INDEPENDENT of how large n is, which is why MGDA scales to deep nets with millions of shared 
+parameters, unlike population methods.
+Slide 35 Chapter 5 · Advanced MOO
+
+PAGE 36
+G R A D I E N T- B A S E D  M O O
+MGDA: Worked Example — Shared-parameter multi-task toy model
+• x∈R² pulled by two tasks: f1(x)=‖x−a‖², a=(3,3); f2(x)=‖x−b‖², b=(−3,−3). Start x0=(5,5), learning rate η=0.1.
+Iteration 1
+• ∇f1(x0)=2(x0−a)=(4,4) =: g1.  ∇f2(x0)=2(x0−b)=(16,16) =: g2  (gᵢ is just shorthand for ∇fᵢ(x) 
+here — a VECTOR, not the scalar 'base gradient norm' g used later in GradNorm).
+• α* = 1.0 (min-norm point on the segment is g1 itself, since both point the same direction 
+and g1 is shorter) → d*=(4,4), ‖d*‖=5.657.
+• Update: x1 = x0 − 0.1·d* = (4.6, 4.6).
+• f1: 8.00 → 5.12,  f2: 128.00 → 115.52 — both objectives decreased.
+Iteration 2
+• ∇f1(x1)=(3.2,3.2). ∇f2(x1)=(15.2,15.2).
+• α*=1.0 again → d*=(3.2,3.2), ‖d*‖=4.526.
+• Update: x2 = x1 − 0.1·d* = (4.28, 4.28).
+• f1: 5.12 → 3.28,  f2: 115.52 → 106.00 — both objectives decreased again.
+Slide 36 Chapter 5 · Advanced MOO
+
+PAGE 37
+G R A D I E N T- B A S E D  M O O
+MGDA: Convergence Trace Toward the Pareto Segment [a,b]
+Step x f1 f2 ‖d*‖
+0 (start) (5.00, 5.00) 8.00 128.00 —
+1 (4.60, 4.60) 5.12 115.52 5.657
+2 (4.28, 4.28) 3.28 106.00 4.526
+Why these solutions / this outcome was selected
+• ‖d*‖ is shrinking (5.66 → 4.53) but not yet zero — x is heading toward the whole segment [a,b], which is Pareto-optimal for this pair of convex quadratics, but has not 
+reached it after 2 steps.
+• More iterations (or a larger η) are needed; MGDA guarantees monotonic joint improvement per step, not immediate convergence.
+Slide 37 Chapter 5 · Advanced MOO
+
+PAGE 38
+G R A D I E N T- B A S E D  M O O
+GradNorm: Concept & Generalized Steps
+Full form: Gradient Normalization for Adaptive Loss Balancing
+Proposed by: Chen, Badrinarayanan, Lee & Rabinovich (2018)
+Core idea
+• Dynamically re-weight per-task losses in multi-task learning so every task's 
+gradient norm at the shared layer trains at a comparable, self-correcting 
+rate.
+Pros / Cons / When to use
+•
+ Balances multi-task training automatically; adapts over the whole run.
+•
+ Needs tuning (α, learning rate); adds a second, small optimization loop on 
+top of the main one.
+• Best used when: Multi-task learning with a shared backbone and several loss 
+heads.
+• Parameters: Asymmetry α; loss-weight learning rate.
+Generalized steps (any n variables, k objectives)
+1.  Maintain one trainable weight wᵢ per task loss (init to 1); the shared parameters θ 
+(possibly millions of them) are never enumerated directly.
+2.  After each pass, measure gradient norm Gᵢ(t)=‖∇θ(wᵢ·Lᵢ(t))‖ and loss ratio Lᵢ(t)/Lᵢ(0) per 
+task.
+3.  Compute average gradient norm Ḡ(t) and relative inverse training rate rᵢ(t) = [Lᵢ(t)/Lᵢ(0)] / 
+mean_j[Lⱼ(t)/Lⱼ(0)] — a slower-than-average task gets rᵢ>1. (This rᵢ is unrelated to the 
+reference POINT r used earlier in SMS-EMOA/HypE — same letter, a training-rate ratio here.)
+4.  Target gradient norm for task i: targetᵢ = Ḡ(t)·rᵢ(t)^α. (This targetᵢ is recomputed every step 
+from current gradients — unlike Goal Programming's Tᵢ, which is a fixed DM-supplied 
+number.)
+5.  GradNorm loss Lgrad=Σᵢ|Gᵢ(t)−targetᵢ|; gradient-descend ONLY the wᵢ against this loss, 
+then renormalize Σwᵢ=k.
+Dimension handling: This whole procedure runs on k scalars wᵢ, never on the n (possibly 
+millions of) shared parameters directly — n enters only via the single already-computed scalar 
+Gᵢ(t) per task.
+Slide 38 Chapter 5 · Advanced MOO
+
+PAGE 39
+G R A D I E N T- B A S E D  M O O
+GradNorm: Worked Example — 2-Task CNN (classification + segmentation)
+• L1=classification, L2=segmentation. Baselines L1(0)=2.0, L2(0)=4.0. α=0.5 (asymmetry — a fixed input, unrelated to RVEA's α or MGDA's solved α*), lr=0.025. Base (unweighted) gradient-norm 
+MAGNITUDES fixed at g1=2.0, g2=3.0 for this hand-checkable toy (these are scalars, unlike MGDA's g1,g2 which were gradient VECTO RS). Start w=(1,1).
+Iteration 1
+• Current losses: L1(t)=1.0, L2(t)=3.6. G=(w1·2.0, w2·3.0)=(2.0,3.0), Ḡ=2.5.
+• Ratios L(t)/L(0) = (0.5, 0.9), avg=0.7 → r=(0.714, 1.286).
+• Target = Ḡ·r^0.5 = (2.113, 2.835). Lgrad=|2.0−2.113|+|3.0−2.835|=0.278.
+• ∂Lgrad/∂w=(−2.0,+3.0) → raw w=(1.05,0.925) → renormalized (Σw=2): w=(1.063, 0.937).
+Iteration 2
+• Training continues: L1(t)=0.8, L2(t)=3.0. G=(1.063·2.0, 0.937·3.0)=(2.127,2.810), Ḡ=2.468.
+• Ratios=(0.4,0.75), avg=0.575 → r=(0.696,1.304). Target=(2.059,2.819).
+• Lgrad=|2.127−2.059|+|2.810−2.819|=0.077 — down sharply from 0.278.
+• Raw w=(1.013,1.012) → renormalized: w=(1.001, 0.999).
+Slide 39 Chapter 5 · Advanced MOO
+
+PAGE 40
+G R A D I E N T- B A S E D  M O O
+GradNorm: Task Weights Self-Correct Back Toward Balance
+Step w1 (classification) w2 (segmentation) L_grad
+0 (start) 1.000 1.000 —
+1 1.063 0.937 0.278
+2 1.001 0.999 0.077
+Why these solutions / this outcome was selected
+• L_grad fell from 0.278 to 0.077 in just two steps — the imbalance-correcting signal is shrinking.
+• Weights swung to favor the lagging task (segmentation, w2>1 in step 1) then relaxed back near (1,1) once its training rate caught up — exactly GradNorm's intended self-
+correcting behaviour.
+Slide 40 Chapter 5 · Advanced MOO
+
+PAGE 41
+P E R F O R M A N C E  M E T R I C S
+Hypervolume (HV): Worked Example
+Setup
+• True Pareto front (ZDT1-style): f2 = 1 − √f1, sampled at f1 = 0, 0.25, 0.5, 
+0.75, 1.0.
+• Obtained approximation set (5 points, close to but not exactly on the front): 
+(0.02,0.87), (0.24,0.55), (0.48,0.31), (0.80,0.20), (0.95,0.08).
+• Reference point r = (1.1, 1.1) — worse than every point on both axes.
+• HV(true front) = 0.7283 (upper bound for this sample).
+• HV(obtained set) = 0.7234.
+• HV ratio = 0.7234 / 0.7283 = 0.9933 → the obtained front captures 99.3% 
+of the achievable hypervolume.
+Reading the number
+• HV is the ONLY common metric that needs no reference/true front to 
+compute — only the reference point r.
+• Higher HV is always better; it rewards convergence (points closer to the 
+true front) AND diversity (spread across it) in a single number.
+• It is the metric SMS-EMOA and HypE (this deck) directly optimize, which is 
+why those two families tend to score best on HV in comparative studies.
+• Weakness: computing exact HV is expensive when k is large — exponential 
+in the worst case — hence HypE's Monte-Carlo estimate.
+Slide 41 Chapter 5 · Advanced MOO
+
+PAGE 42
+P E R F O R M A N C E  M E T R I C S
+GD, IGD & Spread: Same Worked Example
+True front pt Nearest obtained (dist) Obtained pt Nearest true (dist)
+(0.00, 1.00) 0.1315 (0.02, 0.87) 0.1315
+(0.25, 0.50) 0.0510 (0.24, 0.55) 0.0510
+(0.50, 0.293) 0.0263 (0.48, 0.31) 0.0263
+(0.75, 0.134) 0.0828 (0.80, 0.20) 0.0828
+(1.00, 0.00) 0.0943 (0.95, 0.08) 0.0943
+Results & interpretation
+• GD (avg. obtained → nearest true) = 0.0772.   IGD (avg. true → nearest obtained) = 0.0772 — identical here only because both sets are matched 1-to-1 in this example; in 
+general GD ignores missing coverage while IGD penalizes it, so they usually differ.
+• Spread (Δ) = 0.3172, combining the 4 consecutive-point gaps (mean 0.315) with the 2 extreme-point gaps — 0 would mean perfectly even spacing including the extremes.
+• Rule of thumb: use GD/IGD when a known or estimated true front exists (as in benchmark studies); use Spread/HV when it doesn't (as in most real applications).
+A sensitive reader's note: this is a factual, informational worked example (no personal data), included purely to demonstratethe formulas.
+Slide 42 Chapter 5 · Advanced MOO
+
+PAGE 43
+R E C A P
+Key Takeaways — Advanced MOO
+Many-objective (k≥3) NSGA-III, RVEA Reference points/vectors replace crowding distance
+Indicator-based IBEA, SMS-EMOA, HypE ε-indicator or (exact/estimated) hypervolume drives selection
+Preference-based R-NSGA-II DM reference point + ε-clearing keeps a focused spread
+Math programming Goal Prog., Lexicographic, TOPSIS, VIKOR Scalarize to ONE compromise/ranked solution, not a front
+Gradient-based MGDA, GradNorm Exploit differentiability; scale to huge n (deep nets)
+Evaluation HV, GD, IGD, Spread HV needs no true front; GD/IGD/Spread quantify convergence & diversity
+Slide 43 Chapter 5 · Advanced MOO
+
+PAGE 44
+Q U A L I T Y  A U D I T
+Verification: Is the Deck Logically & Numerically Correct?
+How every number here was checked
+• Every iteration table was produced by executable code (Python/NumPy/SciPy), not hand arithmetic, then transcribed — arithmetic slips are structurally ruled out.
+• Non-dominated sorting was validated against manual dominance checks for all 6 population-based modules (NSGA-III, RVEA, IBEA, SMS-EMOA, HypE, R-NSGA-II).
+• Goal Programming and Lexicographic LPs were solved independently with the HiGHS solver (via SciPy) as ground truth, in addition to the 'trial vs optimal' iterations shown.
+• Hypervolume, ε-indicator, TOPSIS Cᵢ and VIKOR Qᵢ formulas were cross-checked term-by-term against their original published definitions.
+3 correct-but-surprising findings (kept, not hidden)
+• RVEA / HypE result tables retain a solution dominated by another survivor — verified as a genuine property of sector-exclusive / estimated-share selection, not a bug.
+• Un-normalized IBEA (κ fixed, no per-objective scaling) converges to one side of the laptop front — a documented scale-sensitivity of the ε-indicator, now flagged with the 
+fix (normalize first).
+• Goal Programming and the Lexicographic Method each return ONE compromise solution, never a Pareto front — this is correct behaviour for scalarizing methods, not a 
+missing table.
+• No formula carried over from the original 24-slide base (H=C(M+p−1,p), the ε-indicator, ΔHV, Sᵢ/Rᵢ/Qᵢ) was found to conflict with its source paper.
+Slide 44 Chapter 5 · Advanced MOO
+
+PAGE 45
+L E A R N E R ' S  P A S S
+Reading This as a Student: Ambiguities Found & Fixed
+Q Why does Goal Programming / Lexicographic show only ONE final answer while the EA slides show a table of several?
+Fix Clarified above: scalarizing methods (Goal Programming, Lexicographic, and TOPSIS's ranking of a single winner) are designed to return one preferred/compromise solution. Only population-based Pareto methods and VIKOR's compromise SET return several.
+Q The formula H = C(k+p−1, p) wasn't defined inline on the original slide — what are k and p? (The original NSGA-III paper writes this same formula with 'M' instead of 'k'.)
+Fix Every formula slide in this deck now states its symbols explicitly (k = number of objectives, p = divisions per objective axis), and standardizes on k throughout — see the Notation Guide for the k/M equivalence and other reused symbols.
+Q Constants like IBEA's κ=20, MGDA's η=0.1, or GradNorm's α=0.5/lr=0.025 look like arbitrary 'magic numbers'.
+Fix Each worked-example slide now states WHY that value was chosen (e.g. κ scaled to the observed ε-range of 0–86 in that problem) instead of leaving it unexplained.
+Q Isn't it a mistake that a dominated design (e.g. D3 under RVEA, D2 under HypE) survives into the final table?
+Fix Not a mistake — re-verified against each algorithm's actual selection rule and explicitly flagged as a property of decomposition-/estimation-based selection, with a one-line explanation on that slide rather than silently 'fixing' it away.
+Q TOPSIS and VIKOR gave different runner-up rankings on the same supplier data — is one of them wrong?
+Fix Neither is wrong: the rationale text now states plainly that TOPSIS (Euclidean closeness) and VIKOR (utility+regret compromise) optimize different notions of 'best', so mild rank differences between the two are expected.
+Slide 45 Chapter 5 · Advanced MOO
+
+PAGE 46
+F U R T H E R  R E A D I N G
+References
+•  Deb, K., & Jain, H. (2014). An Evolutionary Many-Objective Optimization Algorithm Using Reference-Point-Based Non-dominated Sorting Approach (NSGA-III). IEEE TEVC.
+•  Cheng, R., Jin, Y., Olhofer, M., & Sendhoff, B. (2016). A Reference Vector Guided Evolutionary Algorithm for Many-Objective Optimization. IEEE TEVC.
+•  Zitzler, E., & Künzli, S. (2004). Indicator-Based Selection in Multiobjective Search. PPSN VIII.
+•  Beume, N., Naujoks, B., & Emmerich, M. (2007). SMS-EMOA: Multiobjective Selection Based on Dominated Hypervolume. EJOR.
+•  Bader, J., & Zitzler, E. (2011). HypE: An Algorithm for Fast Hypervolume-Based Many-Objective Optimization. Evolutionary Computation.
+•  Deb, K., Sundar, J., Udaya Bhaskara Rao, N., & Chaudhuri, S. (2006). Reference Point Based Multi-Objective Optimization UsingEvolutionary Algorithms. IJCIA.
+•  Hwang, C.L., & Yoon, K. (1981). Multiple Attribute Decision Making: Methods and Applications (TOPSIS). Springer.
+•  Opricovic, S. (1998). Multicriteria Optimization of Civil Engineering Systems (VIKOR). Faculty of Civil Engineering, Belgrade.
+•  Désidéri, J.-A. (2012). Multiple-Gradient Descent Algorithm (MGDA) for Multiobjective Optimization. C. R. Acad. Sci. Paris.
+•  Chen, Z., Badrinarayanan, V., Lee, C.-Y., & Rabinovich, A. (2018). GradNorm: Gradient Normalization for Adaptive Loss Balancing in Deep Multitask Networks. ICML.
+Slide 46 Chapter 5 · Advanced MOO

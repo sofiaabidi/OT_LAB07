@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 29,
+  "algorithm": "MOBA",
+  "problem": "P5",
+  "objectives": 2,
+  "seed": 639,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 1.1817513216904354,
+  "IGD": 0.014561299272338363,
+  "Spacing": 0.0175521021510004,
+  "runtime": 0.5083401249999042,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "D_A29_P5_M2_S639_B10000_"
+}

@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 23,
+  "algorithm": "MOGWO",
+  "problem": "P9",
+  "objectives": 2,
+  "seed": 638,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 200,
+  "evaluations": 200,
+  "HV": 0.7196660808435853,
+  "IGD": null,
+  "Spacing": 0.00507337670641147,
+  "runtime": 6.030735917000129,
+  "front_size": 4,
+  "feasible_fraction": 1.0,
+  "file": "base_A23_P9_M2_S638_B200_"
+}

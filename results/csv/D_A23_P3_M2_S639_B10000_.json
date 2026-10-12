@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 23,
+  "algorithm": "MOGWO",
+  "problem": "P3",
+  "objectives": 2,
+  "seed": 639,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.11000000000000011,
+  "IGD": 0.609801098783408,
+  "Spacing": 0.0,
+  "runtime": 0.27939833400023417,
+  "front_size": 1,
+  "feasible_fraction": 1.0,
+  "file": "D_A23_P3_M2_S639_B10000_"
+}

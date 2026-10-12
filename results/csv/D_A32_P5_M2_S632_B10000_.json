@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 32,
+  "algorithm": "IBEA",
+  "problem": "P5",
+  "objectives": 2,
+  "seed": 632,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 1.1417901914149755,
+  "IGD": 0.008145479783949125,
+  "Spacing": 0.007637963046675118,
+  "runtime": 1.6561881249999715,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "D_A32_P5_M2_S632_B10000_"
+}

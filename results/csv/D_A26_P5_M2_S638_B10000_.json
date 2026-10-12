@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 26,
+  "algorithm": "MOSA",
+  "problem": "P5",
+  "objectives": 2,
+  "seed": 638,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 1.1816309840511166,
+  "IGD": 0.011345530437814577,
+  "Spacing": 0.018750777888054033,
+  "runtime": 0.219667667000067,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "D_A26_P5_M2_S638_B10000_"
+}

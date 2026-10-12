@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 29,
+  "algorithm": "MOBA",
+  "problem": "P3",
+  "objectives": 2,
+  "seed": 633,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.29502866658736726,
+  "IGD": 0.3533739387916715,
+  "Spacing": 0.009046689166213685,
+  "runtime": 0.4628880420000314,
+  "front_size": 27,
+  "feasible_fraction": 1.0,
+  "file": "D_A29_P3_M2_S633_B10000_"
+}

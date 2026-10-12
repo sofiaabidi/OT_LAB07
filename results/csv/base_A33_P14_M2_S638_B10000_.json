@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 33,
+  "algorithm": "SMS-EMOA",
+  "problem": "P14",
+  "objectives": 2,
+  "seed": 638,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.858724723462531,
+  "IGD": 0.007586203835234412,
+  "Spacing": 0.0030605245062796035,
+  "runtime": 6.0141177499999685,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "base_A33_P14_M2_S638_B10000_"
+}

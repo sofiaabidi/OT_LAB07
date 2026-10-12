@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 23,
+  "algorithm": "MOGWO",
+  "problem": "P5",
+  "objectives": 2,
+  "seed": 632,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 1.1813931001388829,
+  "IGD": 0.012956821007901447,
+  "Spacing": 0.019190436441463406,
+  "runtime": 0.60216787499985,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "base_A23_P5_M2_S632_B10000_"
+}

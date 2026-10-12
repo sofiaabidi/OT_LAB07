@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 13,
+  "algorithm": "NPGA",
+  "problem": "P5",
+  "objectives": 2,
+  "seed": 634,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 1.1809326133855809,
+  "IGD": 0.01626709220595531,
+  "Spacing": 0.023339042662641602,
+  "runtime": 0.8254610419999153,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "D_A13_P5_M2_S634_B10000_"
+}

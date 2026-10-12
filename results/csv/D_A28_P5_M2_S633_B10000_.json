@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 28,
+  "algorithm": "MO-TLBO",
+  "problem": "P5",
+  "objectives": 2,
+  "seed": 633,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 1.1818979323046055,
+  "IGD": 0.01243169206641141,
+  "Spacing": 0.023162286437433198,
+  "runtime": 1.4206019999996897,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "D_A28_P5_M2_S633_B10000_"
+}

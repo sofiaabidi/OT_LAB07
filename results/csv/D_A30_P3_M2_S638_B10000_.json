@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 30,
+  "algorithm": "MOMA",
+  "problem": "P3",
+  "objectives": 2,
+  "seed": 638,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.5289168746800945,
+  "IGD": 0.011561852642813009,
+  "Spacing": 0.018770022468704715,
+  "runtime": 0.6773400410002068,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "D_A30_P3_M2_S638_B10000_"
+}

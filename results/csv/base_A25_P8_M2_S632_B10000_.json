@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 25,
+  "algorithm": "MOACO",
+  "problem": "P8",
+  "objectives": 2,
+  "seed": 632,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.9239371279849584,
+  "IGD": null,
+  "Spacing": 0.0027223508763520605,
+  "runtime": 2.0282924580001236,
+  "front_size": 5,
+  "feasible_fraction": 1.0,
+  "file": "base_A25_P8_M2_S632_B10000_"
+}

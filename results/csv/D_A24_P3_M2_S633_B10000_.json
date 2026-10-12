@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 24,
+  "algorithm": "MOABC",
+  "problem": "P3",
+  "objectives": 2,
+  "seed": 633,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.514075675902394,
+  "IGD": 0.018846899959621983,
+  "Spacing": 0.03006080223256734,
+  "runtime": 0.9555347499999698,
+  "front_size": 37,
+  "feasible_fraction": 1.0,
+  "file": "D_A24_P3_M2_S633_B10000_"
+}

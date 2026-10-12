@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 33,
+  "algorithm": "SMS-EMOA",
+  "problem": "P5",
+  "objectives": 2,
+  "seed": 635,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 1.1819067451959449,
+  "IGD": 0.0261218121809974,
+  "Spacing": 0.01654914530298361,
+  "runtime": 5.400927666999905,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "D_A33_P5_M2_S635_B10000_"
+}

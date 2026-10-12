@@ -1,0 +1,472 @@
+[
+  {
+    "page": 1,
+    "chars": 1198,
+    "first": "Lab Assignment 7 | 1\nLab Assignment 7\nMultiobjective Optimization\nAlgorithms tradeoffs and applications\nOptimization Techniques Lab | Depart"
+  },
+  {
+    "page": 2,
+    "chars": 674,
+    "first": "Lab Assignment 7 | 2\nContents\n1 Overview and completion status\n2 Methodology and reproducibility\n3 Problem formulations\n4 Shared tools and v"
+  },
+  {
+    "page": 3,
+    "chars": 1164,
+    "first": "Lab Assignment 7 | 3\n1 Overview and completion status\nThe project has 37 separately named algorithm modules, 37 defining-mechanism tests and"
+  },
+  {
+    "page": 4,
+    "chars": 2759,
+    "first": "Lab Assignment 7 | 4\n2 Methodology and reproducibility\nImplementations use NumPy and the standard library. Matplotlib creates plots. SciPy S"
+  },
+  {
+    "page": 5,
+    "chars": 43,
+    "first": "Lab Assignment 7 | 5\n3 Problem formulations"
+  },
+  {
+    "page": 6,
+    "chars": 1000,
+    "first": "Lab Assignment 7 | 6\nP1 Factory speed\nDecision variables and encoding x in [1,10], one real variable\nStandard form objectives in minimizatio"
+  },
+  {
+    "page": 7,
+    "chars": 948,
+    "first": "Lab Assignment 7 | 7\nP2 Fleet size\nDecision variables and encoding x in [1,10], real or integer\nStandard form objectives in minimization con"
+  },
+  {
+    "page": 8,
+    "chars": 1126,
+    "first": "Lab Assignment 7 | 8\nP3 Specified ZDT2\nDecision variables and encoding 10 real variables in [0,1]\nStandard form objectives in minimization c"
+  },
+  {
+    "page": 9,
+    "chars": 1123,
+    "first": "Lab Assignment 7 | 9\nP4 Portfolio\nDecision variables and encoding four nonnegative real weights\nStandard form objectives in minimization con"
+  },
+  {
+    "page": 10,
+    "chars": 1118,
+    "first": "Lab Assignment 7 | 10\nP5 Cantilever beam\nDecision variables and encoding b in [.01,.10]m, h in [.02,.20]m\nStandard form objectives in minimi"
+  },
+  {
+    "page": 11,
+    "chars": 999,
+    "first": "Lab Assignment 7 | 11\nP6 Binh Korn\nDecision variables and encoding x1 in [0,5], x2 in [0,3]\nStandard form objectives in minimization convent"
+  },
+  {
+    "page": 12,
+    "chars": 1063,
+    "first": "Lab Assignment 7 | 12\nP7 Water allocation\nDecision variables and encoding x1 agriculture [10,70], x2 industry [20,80]\nStandard form objectiv"
+  },
+  {
+    "page": 13,
+    "chars": 1375,
+    "first": "Lab Assignment 7 | 13\nP8 Delivery routing\nDecision variables and encoding permutation of 15 city indices, closed tour\nStandard form objectiv"
+  },
+  {
+    "page": 14,
+    "chars": 1154,
+    "first": "Lab Assignment 7 | 14\nP9 Feature selection\nDecision variables and encoding 30-bit mask with at least one selected feature\nStandard form obje"
+  },
+  {
+    "page": 15,
+    "chars": 1142,
+    "first": "Lab Assignment 7 | 15\nP10 DTLZ2\nDecision variables and encoding n=M+9 variables in [0,1], M=3 or 5\nStandard form objectives in minimization "
+  },
+  {
+    "page": 16,
+    "chars": 1072,
+    "first": "Lab Assignment 7 | 16\nP11 Production planning\nDecision variables and encoding xA,xB>=0; finite bounds [0,400]^2\nStandard form objectives in "
+  },
+  {
+    "page": 17,
+    "chars": 1133,
+    "first": "Lab Assignment 7 | 17\nP12 Supplier ranking\nDecision variables and encoding index 0..4 or supplied finite alternatives table\nStandard form ob"
+  },
+  {
+    "page": 18,
+    "chars": 1227,
+    "first": "Lab Assignment 7 | 18\nP13 Differentiable multi task toy and network\nDecision variables and encoding toy x in R^2, start (0,5); network 5->8 "
+  },
+  {
+    "page": 19,
+    "chars": 1147,
+    "first": "Lab Assignment 7 | 19\nP14 Laptop preference\nDecision variables and encoding screen [13,17]in, battery [40,90]Wh\nStandard form objectives in "
+  },
+  {
+    "page": 20,
+    "chars": 1278,
+    "first": "Lab Assignment 7 | 20\n4 Shared tools and verification\nmoo_utils.py centralizes dominance, pairwise front sorting, crowding distance, archive"
+  },
+  {
+    "page": 21,
+    "chars": 1779,
+    "first": "Lab Assignment 7 | 21\n5 Tasks A and B algorithm implementations and comparison\nEach algorithm page combines its Task A implementation and me"
+  },
+  {
+    "page": 22,
+    "chars": 1627,
+    "first": "Lab Assignment 7 | 22\n1 Weighted Sum\nLinear scalar solve and a sweep. Module src/algorithms/weighted_sum.py. Status works. Defining test \nte"
+  },
+  {
+    "page": 23,
+    "chars": 1629,
+    "first": "Lab Assignment 7 | 23\n2 Epsilon Constraint\nOne objective minimized and others bounded. Module src/algorithms/epsilon_constraint.py. Status w"
+  },
+  {
+    "page": 24,
+    "chars": 1771,
+    "first": "Lab Assignment 7 | 24\n3 Benson reference improvement\nWeighted improvement below a reference. Module src/algorithms/benson.py. Status works. "
+  },
+  {
+    "page": 25,
+    "chars": 1591,
+    "first": "Lab Assignment 7 | 25\n4 Weight Metric\nWeighted distance to fixed ideal. Module src/algorithms/weight_metric.py. Status works. Defining test "
+  },
+  {
+    "page": 26,
+    "chars": 1665,
+    "first": "Lab Assignment 7 | 26\n5 Value Function\nDeclared decision-maker utility. Module src/algorithms/value_function.py. Status works. Defining test"
+  },
+  {
+    "page": 27,
+    "chars": 1684,
+    "first": "Lab Assignment 7 | 27\n6 Goal Programming\nExplicit positive/negative goal deviations. Module src/algorithms/goal_programming.py. Status works"
+  },
+  {
+    "page": 28,
+    "chars": 1619,
+    "first": "Lab Assignment 7 | 28\n7 Lexicographic\nSequential strict priorities with tolerances. Module src/algorithms/lexicographic.py. Status works. De"
+  },
+  {
+    "page": 29,
+    "chars": 1413,
+    "first": "Lab Assignment 7 | 29\n8 TOPSIS\nCloseness to weighted ideal and anti-ideal. Module src/algorithms/topsis.py. Status works. Defining test \ntes"
+  },
+  {
+    "page": 30,
+    "chars": 1663,
+    "first": "Lab Assignment 7 | 30\n9 VIKOR\nCompromise via group regret and worst regret. Module src/algorithms/vikor.py. Status works. Defining test \ntes"
+  },
+  {
+    "page": 31,
+    "chars": 1507,
+    "first": "Lab Assignment 7 | 31\n10 VEGA\nObjective-partitioned selection. Module src/algorithms/vega.py. Status works. Defining test test_10_mechanism "
+  },
+  {
+    "page": 32,
+    "chars": 1519,
+    "first": "Lab Assignment 7 | 32\n11 MOGA\nDomination-count rank and fitness sharing. Module src/algorithms/moga.py. Status works. Defining test \ntest_11"
+  },
+  {
+    "page": 33,
+    "chars": 1491,
+    "first": "Lab Assignment 7 | 33\n12 NSGA\nFront layers and within-front sharing. Module src/algorithms/nsga.py. Status works. Defining test \ntest_12_mec"
+  },
+  {
+    "page": 34,
+    "chars": 1727,
+    "first": "Lab Assignment 7 | 34\n13 NPGA\nDirect contestant dominance then separate comparison-set quadratic niche tie. Module src/algorithms/npga.py. \n"
+  },
+  {
+    "page": 35,
+    "chars": 1590,
+    "first": "Lab Assignment 7 | 35\n14 NSGA II\nFront rank, crowding, parent-child elitism. Module src/algorithms/nsga2.py. Status works. Defining test \nte"
+  },
+  {
+    "page": 36,
+    "chars": 1623,
+    "first": "Lab Assignment 7 | 36\n15 NSGA III\nReference-point niching after front rank. Module src/algorithms/nsga3.py. Status works. Defining test \ntes"
+  },
+  {
+    "page": 37,
+    "chars": 1547,
+    "first": "Lab Assignment 7 | 37\n16 SPEA2\nStrength, raw fitness and neighbour density. Module src/algorithms/spea2.py. Status works. Defining test \ntes"
+  },
+  {
+    "page": 38,
+    "chars": 1562,
+    "first": "Lab Assignment 7 | 38\n17 PESA II\nArchive region occupancy selection. Module src/algorithms/pesa2.py. Status works. Defining test \ntest_17_me"
+  },
+  {
+    "page": 39,
+    "chars": 1578,
+    "first": "Lab Assignment 7 | 39\n18 MOEA D\nNeighbouring Tchebycheff subproblems. Module src/algorithms/moead.py. Status works. Defining test \ntest_18_m"
+  },
+  {
+    "page": 40,
+    "chars": 1555,
+    "first": "Lab Assignment 7 | 40\n19 MOEA D DE\nDE variation inside MOEA/D. Module src/algorithms/moead_de.py. Status works. Defining test \ntest_19_mecha"
+  },
+  {
+    "page": 41,
+    "chars": 1448,
+    "first": "Lab Assignment 7 | 41\n20 MOEA D ACO\nWeight-specific ant pheromones and scalar replacement. Module src/algorithms/moead_aco.py. Status works."
+  },
+  {
+    "page": 42,
+    "chars": 1677,
+    "first": "Lab Assignment 7 | 42\n21 Constrained NSGA II\nNSGA-II with Deb feasibility. Module src/algorithms/constrained_nsga2.py. Status works. Definin"
+  },
+  {
+    "page": 43,
+    "chars": 1509,
+    "first": "Lab Assignment 7 | 43\n22 MOPSO\nParticle velocity with personal and archive leaders. Module src/algorithms/mopso.py. Status works. Defining t"
+  },
+  {
+    "page": 44,
+    "chars": 1636,
+    "first": "Lab Assignment 7 | 44\n23 MOGWO\nThree archive leaders and encircling. Module src/algorithms/mogwo.py. Status partly works. Defining test \ntes"
+  },
+  {
+    "page": 45,
+    "chars": 1587,
+    "first": "Lab Assignment 7 | 45\n24 MOABC\nEmployed moves, crowding-based onlookers and abandonment scouts. Module src/algorithms/moabc.py. Status \nwork"
+  },
+  {
+    "page": 46,
+    "chars": 1453,
+    "first": "Lab Assignment 7 | 46\n25 MOACO\nTwo pheromone matrices and route construction. Module src/algorithms/moaco.py. Status works. Defining test \nt"
+  },
+  {
+    "page": 47,
+    "chars": 1873,
+    "first": "Lab Assignment 7 | 47\n26 MOSA\nIncomparable neighbour acceptance and Boltzmann dominated moves. Module src/algorithms/mosa.py. Status \nworks."
+  },
+  {
+    "page": 48,
+    "chars": 1546,
+    "first": "Lab Assignment 7 | 48\n27 MODE\nDE dominance-only trial replacement. Module src/algorithms/mode.py. Status works. Defining test \ntest_27_mecha"
+  },
+  {
+    "page": 49,
+    "chars": 1683,
+    "first": "Lab Assignment 7 | 49\n28 MO TLBO\nCrowding archive teacher, shrinking TF and nondominated learner moves. Module src/algorithms/motlbo.py. \nSt"
+  },
+  {
+    "page": 50,
+    "chars": 1615,
+    "first": "Lab Assignment 7 | 50\n29 MOBA\nFrequency velocity, pulse and loudness. Module src/algorithms/moba.py. Status works. Defining test \ntest_29_me"
+  },
+  {
+    "page": 51,
+    "chars": 1602,
+    "first": "Lab Assignment 7 | 51\n30 MOMA\nNSGA-II plus sparse-child combined-score hill climbing. Module src/algorithms/moma.py. Status partly works. \nD"
+  },
+  {
+    "page": 52,
+    "chars": 1638,
+    "first": "Lab Assignment 7 | 52\n31 RVEA\nNormalized reference vectors and lecture linear-progress APD. Module src/algorithms/rvea.py. Status works. \nDe"
+  },
+  {
+    "page": 53,
+    "chars": 1652,
+    "first": "Lab Assignment 7 | 53\n32 IBEA\nOutgoing additive-epsilon fitness and largest-fitness deletion. Module src/algorithms/ibea.py. Status works. \n"
+  },
+  {
+    "page": 54,
+    "chars": 1639,
+    "first": "Lab Assignment 7 | 54\n33 SMS EMOA\nSteady-state smallest HV deletion. Module src/algorithms/sms_emoa.py. Status works. Defining test \ntest_33"
+  },
+  {
+    "page": 55,
+    "chars": 1694,
+    "first": "Lab Assignment 7 | 55\n34 HypE\nEqual-share Monte Carlo HV fitness and repeated deletion. Module src/algorithms/hype.py. Status works. \nDefini"
+  },
+  {
+    "page": 56,
+    "chars": 1634,
+    "first": "Lab Assignment 7 | 56\n35 R NSGA II\nReference preference and epsilon clearing. Module src/algorithms/r_nsga2.py. Status works. Defining test "
+  },
+  {
+    "page": 57,
+    "chars": 1381,
+    "first": "Lab Assignment 7 | 57\n36 MGDA\nMinimum-norm gradient combination. Module src/algorithms/mgda.py. Status works. Defining test \ntest_36_mechani"
+  },
+  {
+    "page": 58,
+    "chars": 1477,
+    "first": "Lab Assignment 7 | 58\n37 GradNorm\nGradient-norm adaptive task weights. Module src/algorithms/gradnorm.py. Status works. Defining test \ntest_"
+  },
+  {
+    "page": 59,
+    "chars": 4401,
+    "first": "Lab Assignment 7 | 59\n6 Task C assigned study cards and hand traces\n26  MOSA   Multiobjective Simulated Annealing\nHistorical context: Paolo "
+  },
+  {
+    "page": 60,
+    "chars": 4376,
+    "first": "Lab Assignment 7 | 60\nCore idea: choose nonnegative weights; normalize objectives; minimize one linear combination; repeat for a \nsequence o"
+  },
+  {
+    "page": 61,
+    "chars": 2676,
+    "first": "Lab Assignment 7 | 61\napplicable, use OX plus swap/inversion.\n6. Replace the generation without elitism. A passive logging archive does not "
+  },
+  {
+    "page": 62,
+    "chars": 165,
+    "first": "Lab Assignment 7 | 62\nFlow diagram A1 Weighted Sum\nFigure C1 Current implementation control flow\nFlow diagram A13 NPGA\nFigure C13 Current im"
+  },
+  {
+    "page": 63,
+    "chars": 302,
+    "first": "Lab Assignment 7 | 63\nWeighted Sum two settings\nw1 w2 x f1 f2 Scalar\n0.25 0.75 6.0 9.0 1.0 3.0\n0.75 0.25 4.0 1.0 9.0 3.0\nStationarity gives "
+  },
+  {
+    "page": 64,
+    "chars": 1468,
+    "first": "Lab Assignment 7 | 64\nMOSA lecture and population four trace\nStep Current x Next x Current F Next F T next Rule\n1 10 13 (20,10) (17,11.5) 90"
+  },
+  {
+    "page": 65,
+    "chars": 614,
+    "first": "Lab Assignment 7 | 65\nNPGA exact lecture tournament rounds\nTopology Cost Reliability Normalized cost Normalized reliability\nA 10 0.8 0 0\nB 1"
+  },
+  {
+    "page": 66,
+    "chars": 1175,
+    "first": "Lab Assignment 7 | 66\nNPGA two complete population four generations\nGeneration 1\nMember x f1 f2 Norm f1 Norm f2\n0 3 0 16 0 1\n1 4 1 9 0.0625 "
+  },
+  {
+    "page": 67,
+    "chars": 999,
+    "first": "Lab Assignment 7 | 67\nMember x f1 f2 Norm f1 Norm f2\n2 7.25 18.06 0.0625 1 0\n3 2.5 0.25 20.25 0 1\nAll distances and quadratic sharing terms "
+  },
+  {
+    "page": 68,
+    "chars": 1337,
+    "first": "Lab Assignment 7 | 68\nTen trial sensitivity studies\nMOSA\nSetting Trials HV IGD Spacing Calls\n{\"cooling\": 0.97} 10 0.5048 +/- 0.01142 0.02343"
+  },
+  {
+    "page": 69,
+    "chars": 691,
+    "first": "Lab Assignment 7 | 69\nFigure S1 Sensitivity metrics with sample SD across ten seeds\nNPGA\nSetting Trials HV IGD Spacing Calls\n{\"sigma\": 0.1} "
+  },
+  {
+    "page": 70,
+    "chars": 518,
+    "first": "Lab Assignment 7 | 70\n7 Task D head to head comparisons\nThe continuous comparison includes 25 applicable two-objective optimizer mechanisms."
+  },
+  {
+    "page": 71,
+    "chars": 2011,
+    "first": "Lab Assignment 7 | 71\nP3 comparison\nRank Algorithm HV IGD Spacing Runtime s\n1 SMS-EMOA 0.5319 +/- 7.994e-05 0.009663 +/- 0.0001899 0.003307 "
+  },
+  {
+    "page": 72,
+    "chars": 889,
+    "first": "Lab Assignment 7 | 72\nRank Algorithm HV IGD Spacing Runtime s\n22 IBEA 0.1935 +/- 0.01998 0.3559 +/- 0.03541 0.007561 +/- 0.005889 1.54 +/- 0"
+  },
+  {
+    "page": 73,
+    "chars": 2001,
+    "first": "Lab Assignment 7 | 73\nP5 comparison\nRank Algorithm HV IGD Spacing Runtime s\n1 MOEA/D 1.182 +/- 8.228e-06 0.01853 +/- 0.003146 0.02406 +/- 0."
+  },
+  {
+    "page": 74,
+    "chars": 923,
+    "first": "Lab Assignment 7 | 74\nRank Algorithm HV IGD Spacing Runtime s\n22 VEGA 1.18 +/- 0.001278 0.0113 +/- 0.0007522 0.0168 +/- 0.001562 0.3886 +/- "
+  },
+  {
+    "page": 75,
+    "chars": 1258,
+    "first": "Lab Assignment 7 | 75\nP10 comparison\nRank Algorithm HV IGD Spacing Runtime s\n1 RVEA 1.008 +/- 0.02081 0.3082 +/- 0.01173 0.2683 +/- 0.01688 "
+  },
+  {
+    "page": 76,
+    "chars": 1263,
+    "first": "Lab Assignment 7 | 76\nP8 comparison\nRank Algorithm HV IGD Spacing Runtime s\n1 NSGA-II 0.9238 +/- 0.0002031 N/A +/- N/A 0.003701 +/- 0.002802"
+  },
+  {
+    "page": 77,
+    "chars": 1713,
+    "first": "Lab Assignment 7 | 77\nRanking existing alternatives and preferred scalar solutions\nInput Method Weights v Top three\nP12 topsis [0.3, 0.3, 0."
+  },
+  {
+    "page": 78,
+    "chars": 1468,
+    "first": "Lab Assignment 7 | 78\nP13 gradient methods and equal weights\nMethod Scale BCE initial BCE final MSE initial MSE final\nequal 1 0.6945 0.537 +"
+  },
+  {
+    "page": 79,
+    "chars": 21,
+    "first": "Lab Assignment 7 | 79"
+  },
+  {
+    "page": 80,
+    "chars": 2998,
+    "first": "Lab Assignment 7 | 80\n8 Task E algorithm selection cases\nP1\nSuitable: Weighted Sum,Weight Metric. Poor choice: VEGA. Convex one-variable pro"
+  },
+  {
+    "page": 81,
+    "chars": 284,
+    "first": "Lab Assignment 7 | 81\nA5 M=2 base: HV=0.32905 +/- 0, IGD=0.35302 +/- 0; A35 M=2 base: HV=0.85628 +/- 0.00064468, IGD=0.0094464 \n+/- 0.000495"
+  },
+  {
+    "page": 82,
+    "chars": 3536,
+    "first": "Lab Assignment 7 | 82\n9 Task F viva preparation\n1 Why can Weighted Sum miss a dented front \nOn P3 the true front is (t,1-t^2). A positive we"
+  },
+  {
+    "page": 83,
+    "chars": 3779,
+    "first": "Lab Assignment 7 | 83\n12 How does changing a parameter affect behaviour \nRaise sigma to include more comparison neighbours in NPGA; increase"
+  },
+  {
+    "page": 84,
+    "chars": 3648,
+    "first": "Lab Assignment 7 | 84\nLocal solves are not a global optimality certificate. Inspect Value Function in src/algorithms/value_function.py and \n"
+  },
+  {
+    "page": 85,
+    "chars": 3950,
+    "first": "Lab Assignment 7 | 85\nShared defaults: population=40, budget=10000, seed=63.\nConstraints: Deb feasibility comparison unless the stated metho"
+  },
+  {
+    "page": 86,
+    "chars": 3686,
+    "first": "Lab Assignment 7 | 86\n33 Explain A19 MOEA D DE and predict one change\nDE variation inside MOEA/D. MOEA/D-DE: neighbourhood donor x_a+F*(x_b-"
+  },
+  {
+    "page": 87,
+    "chars": 3770,
+    "first": "Lab Assignment 7 | 87\n39 Explain A25 MOACO and predict one change\nTwo pheromone matrices and route construction. MOACO: two pheromone matric"
+  },
+  {
+    "page": 88,
+    "chars": 3784,
+    "first": "Lab Assignment 7 | 88\nLecture decks supplied on 12 October 2026; teaching variants documented in docs/lecture_alignment.md. Inspect \nMOMA in"
+  },
+  {
+    "page": 89,
+    "chars": 687,
+    "first": "Lab Assignment 7 | 89\nfor arbitrary nonconvex neural networks. Inspect MGDA in src/algorithms/mgda.py and identify the \ntest_36_mechanism as"
+  },
+  {
+    "page": 90,
+    "chars": 2479,
+    "first": "Lab Assignment 7 | 90\n10 Findings and limitations\nThe numerical comparison shows meaningful differences in convergence, coverage and computa"
+  },
+  {
+    "page": 91,
+    "chars": 862,
+    "first": "Lab Assignment 7 | 91\n11 Reproducibility and repository instructions\nKeep src tests results figures docs and data together. From the project"
+  },
+  {
+    "page": 92,
+    "chars": 2700,
+    "first": "Lab Assignment 7 | 92\n12 References\n1. Department of Artificial Intelligence & Data Science. Lab Assignment 7 - Multiobjective Optimization:"
+  },
+  {
+    "page": 93,
+    "chars": 3473,
+    "first": "Lab Assignment 7 | 93\n13 Appendix evidence files and lecture alignment\nEvidence Location\nRaw fronts and decisions results/csv/job_name.npz\nJ"
+  },
+  {
+    "page": 94,
+    "chars": 2438,
+    "first": "Lab Assignment 7 | 94\nthe canonical alternative M*(t/tmax)^alpha. Per-generation range normalization and periodic vector adaptation \nretaine"
+  }
+]

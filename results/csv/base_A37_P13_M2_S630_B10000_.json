@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 37,
+  "algorithm": "GradNorm",
+  "problem": "P13",
+  "objectives": 2,
+  "seed": 630,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.6051898527242864,
+  "IGD": 0.43295732248234425,
+  "Spacing": 0.0,
+  "runtime": 0.40706870800022443,
+  "front_size": 1,
+  "feasible_fraction": 1.0,
+  "file": "base_A37_P13_M2_S630_B10000_"
+}

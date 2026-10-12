@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 14,
+  "algorithm": "NSGA-II",
+  "problem": "P8",
+  "objectives": 2,
+  "seed": 639,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.9239038332342914,
+  "IGD": null,
+  "Spacing": 0.008787786598502094,
+  "runtime": 0.7726596249999602,
+  "front_size": 3,
+  "feasible_fraction": 1.0,
+  "file": "D_A14_P8_M2_S639_B10000_"
+}

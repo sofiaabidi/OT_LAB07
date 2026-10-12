@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 17,
+  "algorithm": "PESA-II",
+  "problem": "P3",
+  "objectives": 2,
+  "seed": 632,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.49540430848631967,
+  "IGD": 0.043185267442195564,
+  "Spacing": 0.024743487290548757,
+  "runtime": 0.7355481670001609,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "D_A17_P3_M2_S632_B10000_"
+}

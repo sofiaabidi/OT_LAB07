@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 35,
+  "algorithm": "R-NSGA-II",
+  "problem": "P3",
+  "objectives": 2,
+  "seed": 637,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.527949706994092,
+  "IGD": 0.011700066933119143,
+  "Spacing": 0.018229125897772848,
+  "runtime": 0.7894973749998826,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "D_A35_P3_M2_S637_B10000_"
+}

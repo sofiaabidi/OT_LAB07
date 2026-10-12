@@ -1,0 +1,776 @@
+{
+  "algorithm_number": 4,
+  "algorithm": "Weight Metric",
+  "problem": "P1",
+  "objectives": 2,
+  "seed": 630,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 1895,
+  "HV": 1.0347269020283623,
+  "IGD": 0.012339279089368495,
+  "Spacing": 0.023805983239781846,
+  "runtime": 0.1819376249995912,
+  "front_size": 63,
+  "feasible_fraction": 1.0,
+  "file": "base_A04_P1_M2_S630_B10000_",
+  "solves": [
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        6.999995991009939
+      ],
+      "f": [
+        15.999967928095586,
+        1.60720013076806e-11
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        6.799999984706601
+      ],
+      "f": [
+        14.43999988377017,
+        0.040000006117359724
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        6.600000009107252
+      ],
+      "f": [
+        12.960000065572217,
+        0.15999999271419818
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        6.399999989922007
+      ],
+      "f": [
+        11.559999931469646,
+        0.36000001209359195
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        6.199999971668089
+      ],
+      "f": [
+        10.239999818675772,
+        0.6400000453310581
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        5.9999999772560155
+      ],
+      "f": [
+        8.999999863536093,
+        1.0000000454879694
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        5.7999999847065995
+      ],
+      "f": [
+        7.839999914356958,
+        1.4400000367041614
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        5.5999999783736065
+      ],
+      "f": [
+        6.7599998875427545,
+        1.9600000605539023
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        5.400000013763863
+      ],
+      "f": [
+        5.760000066066544,
+        2.5599999559556377
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        5.199999951924044
+      ],
+      "f": [
+        4.839999788465795,
+        3.240000173073445
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        4.999999989176947
+      ],
+      "f": [
+        3.9999999567077893,
+        4.000000043292211
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        4.799999954904276
+      ],
+      "f": [
+        3.2399998376553962,
+        4.840000198421187
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        4.599999956394388
+      ],
+      "f": [
+        2.5599998604620438,
+        5.76000020930694
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        4.399999998117644
+      ],
+      "f": [
+        1.959999994729403,
+        6.760000009788252
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        4.199999975765903
+      ],
+      "f": [
+        1.4399999418381673,
+        7.8400001357109455
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        4.000000013018806
+      ],
+      "f": [
+        1.0000000260376114,
+        8.999999921887166
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        3.8000000025879936
+      ],
+      "f": [
+        0.6400000041407898,
+        10.23999998343684
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        3.599999968315319
+      ],
+      "f": [
+        0.3599999619783838,
+        11.560000215455831
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        3.3999999861967147
+      ],
+      "f": [
+        0.15999998895737197,
+        12.960000099383654
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        3.1999999712955542
+      ],
+      "f": [
+        0.03999998851822252,
+        14.440000218153788
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        3.0000039990767333
+      ],
+      "f": [
+        1.5992614718970756e-11,
+        15.999968007402126
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        6.960442093795772
+      ],
+      "f": [
+        15.685101578309435,
+        0.0015648279432625308
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        5.909606816886295
+      ],
+      "f": [
+        8.465811828871196,
+        1.1889572937808384
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        5.701332164118624
+      ],
+      "f": [
+        7.29719546090181,
+        1.6865381479528156
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        5.562607519870603
+      ],
+      "f": [
+        6.566957300897364,
+        2.0660971419325382
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        5.454040019798298
+      ],
+      "f": [
+        6.022312418771631,
+        2.3899922603852466
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        5.362159868375277
+      ],
+      "f": [
+        5.579799243762705,
+        2.682520296760491
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        5.280568035524817
+      ],
+      "f": [
+        5.200990564657521,
+        2.9564462804589886
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        5.205620216551113
+      ],
+      "f": [
+        4.8647605396589775,
+        3.2197988072500756
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        5.134956538082087
+      ],
+      "f": [
+        4.55803941949945,
+        3.478387114842753
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        5.066873683913408
+      ],
+      "f": [
+        4.271966825253782,
+        3.7369773539465188
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        5.000006415101661
+      ],
+      "f": [
+        4.0000256604477995,
+        3.999974339634508
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        4.933135306044164
+      ],
+      "f": [
+        3.7370121114744648,
+        4.27192966312115
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        4.865041607485745
+      ],
+      "f": [
+        3.4783801976530118,
+        4.558047337767052
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        4.794382663419895
+      ],
+      "f": [
+        3.2198091427818754,
+        4.864747835422717
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        4.719429974132613
+      ],
+      "f": [
+        2.956439435945677,
+        5.200999642884776
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        4.6378342966577275
+      ],
+      "f": [
+        2.6825011833083128,
+        5.579826810046493
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        4.54595290644192
+      ],
+      "f": [
+        2.389970388936221,
+        6.022347137400858
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        4.4373872692823495
+      ],
+      "f": [
+        2.0660821618949696,
+        6.566984007636173
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        4.298665989500194
+      ],
+      "f": [
+        1.686533352284519,
+        7.2972054362829635
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        4.090392990992152
+      ],
+      "f": [
+        1.1889568748048112,
+        8.465812946867596
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        3.0396094312176714
+      ],
+      "f": [
+        0.001568907041387438,
+        15.684693457300016
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        6.999999991784652
+      ],
+      "f": [
+        15.999999934277213,
+        6.74919493590713e-17
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        6.253578019182857
+      ],
+      "f": [
+        10.585769926909844,
+        0.5571457734469871
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        5.999999999985671
+      ],
+      "f": [
+        8.999999999914026,
+        1.000000000028658
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        5.816734735461467
+      ],
+      "f": [
+        7.933994569955181,
+        1.4001166862634442
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        5.66666666535418
+      ],
+      "f": [
+        7.111111104111182,
+        1.7777777812777424
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        5.53589837910106
+      ],
+      "f": [
+        6.430780589127385,
+        2.1435935563189026
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        5.417424301592587
+      ],
+      "f": [
+        5.843940253930406,
+        2.5045458411897115
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        5.307071983247713
+      ],
+      "f": [
+        5.322581135886536,
+        2.8660052699048313
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        5.202041027890529
+      ],
+      "f": [
+        4.848984688513179,
+        3.2326564653889442
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        5.100251254147282
+      ],
+      "f": [
+        4.411055330547231,
+        3.609045297368975
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        4.999999995588718
+      ],
+      "f": [
+        3.999999982354872,
+        4.000000017645128
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        4.899748739046709
+      ],
+      "f": [
+        3.6090452715095607,
+        4.411055359135889
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        4.7979589705237204
+      ],
+      "f": [
+        3.2326564596867167,
+        4.848984695496953
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        4.692928006220476
+      ],
+      "f": [
+        2.8660052342456357,
+        5.3225811844818285
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        4.582575694830728
+      ],
+      "f": [
+        2.5045458298689627,
+        5.843940271223135
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        4.46410161482011
+      ],
+      "f": [
+        2.143593538518853,
+        6.430780619957975
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        4.333333323965786
+      ],
+      "f": [
+        1.7777777527976524,
+        7.111111161071362
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        4.183265257571699
+      ],
+      "f": [
+        1.4001166697762184,
+        7.933994609202629
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        3.9999999906872064
+      ],
+      "f": [
+        0.9999999813744128,
+        9.000000055876763
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        3.746421979605465
+      ],
+      "f": [
+        0.5571457716381412,
+        10.58576993479442
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        3.0000000130188056
+      ],
+      "f": [
+        1.6948929896747697e-16,
+        15.999999895849555
+      ],
+      "cv": 0.0
+    }
+  ]
+}

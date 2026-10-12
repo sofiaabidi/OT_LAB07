@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 19,
+  "algorithm": "MOEA/D-DE",
+  "problem": "P5",
+  "objectives": 2,
+  "seed": 634,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 1.1818436304531612,
+  "IGD": 0.052647052835914636,
+  "Spacing": 0.033340203428917616,
+  "runtime": 2.5414894579998872,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "base_A19_P5_M2_S634_B10000_"
+}

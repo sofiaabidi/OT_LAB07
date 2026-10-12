@@ -1,0 +1,18 @@
+{
+  "algorithm_number": 10,
+  "algorithm": "VEGA",
+  "problem": "P3",
+  "objectives": 2,
+  "seed": 633,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.19515181278224938,
+  "IGD": 0.32536609010429435,
+  "Spacing": 0.03639995100115359,
+  "runtime": 0.3405462919999991,
+  "front_size": 6,
+  "feasible_fraction": 1.0,
+  "file": "D_A10_P3_M2_S633_B10000_"
+}

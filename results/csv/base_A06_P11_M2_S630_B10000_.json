@@ -1,0 +1,46 @@
+{
+  "algorithm_number": 6,
+  "algorithm": "Goal Programming",
+  "problem": "P11",
+  "objectives": 2,
+  "seed": 630,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 275,
+  "HV": 1.2100000000715876,
+  "IGD": 4.825210196566831e-11,
+  "Spacing": 0.0,
+  "runtime": 0.025949374999981956,
+  "front_size": 1,
+  "feasible_fraction": 1.0,
+  "file": "base_A06_P11_M2_S630_B10000_",
+  "solves": [
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        299.9999999855021,
+        200.0000000201451
+      ],
+      "f": [
+        -2400.000000062879,
+        -500.00000000564717
+      ],
+      "cv": 2.6199510709072154e-11
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        299.9999999820559,
+        200.00000002908322
+      ],
+      "f": [
+        -2400.000000102723,
+        -500.00000001113915
+      ],
+      "cv": 4.2801199621559743e-11
+    }
+  ]
+}
