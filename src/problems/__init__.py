@@ -8,11 +8,14 @@ from dataclasses import dataclass
 from functools import lru_cache
 import numpy as np
 from src.moo_utils import normalize, nondominated
+from src.project_config import (
+    DTLZ_REFERENCE_SEED_OFFSET, P8_INSTANCE_SEED, P9_FOLD_SEED,
+)
 
 MU=np.array([.08,.12,.15,.10])
 COV=np.array([[.010,.002,.001,.003],[.002,.040,.006,.004],[.001,.006,.090,.005],[.003,.004,.005,.020]])
 SUPPLIERS=np.array([[120,8,10,92],[100,7,14,88],[140,9,7,95],[90,6,18,80],[130,8,9,90]],float)
-rs=np.random.RandomState(7)
+rs=np.random.RandomState(P8_INSTANCE_SEED)
 COORDS=rs.uniform(0,100,(15,2))
 DIST=np.linalg.norm(COORDS[:,None]-COORDS[None,:],axis=2)
 U=np.ones((15,15))
@@ -24,7 +27,7 @@ TIME=DIST*U
 def cancer_data():
     # Dataset loader only. No sklearn classifier or cross-validation tools.
     from sklearn.datasets import load_breast_cancer
-    ds=load_breast_cancer(); folds=np.array_split(np.random.default_rng(63).permutation(len(ds.target)),5)
+    ds=load_breast_cancer(); folds=np.array_split(np.random.default_rng(P9_FOLD_SEED).permutation(len(ds.target)),5)
     matrices=[]
     for test in folds:
         train=np.setdiff1d(np.arange(len(ds.target)),test)
@@ -131,7 +134,7 @@ class Problem:
             return self.evaluate(np.r_[np.c_[u,u],np.c_[v,np.full(len(v),3)]])[0]
         if self.key=='P7': return self.evaluate(np.c_[10+60*t,80-60*t])[0]
         if self.key=='P10':
-            z=np.abs(np.random.default_rng(100+self.m).normal(size=(n,self.m)))
+            z=np.abs(np.random.default_rng(DTLZ_REFERENCE_SEED_OFFSET+self.m).normal(size=(n,self.m)))
             return z/np.linalg.norm(z,axis=1,keepdims=True)
         if self.key=='P11': return np.array([[-2400.,-500.]])
         if self.key=='P13': return self.evaluate(np.c_[-3+6*t,-3+6*t])[0]

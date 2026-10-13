@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 19,
+  "algorithm": "MOEA/D-DE",
+  "problem": "P5",
+  "objectives": 2,
+  "seed": 723,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 1.181784752770388,
+  "IGD": 0.0344986723553113,
+  "Spacing": 0.03187078928570222,
+  "runtime": 12.722906599985436,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "D_A19_P5_M2_S723_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 723
+}

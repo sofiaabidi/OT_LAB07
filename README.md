@@ -1,99 +1,69 @@
-# Lab Assignment 7 Multiobjective Optimization
+# Lab Assignment 7: Multiobjective Optimization
 
-Educational Python implementations of all 37 catalogue mechanisms with P1-P14, tests, measured results and an editable Word report. Roll suffix 63 assigns MOSA (26), Weighted Sum (1), and NPGA (13). No optimizer libraries are used: NumPy and standard-library search code, permitted SciPy scalar solves for 1-7, sklearn dataset loader only. Five supplied Chapter 5 lecture PDFs were checked; teaching conventions and numerical discrepancies are in `docs/lecture_alignment.md`.
+Educational Python implementations of all 37 catalogue methods and problems P1-P14, configured for **Sofia Abidi** (registration **241071072**, roll suffix **72**), B.Tech Computer Engineering, Veermata Jijabai Technological Institute.
 
-The final requested report is **Lab_Assignment_7_Report.docx**. Paste your GitHub repository URL into its editable field and add your student details. You can export it to PDF yourself. No submission ZIP is generated, as requested. Nothing has been pushed to GitHub.
+The Task C formulas are evaluated in `src/project_config.py` and select **Algorithm 35 — R-NSGA-II**, **Algorithm 10 — VEGA**, and **Algorithm 22 — MOPSO**. That module is also the source of truth for student metadata, optimizer seeds, fixed problem-data seeds, and Monte Carlo hypervolume settings.
 
-## Install
+## Install and test
 
-Python 3.10 or later:
+Python 3.10 or later is required.
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
+python -m venv .venv
+.venv\Scripts\activate
 python -m pip install -r requirements.txt
-```
-
-On Windows activate with `.venv\Scripts\activate`. Development was tested with Python 3.12. Versions used in the recorded experiment environment are saved in `results/environment.json`. Newer dependency versions can affect exact floating-point last digits; use the recorded versions for close reproduction.
-
-## Structure
-
-- `src/moo_utils.py`: dominance, Deb rules, sorting, crowding, HV, IGD, Spacing and archives.
-- `src/problems/`: all 14 assignment definitions, exact P8 data generator, hand-coded five-fold 5NN, NumPy network.
-- `src/algorithms/`: 37 separate modules, plus shared variation/bookkeeping.
-- `src/experiments/`: checkpoint runner, reports, investigations and verification.
-- `tests/`: utility, problem, 37 mechanism, reproducibility, hand-trace and exact lecture tests.
-- `results/csv/`: job JSON/NPZ, aggregated raw CSV, traces, rankings and learning curves.
-- `results/tables/`: summary, comparison, case studies, completion status and figure provenance.
-- `figures/`: real-result plots and mechanism flows.
-- `docs/`: original specification, lecture extractions, requirement map, study cards, viva and bibliography.
-- `data/`: routing coordinates, distance and traffic matrices.
-
-## Run tests
-
-```bash
 python run_all.py test
+python run_all.py verify
 ```
 
-59 tests currently pass. Each of 37 modules has a defining-mechanism test. Stochastic reproducibility tests repeat all 26 population algorithms at identical seeds, check exact budgets and output bounds. Lecture tests reproduce the car front, Deb table, NPGA two rounds, MOSA two iterations and Benson achievement signs. Network gradients pass central finite-difference checks.
+Linux/macOS activation is `source .venv/bin/activate`. The project uses NumPy and hand-written optimization code. SciPy is limited to permitted classical methods 1-7; scikit-learn is used only to load the P9 dataset.
 
-## Run one algorithm
+## Repository map
+
+- `src/project_config.py`: identity, Task C computation, seed namespaces, and report metadata.
+- `src/problems/`: all 14 problem definitions, P8 routing data, hand-coded P9 five-fold 5-NN, and the NumPy P13 network.
+- `src/algorithms/`: 37 separate algorithm modules and shared operators.
+- `src/experiments/`: checkpoint runner, traces, evidence builders, report generator, and verifier.
+- `results/roll72/`: active job records, arrays, traces, tables, logs, and verification evidence.
+- `figures/roll72/`: active result plots, sensitivity plots, and Task C flowcharts.
+- `docs/`: specification, lecture extracts, alignment notes, study cards, audit, case studies, and viva material.
+
+## Run one method
 
 ```bash
-python run_all.py one --algorithm 26 --problem P3 --budget 10000 --seed 630
-python run_all.py one --algorithm 13 --problem P5 --budget 10000 --seed 630
-python run_all.py one --algorithm 1 --problem P1
-python run_all.py one --algorithm 15 --problem P10 --objectives 5
-python run_all.py one --algorithm 25 --problem P8
-python run_all.py one --algorithm 8 --problem P12
+python run_all.py one --algorithm 35 --problem P14 --budget 10000 --seed 720
+python run_all.py one --algorithm 10 --problem P3 --budget 10000 --seed 720
+python run_all.py one --algorithm 22 --problem P4 --budget 10000 --seed 720
 ```
 
-Output includes decisions, objectives and evaluation count, or ranking arrays for 8-9. Python API: `load(number).run(get_problem('P3'), budget=10000, seed=630, population=40)`. Parameters are documented in each module. Ant methods require P8; gradient methods require P13; the MODE donor is real-coded; SMS-EMOA here is two-objective.
+The default optimizer seed is 720. Ranking methods 8-9 use the supplier fixture; ant methods require P8; gradient methods require P13; SMS-EMOA is implemented for two objectives.
 
-## Run all experiments
+## Experiments and reproducibility
 
 ```bash
 python run_all.py experiments --workers 4
 ```
 
-Seeds 630-639, population 40, 10000 candidate calls for stochastic comparisons. Classical methods share a cap but terminate naturally and may use fewer actual calls. P9 deliberately uses 200 calls because five-fold distance computation is costly; these are exploratory reduced-budget experiments. Network uses 1000 full-batch steps at fixed data seed 63 with ten initialization seeds. Evaluation of M-objective quality uses fixed normalization and HV reference 1.1 in every coordinate. MC HV uses 8192 identical points, seed 991; IGD uses 301 exact-front samples. SLSQP default maxiter 120, ftol 1e-10.
+Independent optimizer trials use seeds **720-729**. Stochastic comparisons use population 40 and a 10,000-evaluation cap. Classical solvers share the cap but may terminate earlier. P9 is explicitly limited to 200 evaluations because its five-fold distance evaluation is expensive; it must not be described as a full-budget run.
 
-An additional P3 study compares populations 20, 40 and 80 at budgets 1000, 5000 and 10000 with ten seeds per condition; its 90 raw jobs are under `results/csv/population/`.
+Problem construction and measurement randomness are separate from optimizer trials: P8 retains instance seed 7, P9 folds and P13 network data retain fixed seed 63, and Monte Carlo HV uses 8,192 common samples with seed 991. Checkpoints are reused only when their roll and provenance metadata match the active configuration.
 
-Jobs checkpoint under `results/csv/`. Existing files are reused; selective rerun:
-
-```bash
-python -m src.experiments.runner --algorithms 13 26 --force --skip-extras --workers 4
-```
-
-The current implementation deliberately caps P9 to 200 even when `--budget 10000` is supplied. To pursue full-budget feature runs, change that explicit P9 cap in `runner.tasks`, clear the affected checkpoints with `--force`, and allow sufficient time. Do not relabel existing reduced runs as 10000 evaluations.
-
-## Regenerate figures tables and Word report
+The completed active campaign contains 1,196 main jobs, 90 population-study jobs, and 134 summary groups. A selective Task C rerun is:
 
 ```bash
-python run_all.py report
+python -m src.experiments.runner --algorithms 10 22 35 --force --skip-extras --workers 4
+python -m src.experiments.traces
+python -m src.experiments.build_deliverables
 ```
 
-This reads the saved raw outputs, generates figures/tables/prose and builds the DOCX. Source fixtures should first be regenerated with `python -m src.experiments.traces` if code changed. The report builder embeds actual plots; editable prose/tables contain no fabricated numbers. Equations are high-resolution display images while code notation remains editable.
+## Evidence and report generation
 
-The standard `.docx` opens in Word or compatible editors. Update your repository field and export PDF using Word. Renderer scripts used during development are environment-specific QA tools and not needed to regenerate the DOCX itself.
+`python -m src.experiments.build_deliverables` rebuilds tables, figures, algorithm notes, case studies, and viva material from active checkpoints. Task C has two deterministic hand-worked iterations and three-value, ten-seed sensitivity studies for each assigned method.
 
-## Verify stored artifacts
+`python run_all.py report` additionally creates the editable DOCX. The DOCX is intentionally deferred in the current phase; it is not required for `python run_all.py verify` to validate the stored experiment evidence.
 
-```bash
-python run_all.py verify
-```
+## Scope and limitations
 
-Checks 37 modules, designated experiments, ten-trial stochastic groups, per-run budgets, feasible stored fronts, valid tours, aggregate consistency, figures and DOCX ZIP/XML structure. Verification does not certify original-paper equivalence or global optimality.
+The tests establish implemented mechanisms, reproducibility, accounting, constraints, and stored-result consistency; they do not prove global optimality or exact reproduction of every original paper. Task B includes measured quality/runtime evidence plus clearly separated mechanism-based reasoning, but the stronger requirement for two causal, experimentally supported advantages and disadvantages for every one of 37 algorithms would require additional method-specific ablations. P9 full-budget evidence remains incomplete. The student must validate and be able to explain all conclusions before submission.
 
-## Assigned deep dives
-
-- **Weighted Sum:** fixed-scale scalarization and a 21-direction sweep; analytical P1 trace gives x=6 and x=4. Nonconvex P3 geometry explains why more weights cannot recover unsupported points.
-- **NPGA:** supplied lecture variant: direct contestant dominance, then quadratic sharing against a separate two-member comparison set. Exact telecom rounds and two full four-member generations are checked.
-- **MOSA:** supplied lecture acceptance: incomparable moves always accepted; dominated moves use summed worsened-objective Boltzmann energy. Experiments use forty parallel chains with normalized T0=.1; exact single-chain lecture trace uses raw T0=100.
-
-## Honest status and limitations
-
-All 37 mechanisms are implemented and tested; P9 runs for MOGWO/MOMA remain at 200 evaluations, so their assignment-level status is partly works. Targeted experimental ablations do not yet establish two experimentally supported advantages and two experimentally supported disadvantages for **every** method: the report provides actual quality/runtime measurements and separately labels mechanism-based reasoning. This stricter Task B evidence requirement remains partly satisfied. No global-optimality claims are made. These are teaching variants, and the original NPGA/IBEA/HypE conventions differ from some course slides; all choices are documented.
-
-The final report includes Tasks A-F, not a claim that the student has mastered them. Read the implementations and `docs/viva_questions.md`; rewrite personal conclusions in your own words before submitting, consistent with the assignment's integrity requirement.
+No submission ZIP is produced and no repository operation is performed by these commands.

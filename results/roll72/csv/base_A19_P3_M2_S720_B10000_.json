@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 19,
+  "algorithm": "MOEA/D-DE",
+  "problem": "P3",
+  "objectives": 2,
+  "seed": 720,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.531049256459508,
+  "IGD": 0.009698686089067751,
+  "Spacing": 0.001489562170663689,
+  "runtime": 15.061702099861577,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "base_A19_P3_M2_S720_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 720
+}

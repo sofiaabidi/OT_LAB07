@@ -1,3 +1,10 @@
+# ARCHIVAL PROJECT INSTRUCTIONS — PREVIOUS ROLL-63 PROMPT
+
+This file is retained to document the repository's history. Its student identity,
+roll-63 Task C algorithms, seed choices and deliverable directions are not current
+requirements. Use docs/assignment.txt plus src/project_config.py for the active
+roll-72 project.
+
 # COMPLETE PROJECT INSTRUCTIONS — LAB ASSIGNMENT 7
 
 ## 1. Your Objective

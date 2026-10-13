@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 17,
+  "algorithm": "PESA-II",
+  "problem": "P3",
+  "objectives": 2,
+  "seed": 726,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.5166714437924634,
+  "IGD": 0.02177279986100708,
+  "Spacing": 0.02195841727169575,
+  "runtime": 5.444081600056961,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "D_A17_P3_M2_S726_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 726
+}

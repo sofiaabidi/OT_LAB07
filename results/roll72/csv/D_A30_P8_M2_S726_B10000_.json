@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 30,
+  "algorithm": "MOMA",
+  "problem": "P8",
+  "objectives": 2,
+  "seed": 726,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.9239371279849585,
+  "IGD": null,
+  "Spacing": 0.004667876537307387,
+  "runtime": 7.412944099865854,
+  "front_size": 6,
+  "feasible_fraction": 1.0,
+  "file": "D_A30_P8_M2_S726_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 726
+}

@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 29,
+  "algorithm": "MOBA",
+  "problem": "P3",
+  "objectives": 2,
+  "seed": 728,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.45784594819868885,
+  "IGD": 0.05877848657680477,
+  "Spacing": 0.052857202536526864,
+  "runtime": 4.4788524999748915,
+  "front_size": 36,
+  "feasible_fraction": 1.0,
+  "file": "D_A29_P3_M2_S728_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 728
+}

@@ -4,8 +4,9 @@ Synthetic 128x5 inputs seed 63, binary class sign(X0-X1), regression
 Full-batch training, BCE and MSE; no autograd, no ML training library.
 """
 import numpy as np
+from src.project_config import NETWORK_DATA_SEED
 
-def data(seed=63,scale=1):
+def data(seed=NETWORK_DATA_SEED,scale=1):
     rng=np.random.default_rng(seed); x=rng.normal(size=(128,5))
     yc=(x[:,0]-x[:,1]>0).astype(float); yr=scale*(3*x[:,0]+2*x[:,2]+rng.normal(0,.1,128))
     return x,yc,yr
@@ -26,10 +27,10 @@ def forward_backward(params,batch):
     shared=np.array([np.r_[g[0].ravel(),g[1]] for g in gradients])
     return loss,gradients,shared
 
-def train(method='equal',seed=63,steps=1000,scale=1,lr=.01):
+def train(method='equal',seed=NETWORK_DATA_SEED,steps=1000,scale=1,lr=.01):
     from src.algorithms.mgda import weights as mgda_weights
     from src.algorithms.gradnorm import update_weights
-    params=initialize(seed); batch=data(63,scale); w=np.ones(2); history=[]; initial=None
+    params=initialize(seed); batch=data(NETWORK_DATA_SEED,scale); w=np.ones(2); history=[]; initial=None
     for t in range(steps):
         loss,g,shared=forward_backward(params,batch)
         if initial is None: initial=loss.copy()

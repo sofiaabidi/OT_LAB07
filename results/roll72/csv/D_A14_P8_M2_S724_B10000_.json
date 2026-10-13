@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 14,
+  "algorithm": "NSGA-II",
+  "problem": "P8",
+  "objectives": 2,
+  "seed": 724,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.9238789360909615,
+  "IGD": null,
+  "Spacing": 0.005353114522188696,
+  "runtime": 5.760639300104231,
+  "front_size": 5,
+  "feasible_fraction": 1.0,
+  "file": "D_A14_P8_M2_S724_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 724
+}

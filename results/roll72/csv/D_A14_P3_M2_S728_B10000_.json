@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 14,
+  "algorithm": "NSGA-II",
+  "problem": "P3",
+  "objectives": 2,
+  "seed": 728,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.528992819071929,
+  "IGD": 0.011070096457037788,
+  "Spacing": 0.01742646057484211,
+  "runtime": 3.3724392000585794,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "D_A14_P3_M2_S728_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 728
+}

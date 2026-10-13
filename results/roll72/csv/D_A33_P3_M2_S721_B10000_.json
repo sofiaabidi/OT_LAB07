@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 33,
+  "algorithm": "SMS-EMOA",
+  "problem": "P3",
+  "objectives": 2,
+  "seed": 721,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.5318613126766251,
+  "IGD": 0.009704709608080328,
+  "Spacing": 0.00362478008562856,
+  "runtime": 28.359693699982017,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "D_A33_P3_M2_S721_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 721
+}

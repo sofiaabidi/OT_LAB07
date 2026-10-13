@@ -1,0 +1,192 @@
+{
+  "algorithm_number": 2,
+  "algorithm": "Epsilon-Constraint",
+  "problem": "P5",
+  "objectives": 2,
+  "seed": 728,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 1.1342225610367502,
+  "IGD": 0.24553739975121558,
+  "Spacing": 0.5785425918278578,
+  "runtime": 3.130852300208062,
+  "front_size": 3,
+  "feasible_fraction": 1.0,
+  "file": "D_A02_P5_M2_S728_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 728,
+  "solves": [
+    {
+      "success": false,
+      "message": "Positive directional derivative for linesearch",
+      "x": [
+        0.1,
+        0.2
+      ],
+      "f": [
+        157.0,
+        2.4999999999999994e-05
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        0.01,
+        0.05428835232631273
+      ],
+      "f": [
+        4.26163565761555,
+        0.012500000003858147
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": false,
+      "message": "Iteration limit reached",
+      "x": [
+        0.010000000000000004,
+        0.04898979485566901
+      ],
+      "f": [
+        3.8456988961700183,
+        0.01701034543598861
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": false,
+      "message": "Iteration limit reached",
+      "x": [
+        0.01,
+        0.048989794855669365
+      ],
+      "f": [
+        3.8456988961700453,
+        0.01701034543598825
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": false,
+      "message": "Iteration limit reached",
+      "x": [
+        0.01,
+        0.04898979485566983
+      ],
+      "f": [
+        3.8456988961700818,
+        0.017010345435987763
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": false,
+      "message": "Iteration limit reached",
+      "x": [
+        0.010000000000000026,
+        0.04898979485566897
+      ],
+      "f": [
+        3.845698896170024,
+        0.017010345435988613
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": false,
+      "message": "Iteration limit reached",
+      "x": [
+        0.01,
+        0.048989794855669226
+      ],
+      "f": [
+        3.8456988961700342,
+        0.01701034543598839
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": false,
+      "message": "Iteration limit reached",
+      "x": [
+        0.01,
+        0.048989794855669386
+      ],
+      "f": [
+        3.8456988961700467,
+        0.017010345435988228
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": false,
+      "message": "Iteration limit reached",
+      "x": [
+        0.01,
+        0.04898979485566983
+      ],
+      "f": [
+        3.8456988961700818,
+        0.017010345435987763
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": false,
+      "message": "Iteration limit reached",
+      "x": [
+        0.01,
+        0.048989794855669545
+      ],
+      "f": [
+        3.845698896170059,
+        0.01701034543598806
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": false,
+      "message": "Iteration limit reached",
+      "x": [
+        0.01,
+        0.04898979485566923
+      ],
+      "f": [
+        3.8456988961700347,
+        0.017010345435988384
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": false,
+      "message": "Iteration limit reached",
+      "x": [
+        0.010000000000000099,
+        0.048989794855668775
+      ],
+      "f": [
+        3.8456988961700374,
+        0.017010345435988696
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": false,
+      "message": "Iteration limit reached",
+      "x": [
+        0.010000000000000168,
+        0.04898979485566862
+      ],
+      "f": [
+        3.8456988961700516,
+        0.017010345435988734
+      ],
+      "cv": 0.0
+    }
+  ]
+}

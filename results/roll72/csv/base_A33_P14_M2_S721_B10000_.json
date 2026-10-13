@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 33,
+  "algorithm": "SMS-EMOA",
+  "problem": "P14",
+  "objectives": 2,
+  "seed": 721,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.8587433902489905,
+  "IGD": 0.007570051316106894,
+  "Spacing": 0.0024251035446753596,
+  "runtime": 29.801665799925104,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "base_A33_P14_M2_S721_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 721
+}

@@ -1,37 +1,42 @@
 import unittest
 import numpy as np
+
 from src.experiments.traces import build
-from src.algorithms.npga import pareto_tournament
-from src.problems import get_problem
+
 
 class HandTraces(unittest.TestCase):
-    def test_weighted_sum(self):
-        t=build()['weighted_sum']; self.assertEqual([v['x'] for v in t],[6,4])
-        np.testing.assert_equal([v['objectives'] for v in t],[[9,1],[1,9]])
-        np.testing.assert_equal([v['raw_scalar'] for v in t],[3,3])
-    def test_mosa_two_generations(self):
-        t=build()['mosa']; np.testing.assert_allclose(t[0]['worsened_sum'],[.015625,.078125,.203125,.28125])
-        np.testing.assert_equal(t[0]['accepted'],[True,True,True,False])
-        np.testing.assert_allclose(t[0]['next_x'],[3.5,4.5,6.5,7])
-        np.testing.assert_allclose(t[1]['T'],.097)
-        np.testing.assert_equal(t[1]['accepted'],[True,True,True,True])
-        np.testing.assert_allclose(t[1]['next_x'],[4,5,7,6.5])
-    def test_npga_two_generations(self):
-        t=build()['npga']; self.assertEqual(len(t),2)
-        # Independent loop sharing check, then winner decisions from counts.
-        for row in t:
-            z=np.array(row['normalized_F']); nc=[]
-            for a in z: nc.append(sum(max(0,1-sum((a-b)**2)/(.8**2)) for b in z))
-            np.testing.assert_allclose(nc,row['niche_counts'])
-            expected=[]
-            f=np.array(row['F'])
-            for (a,b),C in zip(row['pairs'],row['comparison_sets']):
-                if np.all(f[a]<=f[b]) and np.any(f[a]<f[b]): expected.append(a)
-                elif np.all(f[b]<=f[a]) and np.any(f[b]<f[a]): expected.append(b)
-                else:
-                    na=sum(max(0,1-sum((z[a]-z[j])**2)/.8**2) for j in C)
-                    nb=sum(max(0,1-sum((z[b]-z[j])**2)/.8**2) for j in C)
-                    expected.append(a if na<=nb+1e-12 else b)
-            self.assertEqual(expected,row['winners'])
-            child=np.array(row['population'])[expected]+np.array(row['increments'])
-            np.testing.assert_allclose(child,row['offspring'])
+    def test_r_nsga2_two_iterations(self):
+        rows=build()['r_nsga2']; self.assertEqual(len(rows),2)
+        for row in rows:
+            self.assertEqual(row['population_size'],4)
+            self.assertEqual(len(row['parents_x']),4)
+            self.assertEqual(len(row['offspring_x']),4)
+            z=np.asarray(row['normalized_F']); ref=np.asarray(row['normalized_reference'])
+            np.testing.assert_allclose(np.linalg.norm(z-ref,axis=1),row['distance_to_reference'])
+            chosen=row['selected_indices']; self.assertEqual(len(chosen),4)
+            self.assertEqual(len(set(chosen)),4)
+        np.testing.assert_allclose(rows[0]['selected_x'],[5.5,4.5,3.5,6.5])
+        np.testing.assert_allclose(rows[1]['selected_x'],[5.25,4.5,6.,4.75])
+
+    def test_vega_two_iterations(self):
+        rows=build()['vega']; self.assertEqual(len(rows),2)
+        np.testing.assert_allclose(rows[0]['mating_pool'],[40,30,40,30])
+        np.testing.assert_allclose(rows[1]['mating_pool'],[40,40,40,40])
+        for row in rows:
+            self.assertEqual(row['population_size'],4)
+            x=np.asarray(row['population'])
+            np.testing.assert_allclose(row['f1_min'],1000/x)
+            np.testing.assert_allclose(row['f2_max'],x*x/100)
+
+    def test_mopso_two_iterations(self):
+        rows=build()['mopso']; self.assertEqual(len(rows),2)
+        self.assertTrue(all(r['population_size']==4 for r in rows))
+        np.testing.assert_allclose(rows[0]['new_velocity'],[7.5,3.75,-7.5,-5.25])
+        np.testing.assert_allclose(rows[0]['new_x'],[12.5,13.75,7.5,6.75])
+        np.testing.assert_allclose(rows[1]['new_velocity'],[1.5,.75,-1.5,-1.05])
+        np.testing.assert_allclose(rows[1]['new_x'],[14,14.5,6,5.7])
+        self.assertEqual([r['archive_size_after'] for r in rows],[8,12])
+        self.assertTrue(all(len(r['new_x']) == 4 for r in rows))
+
+
+if __name__=='__main__': unittest.main()

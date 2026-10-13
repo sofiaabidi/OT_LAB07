@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 16,
+  "algorithm": "SPEA2",
+  "problem": "P3",
+  "objectives": 2,
+  "seed": 722,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.529706772943638,
+  "IGD": 0.011406845178655294,
+  "Spacing": 0.01633328348507881,
+  "runtime": 5.535318400012329,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "D_A16_P3_M2_S722_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 722
+}

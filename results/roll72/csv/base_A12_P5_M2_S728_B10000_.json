@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 12,
+  "algorithm": "NSGA",
+  "problem": "P5",
+  "objectives": 2,
+  "seed": 728,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 1.1818376109498545,
+  "IGD": 0.016504356817185706,
+  "Spacing": 0.025845723482218145,
+  "runtime": 3.5001982001122087,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "base_A12_P5_M2_S728_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 728
+}

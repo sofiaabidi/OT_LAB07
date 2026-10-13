@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 15,
+  "algorithm": "NSGA-III",
+  "problem": "P10",
+  "objectives": 3,
+  "seed": 723,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.6653375244140627,
+  "IGD": 0.11134864566528722,
+  "Spacing": 0.09255206280806134,
+  "runtime": 5.42765469988808,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "base_A15_P10_M3_S723_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 723
+}

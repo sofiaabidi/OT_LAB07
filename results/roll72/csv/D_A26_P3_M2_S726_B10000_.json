@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 26,
+  "algorithm": "MOSA",
+  "problem": "P3",
+  "objectives": 2,
+  "seed": 726,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.5244757117859253,
+  "IGD": 0.012905032541678432,
+  "Spacing": 0.01712728565060179,
+  "runtime": 1.667331200093031,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "D_A26_P3_M2_S726_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 726
+}

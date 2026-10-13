@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 31,
+  "algorithm": "RVEA",
+  "problem": "P10",
+  "objectives": 3,
+  "seed": 722,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.6630628662109377,
+  "IGD": 0.10818876567823041,
+  "Spacing": 0.09144296576504755,
+  "runtime": 6.332166299922392,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "base_A31_P10_M3_S722_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 722
+}

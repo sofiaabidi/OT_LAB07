@@ -1,0 +1,296 @@
+{
+  "algorithm_number": 3,
+  "algorithm": "Benson reference improvement",
+  "problem": "P5",
+  "objectives": 2,
+  "seed": 721,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 4773,
+  "HV": 1.1807912990550016,
+  "IGD": 0.21309609527044993,
+  "Spacing": 0.2031998921325225,
+  "runtime": 2.294345899950713,
+  "front_size": 20,
+  "feasible_fraction": 1.0,
+  "file": "D_A03_P5_M2_S721_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 721,
+  "solves": [
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        0.09999999999999994,
+        0.2
+      ],
+      "f": [
+        156.99999999999991,
+        2.5000000000000008e-05
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        0.01,
+        0.17377914987728807
+      ],
+      "f": [
+        13.641663265367113,
+        0.0003810982817280369
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        0.01,
+        0.1441682895035099
+      ],
+      "f": [
+        11.317210726025527,
+        0.0006674531059644265
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        0.010000000000000005,
+        0.12842273477923596
+      ],
+      "f": [
+        10.081184680170029,
+        0.0009442875278245833
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        0.01,
+        0.11771081383315923
+      ],
+      "f": [
+        9.240298885903,
+        0.001226255331472572
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        0.010000000000000028,
+        0.10954445216571905
+      ],
+      "f": [
+        8.59923949500897,
+        0.0015214540209328928
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        0.01,
+        0.10287300605823844
+      ],
+      "f": [
+        8.075530975571718,
+        0.0018370699954475544
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        0.01,
+        0.097167520247964
+      ],
+      "f": [
+        7.627650339465174,
+        0.002180050917398653
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        0.01,
+        0.09211556353852357
+      ],
+      "f": [
+        7.2310717377741005,
+        0.0025587682642282724
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        0.01,
+        0.0875175525921065
+      ],
+      "f": [
+        6.8701278784803606,
+        0.0029836268242653145
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        0.01,
+        0.08323401101051739
+      ],
+      "f": [
+        6.533869864325615,
+        0.0034683868012386804
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        0.010000000000000163,
+        0.07916309714125724
+      ],
+      "f": [
+        6.214303125588795,
+        0.004031453590595116
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        0.010000000000000332,
+        0.0752141310409952
+      ],
+      "f": [
+        5.904309286718319,
+        0.004700365916591389
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        0.01,
+        0.07130155331087942
+      ],
+      "f": [
+        5.5971719349040345,
+        0.0055173816019420275
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        0.010000000000000134,
+        0.06734690917651821
+      ],
+      "f": [
+        5.28673237035675,
+        0.006547522337446434
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        0.01000000000000003,
+        0.06324551476052152
+      ],
+      "f": [
+        4.964772908700954,
+        0.007905708566505723
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        0.010000000000000026,
+        0.05885659828452548
+      ],
+      "f": [
+        4.620242965335262,
+        0.009809446942847438
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        0.010000000000000061,
+        0.05394835215012072
+      ],
+      "f": [
+        4.234945643784503,
+        0.012737829884153135
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        0.01,
+        0.04898979508413005
+      ],
+      "f": [
+        3.8456989141042093,
+        0.017010345198008366
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        0.01000000000000011,
+        0.048989795446486614
+      ],
+      "f": [
+        3.845698942549241,
+        0.01701034482055344
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": false,
+      "message": "Iteration limit reached",
+      "x": [
+        0.010000000000000168,
+        0.04898973855883765
+      ],
+      "f": [
+        3.8456944768688204,
+        0.01701040407865578
+      ],
+      "cv": 2.298306956347165e-06
+    }
+  ]
+}

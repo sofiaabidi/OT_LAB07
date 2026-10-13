@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 24,
+  "algorithm": "MOABC",
+  "problem": "P6",
+  "objectives": 2,
+  "seed": 728,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 1.0160442847592714,
+  "IGD": 0.011243397069470988,
+  "Spacing": 0.0061910747061329815,
+  "runtime": 12.500710099935532,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "base_A24_P6_M2_S728_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 728
+}

@@ -8,14 +8,21 @@ from src.algorithms import load
 from src.problems import get_problem,SUPPLIERS,COORDS,DIST,TIME,nearest_neighbour
 from src.moo_utils import hypervolume,igd,spacing,nondominated
 from src.experiments.catalogue import DISPLAY,DESIGNATED,SEEDS
+from src.project_config import (
+    ACTIVE_PROVENANCE, DEFAULT_OPTIMIZER_SEED, NETWORK_DATA_SEED,
+    ROLL_SUFFIX, TASK_C_ALGORITHM_NUMBERS,
+)
 ROOT=Path(__file__).resolve().parents[2]
+RESULTS_ROOT=ROOT/'results'/ACTIVE_PROVENANCE
+CSV_DIR=RESULTS_ROOT/'csv'
+TABLES_DIR=RESULTS_ROOT/'tables'
 
 def tasks(budget=10000):
     jobs=set()
     for a,plist in enumerate(DESIGNATED,1):
         if a in [8,9]: continue
         for p in plist[:2]:
-            for seed in (SEEDS if 10<=a<=35 else [630]):
+            for seed in (SEEDS if 10<=a<=35 else [DEFAULT_OPTIMIZER_SEED]):
                 jobs.add((a,p,5 if p=='P10' else 2,seed,'base','',budget if p!='P9' else min(budget,200)))
     # NSGA-III Task A explicitly includes M=3 and M=5.
     for a in [15,31,34]:
@@ -30,7 +37,12 @@ def tasks(budget=10000):
         for seed in SEEDS: jobs.add((a,'P10',5,seed,'D','',budget))
     for a in [20,25,14,30]:
         for seed in SEEDS: jobs.add((a,'P8',2,seed,'D','',budget))
-    for a,parameter,values,p in [(1,'settings',[11,21,41],'P3'),(13,'sigma',[.1,.3,.6],'P3'),(26,'cooling',[.90,.97,.995],'P3')]:
+    # Task C sensitivity: one primary parameter, three settings, ten seeds.
+    for a,parameter,values,p in [
+        (35,'epsilon',[.02,.05,.10],'P14'),
+        (10,'population',[20,40,80],'P3'),
+        (22,'inertia',[.2,.4,.8],'P4'),
+    ]:
         for value in values:
             for seed in SEEDS: jobs.add((a,p,2,seed,'sensitivity',json.dumps({parameter:value}),budget))
     return sorted(jobs)
@@ -41,10 +53,17 @@ def job_key(job):
     return f'{group}_A{a:02d}_{p}_M{m}_S{seed}_B{b}_{suffix}'
 
 def run_job(job):
-    key=job_key(job); target=ROOT/'results/csv'/f'{key}.json'
-    if target.exists(): return json.loads(target.read_text())
-    a,p,m,seed,group,params,b=job; problem=get_problem(p,m=m); t=time.perf_counter()
-    options=json.loads(params) if params else {}; options['population']=40
+    a,p,m,seed,group,params,b=job
+    key=job_key(job); target=CSV_DIR/f'{key}.json'; target.parent.mkdir(parents=True,exist_ok=True)
+    if target.exists():
+        saved=json.loads(target.read_text())
+        if (saved.get('provenance')!=ACTIVE_PROVENANCE or
+                saved.get('roll_suffix')!=ROLL_SUFFIX or
+                saved.get('optimizer_seed')!=seed):
+            raise ValueError(f'{target} has incompatible provenance')
+        return saved
+    problem=get_problem(p,m=m); t=time.perf_counter()
+    options=json.loads(params) if params else {}; options.setdefault('population',40)
     result=load(a).run(problem,budget=b,seed=seed,**options)
     elapsed=time.perf_counter()-t; f=result['f']; z=problem.normalized(f); true=problem.true_front()
     # IGD only against exact analytic/sphere reference; no invented P4/P8/P9 front.
@@ -52,9 +71,10 @@ def run_job(job):
     row={'algorithm_number':a,'algorithm':DISPLAY[a-1],'problem':p,'objectives':problem.m,'seed':seed,
         'group':group,'parameters':params,'budget_cap':b,'evaluations':result['evaluations'],'HV':hv,
         'IGD':igd(z,problem.normalized(true)) if true is not None else None,'Spacing':spacing(z),
-        'runtime':elapsed,'front_size':len(f),'feasible_fraction':float(np.mean(result['cv']<=1e-10)) if len(f) else 0.,'file':key}
+        'runtime':elapsed,'front_size':len(f),'feasible_fraction':float(np.mean(result['cv']<=1e-10)) if len(f) else 0.,'file':key,
+        'provenance':ACTIVE_PROVENANCE,'roll_suffix':ROLL_SUFFIX,'optimizer_seed':seed}
     # Retain both decisions and objectives for every front, even if empty.
-    np.savez_compressed(ROOT/'results/csv'/f'{key}.npz',x=result['x'],f=f,cv=result['cv'],history=np.asarray(result.get('history',[])),final_f=result.get('final_f',f))
+    np.savez_compressed(CSV_DIR/f'{key}.npz',x=result['x'],f=f,cv=result['cv'],history=np.asarray(result.get('history',[])),final_f=result.get('final_f',f))
     if 'solves' in result: row['solves']=result['solves']
     target.write_text(json.dumps(row,indent=2)); return row
 
@@ -85,29 +105,29 @@ def extras():
             for weights in [[.3,.3,.2,.2],[.4,.2,.2,.2]]:
                 result=(topsis.run(SUPPLIERS,weights,[False,True,False,True]) if method=='topsis' else vikor.run(SUPPLIERS,weights,[False,True,False,True],v))
                 rankings.append({'problem':'P12','method':method,'weights':str(weights),'v':v,'order':str((result['order']+1).tolist()),'top_three':str((result['order'][:3]+1).tolist()),'compromise':str(result.get('compromise',[]))})
-    p=get_problem('P4'); front=load(14).run(p,budget=10000,seed=630)
-    write_csv(ROOT/'results/csv/P4_nsga2_ranking_input.csv',[{'id':i,**{f'f{j+1}':v for j,v in enumerate(f)}} for i,f in enumerate(front['f'])])
+    p=get_problem('P4'); front=load(14).run(p,budget=10000,seed=DEFAULT_OPTIMIZER_SEED)
+    write_csv(CSV_DIR/'P4_nsga2_ranking_input.csv',[{'id':i,**{f'f{j+1}':v for j,v in enumerate(f)}} for i,f in enumerate(front['f'])])
     for weights in [[.5,.5],[.6,.4]]:
         for method in ['topsis','vikor']:
             result=load(8 if method=='topsis' else 9).run(p.normalized(front['f']),weights)
             rankings.append({'problem':'P4 NSGA-II front','method':method,'weights':str(weights),'v':.5,'order':str(result['order'].tolist()),'top_three':str(result['order'][:3].tolist()),'compromise':str(result.get('compromise',[]))})
-    write_csv(ROOT/'results/csv/rankings.csv',rankings)
+    write_csv(CSV_DIR/'rankings.csv',rankings)
     np.savetxt(ROOT/'data/p8_coordinates.csv',COORDS,delimiter=',',header='x,y',comments='')
     np.savetxt(ROOT/'data/p8_distance.csv',DIST,delimiter=','); np.savetxt(ROOT/'data/p8_time.csv',TIME,delimiter=',')
     bases=[]
     for label,matrix in [('distance',DIST),('time',TIME)]:
         tour=nearest_neighbour(matrix); f,c=get_problem('P8').evaluate(tour[None]); bases.append({'baseline':label,'tour':str(tour.tolist()),'distance':f[0,0],'time':f[0,1]})
-    write_csv(ROOT/'results/csv/routing_baselines.csv',bases)
+    write_csv(CSV_DIR/'routing_baselines.csv',bases)
     for scale in [1,10]:
         for seed in SEEDS:
             for method in ['equal','mgda','gradnorm']:
                 h=train(method,seed,1000,scale=scale,lr=.001 if scale==10 else .01)
-                np.savetxt(ROOT/'results/csv'/f'network_{method}_scale{scale}_seed{seed}.csv',h,delimiter=',',header='step,classification,regression,w1,w2',comments='')
+                np.savetxt(CSV_DIR/f'network_{method}_scale{scale}_seed{seed}.csv',h,delimiter=',',header='step,classification,regression,w1,w2',comments='')
     for method in ['equal']:
         x=np.array([0.,5.]); p=get_problem('P13'); h=[]
         for t in range(10000):
             f,c=p.evaluate(x[None]); h.append([t,*f[0],.5,.5,*x]); x-=.05*(2*x)
-        np.savetxt(ROOT/'results/csv/toy_equal.csv',h,delimiter=',',header='step,f1,f2,w1,w2,x1,x2',comments='')
+        np.savetxt(CSV_DIR/'toy_equal.csv',h,delimiter=',',header='step,f1,f2,w1,w2,x1,x2',comments='')
     # Random dominance fraction to quantify many-objective selection pressure.
     rows=[]
     for m in [3,5]:
@@ -115,7 +135,7 @@ def extras():
         for seed in SEEDS:
             x=p.sample(np.random.default_rng(seed),100); f,c=p.evaluate(x)
             rows.append({'M':m,'seed':seed,'nondominated_fraction':len(nondominated(f))/100})
-    write_csv(ROOT/'results/csv/dominance_pressure.csv',rows)
+    write_csv(CSV_DIR/'dominance_pressure.csv',rows)
 
 if __name__=='__main__':
     import argparse,concurrent.futures,os
@@ -125,12 +145,12 @@ if __name__=='__main__':
     if args.limit: jobs=jobs[:args.limit]
     if args.force:
         for job in jobs:
-            path=ROOT/'results/csv'/f'{job_key(job)}.json'
+            path=CSV_DIR/f'{job_key(job)}.json'
             if path.exists(): path.unlink()
     with concurrent.futures.ProcessPoolExecutor(max_workers=args.workers) as pool:
         for i,row in enumerate(pool.map(run_job,jobs),1):
             if i%10==0 or i==len(jobs): print(f'{i}/{len(jobs)} {row["algorithm"]} {row["problem"]}',flush=True)
-    rows=[json.loads(f.read_text()) for f in (ROOT/'results/csv').glob('*.json') if f.name!='hand_traces.json']
-    write_csv(ROOT/'results/csv/raw_experiments.csv',rows,[k for k in rows[0] if k!='solves'])
-    summary=aggregate(rows); write_csv(ROOT/'results/tables/summary.csv',summary)
+    rows=[json.loads(f.read_text()) for f in CSV_DIR.glob('*.json') if f.name!='hand_traces.json']
+    write_csv(CSV_DIR/'raw_experiments.csv',rows,[k for k in rows[0] if k!='solves'])
+    summary=aggregate(rows); write_csv(TABLES_DIR/'summary.csv',summary)
     if not args.skip_extras: extras()

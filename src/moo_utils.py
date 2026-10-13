@@ -3,6 +3,7 @@
 No optimizer libraries are used. Pairwise dominance costs O(M*N**2).
 """
 import numpy as np
+from src.project_config import HV_MONTE_CARLO_SAMPLES, HV_MONTE_CARLO_SEED
 
 def dominates(a, b, ca=0., cb=0.):
     if ca <= 1e-10 < cb: return True
@@ -57,7 +58,8 @@ def archive(x, f, cv, limit=100):
     if len(idx)>limit: idx=idx[np.argsort(-crowding_distance(f[idx]),kind='stable')[:limit]]
     return x[idx].copy(), f[idx].copy(), cv[idx].copy()
 
-def hypervolume(f, reference, samples=8192, seed=991, lower=None):
+def hypervolume(f, reference, samples=HV_MONTE_CARLO_SAMPLES,
+                seed=HV_MONTE_CARLO_SEED, lower=None):
     f=np.asarray(f); r=np.asarray(reference)
     f=f[np.all(f<r,axis=1)]
     if not len(f): return 0.

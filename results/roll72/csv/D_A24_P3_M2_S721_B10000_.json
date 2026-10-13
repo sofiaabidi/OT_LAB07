@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 24,
+  "algorithm": "MOABC",
+  "problem": "P3",
+  "objectives": 2,
+  "seed": 721,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.5122332256913934,
+  "IGD": 0.018351681740140936,
+  "Spacing": 0.02360663997148181,
+  "runtime": 9.33572360011749,
+  "front_size": 39,
+  "feasible_fraction": 1.0,
+  "file": "D_A24_P3_M2_S721_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 721
+}

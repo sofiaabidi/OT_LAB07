@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 21,
+  "algorithm": "Constrained NSGA-II",
+  "problem": "P6",
+  "objectives": 2,
+  "seed": 726,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 1.0125040408407988,
+  "IGD": 0.01222906349906935,
+  "Spacing": 0.013724201232513791,
+  "runtime": 3.6589543998707086,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "base_A21_P6_M2_S726_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 726
+}

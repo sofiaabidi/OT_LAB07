@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 30,
+  "algorithm": "MOMA",
+  "problem": "P3",
+  "objectives": 2,
+  "seed": 729,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.5293040073797041,
+  "IGD": 0.011300256568552087,
+  "Spacing": 0.015319128415909064,
+  "runtime": 5.37518829992041,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "D_A30_P3_M2_S729_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 729
+}

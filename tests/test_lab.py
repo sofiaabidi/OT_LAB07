@@ -4,6 +4,30 @@ from src import moo_utils as u
 from src.problems import get_problem, SUPPLIERS, DIST, TIME, nearest_neighbour
 from src.algorithms import load
 from src.algorithms.common import crossover,mutate
+from src.project_config import (
+    DEFAULT_OPTIMIZER_SEED, OPTIMIZER_SEEDS, ROLL_SUFFIX, STUDENT,
+    TASK_C_ALGORITHM_NUMBERS, task_c_algorithm_numbers,
+)
+
+class ProjectConfiguration(unittest.TestCase):
+    def test_student_roll_and_task_c_formula(self):
+        self.assertEqual(STUDENT.registration, '241071072')
+        self.assertEqual(ROLL_SUFFIX, 72)
+        self.assertEqual(task_c_algorithm_numbers(72), (35, 10, 22))
+        self.assertEqual(TASK_C_ALGORITHM_NUMBERS, (35, 10, 22))
+        self.assertEqual(task_c_algorithm_numbers(0), (37, 12, 24))
+
+    def test_optimizer_seed_namespace(self):
+        self.assertEqual(DEFAULT_OPTIMIZER_SEED, 720)
+        self.assertEqual(OPTIMIZER_SEEDS, tuple(range(720, 730)))
+        self.assertTrue(set(OPTIMIZER_SEEDS).isdisjoint(range(630, 640)))
+
+    def test_missing_metric_series_is_explicit(self):
+        from src.experiments.build_deliverables import metric_series
+        rows=[{'IGD_mean':None,'IGD_std':None} for _ in range(3)]
+        self.assertIsNone(metric_series(rows,'IGD'))
+        means,stds=metric_series([{'HV_mean':1.,'HV_std':.1}],'HV')
+        self.assertEqual(means,[1.]); self.assertEqual(stds,[.1])
 
 class Utilities(unittest.TestCase):
     def test_dominance(self):
@@ -165,6 +189,6 @@ class ActualCallAccounting(unittest.TestCase):
                 def counted(x):
                     counter[0]+=len(np.atleast_2d(x)); return original(x)
                 p.evaluate=counted
-                result=load(a).run(p,budget=1000,seed=630)
+                result=load(a).run(p,budget=1000,seed=DEFAULT_OPTIMIZER_SEED)
                 self.assertEqual(counter[0],result['evaluations'])
                 self.assertLessEqual(counter[0],1000)

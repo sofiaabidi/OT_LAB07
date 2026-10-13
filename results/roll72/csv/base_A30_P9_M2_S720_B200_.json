@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 30,
+  "algorithm": "MOMA",
+  "problem": "P9",
+  "objectives": 2,
+  "seed": 720,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 200,
+  "evaluations": 200,
+  "HV": 0.8684146415368765,
+  "IGD": null,
+  "Spacing": 0.0033213046837365914,
+  "runtime": 43.767782600130886,
+  "front_size": 7,
+  "feasible_fraction": 1.0,
+  "file": "base_A30_P9_M2_S720_B200_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 720
+}

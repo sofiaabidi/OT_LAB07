@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 13,
+  "algorithm": "NPGA",
+  "problem": "P3",
+  "objectives": 2,
+  "seed": 724,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.4236668570623967,
+  "IGD": 0.06336833500561473,
+  "Spacing": 0.07492719068149371,
+  "runtime": 5.944262699922547,
+  "front_size": 34,
+  "feasible_fraction": 1.0,
+  "file": "D_A13_P3_M2_S724_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 724
+}

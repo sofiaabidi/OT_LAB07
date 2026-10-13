@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 31,
+  "algorithm": "RVEA",
+  "problem": "P10",
+  "objectives": 5,
+  "seed": 729,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 1.0067653454589849,
+  "IGD": 0.3053165335048228,
+  "Spacing": 0.28716888412846225,
+  "runtime": 4.991674999939278,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "D_A31_P10_M5_S729_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 729
+}

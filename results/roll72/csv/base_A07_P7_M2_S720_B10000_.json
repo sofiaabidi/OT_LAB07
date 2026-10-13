@@ -1,0 +1,36 @@
+{
+  "algorithm_number": 7,
+  "algorithm": "Lexicographic",
+  "problem": "P7",
+  "objectives": 2,
+  "seed": 720,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 47,
+  "HV": 0.11000000000003039,
+  "IGD": 0.7071067811865226,
+  "Spacing": 0.0,
+  "runtime": 0.023686400149017572,
+  "front_size": 1,
+  "feasible_fraction": 1.0,
+  "file": "base_A07_P7_M2_S720_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 720,
+  "solves": [
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        69.99999999999956,
+        20.000000000001698
+      ],
+      "f": [
+        -55.99999999999965,
+        -24.000000000002032
+      ],
+      "cv": 1.389505794375307e-14
+    }
+  ]
+}

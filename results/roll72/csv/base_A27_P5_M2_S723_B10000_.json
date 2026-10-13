@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 27,
+  "algorithm": "MODE",
+  "problem": "P5",
+  "objectives": 2,
+  "seed": 723,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 1.1816763035104623,
+  "IGD": 0.012730235094924805,
+  "Spacing": 0.020375187079017937,
+  "runtime": 2.280706800054759,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "base_A27_P5_M2_S723_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 723
+}

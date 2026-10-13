@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 32,
+  "algorithm": "IBEA",
+  "problem": "P3",
+  "objectives": 2,
+  "seed": 722,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.22266650166078872,
+  "IGD": 0.3108051388602856,
+  "Spacing": 0.012343379773908265,
+  "runtime": 11.124463200103492,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "base_A32_P3_M2_S722_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 722
+}

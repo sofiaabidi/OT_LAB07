@@ -19,3 +19,20 @@ Five supplied PDFs were parsed: Foundations/Classical (53 pages), Non-Elitist (4
 15. Bonus 5E SMS-EMOA total initial HV=9.10 is correct. After the inserted midpoints, L1's exclusive contribution is .15, not .30; ties occur with C1 and C2. The code recomputes contributions from the current population and does not reproduce stale numbers.
 
 The 37 implementations remain educational variants. Exact original-paper equivalence is not claimed. All optimization is hand-coded except permitted scalar SLSQP solves. Lecture default numbers used in hand examples are not necessarily good experimental defaults after normalization.
+
+## Roll-72 Task C alignment
+
+- VEGA follows the Part 2 objective-wise mating-pool mechanism. The code uses
+  alternating objective-specific binary tournaments, which gives equal objective
+  slot counts when the population is divisible by the objective count. This is
+  closer to the slide's proportional-selection description than its simplified
+  top-k hand example, but it is still a teaching variant. It is nonelitist; the
+  passive result archive must not be described as VEGA survival.
+- MOPSO follows the Part 4 velocity equation with configurable `w`, `c1` and `c2`,
+  crowding-weighted archive guides and Deb dominance. Personal best is retained
+  for incomparable trials, matching the slide's worked example; it changes only
+  when the trial dominates it.
+- R-NSGA-II follows Bonus 5E's normalized reference distance and epsilon-clearing
+  description inside NSGA-II fronts. The caller may provide a natural-unit or
+  already-normalized reference. This is the supplied teaching mechanism, not a
+  claim of exact reproduction of every detail in the 2006 paper.

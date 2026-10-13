@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 10,
+  "algorithm": "VEGA",
+  "problem": "P2",
+  "objectives": 2,
+  "seed": 721,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 1.1116654056871986,
+  "IGD": 0.012018588714997846,
+  "Spacing": 0.013511436925037966,
+  "runtime": 2.997456799959764,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "base_A10_P2_M2_S721_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 721
+}

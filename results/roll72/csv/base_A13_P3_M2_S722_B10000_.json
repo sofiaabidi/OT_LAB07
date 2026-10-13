@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 13,
+  "algorithm": "NPGA",
+  "problem": "P3",
+  "objectives": 2,
+  "seed": 722,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.4797760124428278,
+  "IGD": 0.03160587990946606,
+  "Spacing": 0.051116129615091474,
+  "runtime": 6.847438299795613,
+  "front_size": 32,
+  "feasible_fraction": 1.0,
+  "file": "base_A13_P3_M2_S722_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 722
+}

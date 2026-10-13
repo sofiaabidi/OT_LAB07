@@ -1,0 +1,13 @@
+{
+  "population": 80,
+  "budget": 1000,
+  "seed": 722,
+  "full_generations": 11,
+  "HV": 0.21999855445196687,
+  "IGD": 0.22637319745793744,
+  "Spacing": 0.06271747600582356,
+  "runtime": 0.6008490999229252,
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 722
+}

@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 23,
+  "algorithm": "MOGWO",
+  "problem": "P9",
+  "objectives": 2,
+  "seed": 729,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 200,
+  "evaluations": 200,
+  "HV": 0.7463856735955398,
+  "IGD": null,
+  "Spacing": 2.23449622528746e-16,
+  "runtime": 30.97380149993114,
+  "front_size": 5,
+  "feasible_fraction": 1.0,
+  "file": "base_A23_P9_M2_S729_B200_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 729
+}

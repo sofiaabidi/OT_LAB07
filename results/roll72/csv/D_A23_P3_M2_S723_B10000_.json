@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 23,
+  "algorithm": "MOGWO",
+  "problem": "P3",
+  "objectives": 2,
+  "seed": 723,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.5289961804124882,
+  "IGD": 0.011762793116654156,
+  "Spacing": 0.016654028308736284,
+  "runtime": 5.345030199969187,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "D_A23_P3_M2_S723_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 723
+}

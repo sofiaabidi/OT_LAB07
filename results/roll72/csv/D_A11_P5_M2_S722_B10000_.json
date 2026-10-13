@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 11,
+  "algorithm": "MOGA",
+  "problem": "P5",
+  "objectives": 2,
+  "seed": 722,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 1.1814261532394468,
+  "IGD": 0.01333376648318878,
+  "Spacing": 0.01728819527786805,
+  "runtime": 3.4261650000698864,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "D_A11_P5_M2_S722_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 722
+}

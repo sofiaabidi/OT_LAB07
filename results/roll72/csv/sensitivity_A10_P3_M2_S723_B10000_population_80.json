@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 10,
+  "algorithm": "VEGA",
+  "problem": "P3",
+  "objectives": 2,
+  "seed": 723,
+  "group": "sensitivity",
+  "parameters": "{\"population\": 80}",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.18246668042988648,
+  "IGD": 0.3554558301618316,
+  "Spacing": 0.0495153245535809,
+  "runtime": 3.0082520998548716,
+  "front_size": 7,
+  "feasible_fraction": 1.0,
+  "file": "sensitivity_A10_P3_M2_S723_B10000_population_80",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 723
+}

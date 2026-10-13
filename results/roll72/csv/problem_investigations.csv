@@ -1,0 +1,10 @@
+problem,investigation,value,notes
+P2,VEGA real,40,distinct recorded Pareto points at 10000 evaluations
+P2,VEGA integer,10,distinct recorded Pareto points at 10000 evaluations
+P5,random infeasible fraction,0.0255,10000 independent uniform box designs; same formulas
+P5,ignore stress minimum mass,1.791354483902539,"feasible-front minimum 4.03417; random-design ablation, not an optimizer run"
+P4,raw equality feasible fraction,0.0,repair feasible fraction=1.000; penalty=z1+z2+100*violation
+P9,all-features 5NN baseline error,0.040421792618629215,"smallest observed mask within +.01 error: 5; exploratory 200-evaluation runs, not global optimum"
+P14,aspiration at 12h analytic front weight,1.6908,"at x1=13, battery=53.4Wh yields 1.6908kg; aspiration (1.8,12h) is dominated"
+P6,second-constraint minimum left side,18.0,"at (5,0), 9+9=18>7.7; inactive across full box"
+P7,reference feasible allocation,91.66666666666667,"91.6667>90; exact (40,50) output unattainable"

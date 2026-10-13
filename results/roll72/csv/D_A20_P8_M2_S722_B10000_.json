@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 20,
+  "algorithm": "MOEA/D-ACO",
+  "problem": "P8",
+  "objectives": 2,
+  "seed": 722,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.9224062757291305,
+  "IGD": null,
+  "Spacing": 0.005273246729620533,
+  "runtime": 26.196496600052342,
+  "front_size": 3,
+  "feasible_fraction": 1.0,
+  "file": "D_A20_P8_M2_S722_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 722
+}

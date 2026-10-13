@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 26,
+  "algorithm": "MOSA",
+  "problem": "P5",
+  "objectives": 2,
+  "seed": 726,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 1.1818883937540927,
+  "IGD": 0.01275903045877309,
+  "Spacing": 0.019279396729665676,
+  "runtime": 1.5683022001758218,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "base_A26_P5_M2_S726_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 726
+}

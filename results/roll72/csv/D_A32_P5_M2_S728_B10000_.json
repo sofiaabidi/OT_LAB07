@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 32,
+  "algorithm": "IBEA",
+  "problem": "P5",
+  "objectives": 2,
+  "seed": 728,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 1.142895714622641,
+  "IGD": 0.008172624307699609,
+  "Spacing": 0.009493151798016209,
+  "runtime": 12.166931299958378,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "D_A32_P5_M2_S728_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 728
+}

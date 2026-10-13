@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 24,
+  "algorithm": "MOABC",
+  "problem": "P5",
+  "objectives": 2,
+  "seed": 727,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 1.18184785714788,
+  "IGD": 0.010330570889705975,
+  "Spacing": 0.018490050871830158,
+  "runtime": 12.22715470008552,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "D_A24_P5_M2_S727_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 727
+}

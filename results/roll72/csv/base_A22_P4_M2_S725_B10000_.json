@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 22,
+  "algorithm": "MOPSO",
+  "problem": "P4",
+  "objectives": 2,
+  "seed": 725,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.9229451113908163,
+  "IGD": null,
+  "Spacing": 0.008386330354803889,
+  "runtime": 2.016651100013405,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "base_A22_P4_M2_S725_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 725
+}

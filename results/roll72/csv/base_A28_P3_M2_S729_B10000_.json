@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 28,
+  "algorithm": "MO-TLBO",
+  "problem": "P3",
+  "objectives": 2,
+  "seed": 729,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.531876266601842,
+  "IGD": 0.00954026146251772,
+  "Spacing": 0.0024281174502187005,
+  "runtime": 10.974935499951243,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "base_A28_P3_M2_S729_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 729
+}

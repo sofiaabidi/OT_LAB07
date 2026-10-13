@@ -1,0 +1,192 @@
+{
+  "algorithm_number": 2,
+  "algorithm": "Epsilon-Constraint",
+  "problem": "P5",
+  "objectives": 2,
+  "seed": 721,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 1.1342225610516778,
+  "IGD": 0.2455373997476283,
+  "Spacing": 0.5080231087949963,
+  "runtime": 3.023411100031808,
+  "front_size": 4,
+  "feasible_fraction": 1.0,
+  "file": "D_A02_P5_M2_S721_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 721,
+  "solves": [
+    {
+      "success": false,
+      "message": "Positive directional derivative for linesearch",
+      "x": [
+        0.09999999999999998,
+        0.2
+      ],
+      "f": [
+        156.99999999999997,
+        2.5e-05
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        0.010000000000000446,
+        0.05428835233189885
+      ],
+      "f": [
+        4.261635658054249,
+        0.012499999999998948
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": false,
+      "message": "Iteration limit reached",
+      "x": [
+        0.01,
+        0.04898979485575322
+      ],
+      "f": [
+        3.845698896176628,
+        0.0170103454359009
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": false,
+      "message": "Iteration limit reached",
+      "x": [
+        0.010000000000000082,
+        0.04898979485602463
+      ],
+      "f": [
+        3.845698896197965,
+        0.01701034543561804
+      ],
+      "cv": 0.0
+    },
+    {
+      "success": false,
+      "message": "Iteration limit reached",
+      "x": [
+        0.010000000000000486,
+        0.048989738558837044
+      ],
+      "f": [
+        3.845694476868895,
+        0.017010404078655866
+      ],
+      "cv": 2.2983069494297292e-06
+    },
+    {
+      "success": false,
+      "message": "Iteration limit reached",
+      "x": [
+        0.01,
+        0.048989738558838404
+      ],
+      "f": [
+        3.8456944768688146,
+        0.017010404078655277
+      ],
+      "cv": 2.298306942371121e-06
+    },
+    {
+      "success": false,
+      "message": "Iteration limit reached",
+      "x": [
+        0.01,
+        0.048989738558838966
+      ],
+      "f": [
+        3.845694476868859,
+        0.01701040407865469
+      ],
+      "cv": 2.2983069195012316e-06
+    },
+    {
+      "success": false,
+      "message": "Iteration limit reached",
+      "x": [
+        0.010000000000000486,
+        0.048989738558837044
+      ],
+      "f": [
+        3.845694476868895,
+        0.017010404078655866
+      ],
+      "cv": 2.2983069494297292e-06
+    },
+    {
+      "success": false,
+      "message": "Iteration limit reached",
+      "x": [
+        0.01,
+        0.04898973855883844
+      ],
+      "f": [
+        3.8456944768688173,
+        0.017010404078655242
+      ],
+      "cv": 2.2983069411005718e-06
+    },
+    {
+      "success": false,
+      "message": "Iteration limit reached",
+      "x": [
+        0.010000000000000096,
+        0.04898973855883893
+      ],
+      "f": [
+        3.845694476868893,
+        0.017010404078654565
+      ],
+      "cv": 2.2983069113132466e-06
+    },
+    {
+      "success": false,
+      "message": "Iteration limit reached",
+      "x": [
+        0.01,
+        0.0489897385588386
+      ],
+      "f": [
+        3.84569447686883,
+        0.017010404078655075
+      ],
+      "cv": 2.2983069344654802e-06
+    },
+    {
+      "success": false,
+      "message": "Iteration limit reached",
+      "x": [
+        0.010000000000000087,
+        0.04898973855883841
+      ],
+      "f": [
+        3.8456944768688492,
+        0.017010404078655124
+      ],
+      "cv": 2.2983069334772753e-06
+    },
+    {
+      "success": false,
+      "message": "Iteration limit reached",
+      "x": [
+        0.01,
+        0.048989738558838494
+      ],
+      "f": [
+        3.8456944768688217,
+        0.017010404078655183
+      ],
+      "cv": 2.298306938559473e-06
+    }
+  ]
+}

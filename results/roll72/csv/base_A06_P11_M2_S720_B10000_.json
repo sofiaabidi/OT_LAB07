@@ -1,0 +1,49 @@
+{
+  "algorithm_number": 6,
+  "algorithm": "Goal Programming",
+  "problem": "P11",
+  "objectives": 2,
+  "seed": 720,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 1219,
+  "HV": 1.21000000014385,
+  "IGD": 9.63551783475954e-11,
+  "Spacing": 0.0,
+  "runtime": 0.5276524000801146,
+  "front_size": 1,
+  "feasible_fraction": 1.0,
+  "file": "base_A06_P11_M2_S720_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 720,
+  "solves": [
+    {
+      "success": false,
+      "message": "Iteration limit reached",
+      "x": [
+        299.9999998530219,
+        200.00000030895498
+      ],
+      "f": [
+        -2400.0000012658174,
+        -500.0000001619769
+      ],
+      "cv": 5.461724583710748e-10
+    },
+    {
+      "success": true,
+      "message": "Optimization terminated successfully",
+      "x": [
+        299.99999996790547,
+        200.00000005521164
+      ],
+      "f": [
+        -2400.000000202892,
+        -500.0000000231171
+      ],
+      "cv": 8.453829044204516e-11
+    }
+  ]
+}

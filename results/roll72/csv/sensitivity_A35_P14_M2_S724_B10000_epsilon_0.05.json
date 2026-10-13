@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 35,
+  "algorithm": "R-NSGA-II",
+  "problem": "P14",
+  "objectives": 2,
+  "seed": 724,
+  "group": "sensitivity",
+  "parameters": "{\"epsilon\": 0.05}",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.8546747485665519,
+  "IGD": 0.010975204214617855,
+  "Spacing": 0.011198955770105082,
+  "runtime": 3.911715699825436,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "sensitivity_A35_P14_M2_S724_B10000_epsilon_0.05",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 724
+}

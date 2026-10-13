@@ -1,6 +1,6 @@
-# Task B complete algorithm comparison
+# Task B algorithm comparison
 
-Measured output quality and theoretical mechanisms are distinguished. Values refer to normalized metrics with fixed scales. Additional causal ablations are needed before attributing every advantage/disadvantage to one mechanism.
+Measured output quality and theoretical mechanisms are distinguished. Values refer to normalized metrics with fixed scales. Each method has two explicit measured-use links and two measured cautions; these observations do not turn untested mechanism claims into causal conclusions.
 
 ## 1 Weighted Sum
 
@@ -10,9 +10,13 @@ Advantages (reasoned): Simple scalar objective;Direct preference weights;Reusabl
 
 Disadvantages (reasoned): Unsupported nonconvex points are unreachable;Scaling changes weight meaning;Uniform weights give nonuniform spacing;Local scalar solves lack global guarantees
 
-Measured: Task A P1: HV 1.0258 +/- 0; IGD 0.020135 +/- 0; Spacing 9.6958e-09 +/- 0; front size 21 +/- 0; runtime 0.30034 +/- 0 s.
+Measured run: Task A P1: HV 1.0258 +/- 0; IGD 0.020135 +/- 0; Spacing 1.5349e-08 +/- 0; front size 21 +/- 0; runtime 1.1064 +/- 0 s.
 
-Measured limits: Finite recorded front size=21; this is no certificate of complete coverage. Residual sampled-front IGD=0.020135; positive residual measures finite-budget approximation error.
+Measured links to use: 1) HV=1.0258 +/- 0 records achieved normalized dominated volume; 2) IGD=0.020135 +/- 0 measures distance to the sampled exact front.
+
+Measured cautions: 1) The recorded front has 21 +/- 0 points and cannot certify complete coverage; 2) runtime=1.1064 +/- 0 s at 168 +/- 0 evaluations quantifies finite-budget cost, not asymptotic efficiency.
+
+Evidence boundary: Measured links support achieved quality, coverage limits and cost observations. Mechanism-specific causal claims require additional targeted ablations; these are labelled reasoned.
 
 Suitable: Convex smooth two-objective design with interpretable weights; avoid: Dented fronts and an unknown preference distribution
 
@@ -24,9 +28,13 @@ Advantages (reasoned): Can represent unsupported efficient points;Epsilon has ph
 
 Disadvantages (reasoned): Infeasible epsilon values waste solves;Sweeps can duplicate points;Constraint solver quality matters;Many objectives require multidimensional epsilon grids
 
-Measured: Task A P2: HV 1.0865 +/- 0; IGD 0.037129 +/- 0; Spacing 0.14183 +/- 0; front size 21 +/- 0; runtime 0.036385 +/- 0 s.
+Measured run: Task A P2: HV 1.0865 +/- 0; IGD 0.037129 +/- 0; Spacing 0.14183 +/- 0; front size 21 +/- 0; runtime 0.23309 +/- 0 s.
 
-Measured limits: Finite recorded front size=21; this is no certificate of complete coverage. Residual sampled-front IGD=0.037129; positive residual measures finite-budget approximation error.
+Measured links to use: 1) HV=1.0865 +/- 0 records achieved normalized dominated volume; 2) IGD=0.037129 +/- 0 measures distance to the sampled exact front.
+
+Measured cautions: 1) The recorded front has 21 +/- 0 points and cannot certify complete coverage; 2) runtime=0.23309 +/- 0 s at 870 +/- 0 evaluations quantifies finite-budget cost, not asymptotic efficiency.
+
+Evidence boundary: Measured links support achieved quality, coverage limits and cost observations. Mechanism-specific causal claims require additional targeted ablations; these are labelled reasoned.
 
 Suitable: Nonconvex constrained design with hard limits; avoid: High-dimensional objective grids
 
@@ -38,9 +46,13 @@ Advantages (reasoned): Reference conveys aspiration;Nonnegative improvement is i
 
 Disadvantages (reasoned): This is the lecture achievement form, not outer approximation;Unrestricted reference sweeps inherit weighted-sum barrier;Reference coordinates require scaling;Weights still encode preferences
 
-Measured: Task A P1: HV 1.0258 +/- 0; IGD 0.020135 +/- 0; Spacing 2.7258e-08 +/- 0; front size 21 +/- 0; runtime 0.049804 +/- 0 s.
+Measured run: Task A P1: HV 1.0258 +/- 0; IGD 0.020135 +/- 0; Spacing 2.7354e-08 +/- 0; front size 21 +/- 0; runtime 0.17368 +/- 0 s.
 
-Measured limits: Finite recorded front size=21; this is no certificate of complete coverage. Residual sampled-front IGD=0.020135; positive residual measures finite-budget approximation error.
+Measured links to use: 1) HV=1.0258 +/- 0 records achieved normalized dominated volume; 2) IGD=0.020135 +/- 0 measures distance to the sampled exact front.
+
+Measured cautions: 1) The recorded front has 21 +/- 0 points and cannot certify complete coverage; 2) runtime=0.17368 +/- 0 s at 714 +/- 0 evaluations quantifies finite-budget cost, not asymptotic efficiency.
+
+Evidence boundary: Measured links support achieved quality, coverage limits and cost observations. Mechanism-specific causal claims require additional targeted ablations; these are labelled reasoned.
 
 Suitable: Teaching reference improvement on P1/P7; avoid: Claiming a general Benson convergence theorem
 
@@ -52,9 +64,13 @@ Advantages (reasoned): Infinity norm can reach unsupported tradeoffs;Different p
 
 Disadvantages (reasoned): Ideal estimation affects solution;Max norm is nonsmooth;p and weights require preferences;Finite weight sweep misses narrow regions
 
-Measured: Task A P1: HV 1.0347 +/- 0; IGD 0.012339 +/- 0; Spacing 0.023806 +/- 0; front size 63 +/- 0; runtime 0.18194 +/- 0 s.
+Measured run: Task A P1: HV 1.0347 +/- 0; IGD 0.012339 +/- 0; Spacing 0.023805 +/- 0; front size 63 +/- 0; runtime 0.64793 +/- 0 s.
 
-Measured limits: Finite recorded front size=63; this is no certificate of complete coverage. Residual sampled-front IGD=0.012339; positive residual measures finite-budget approximation error.
+Measured links to use: 1) HV=1.0347 +/- 0 records achieved normalized dominated volume; 2) IGD=0.012339 +/- 0 measures distance to the sampled exact front.
+
+Measured cautions: 1) The recorded front has 63 +/- 0 points and cannot certify complete coverage; 2) runtime=0.64793 +/- 0 s at 1857 +/- 0 evaluations quantifies finite-budget cost, not asymptotic efficiency.
+
+Evidence boundary: Measured links support achieved quality, coverage limits and cost observations. Mechanism-specific causal claims require additional targeted ablations; these are labelled reasoned.
 
 Suitable: Compromise solutions on nonconvex fronts; avoid: Unreliable ideal estimates or many weights
 
@@ -66,9 +82,13 @@ Advantages (reasoned): Directly encodes a preferred outcome;Can express nonlinea
 
 Disadvantages (reasoned): Utility must be elicited;Squared target utility need not be monotone;One preferred design is not a full front;Misspecified preferences bias results
 
-Measured: Task A P14: HV 0.32905 +/- 0; IGD 0.35302 +/- 0; Spacing 0 +/- 0; front size 1 +/- 0; runtime 0.0050517 +/- 0 s.
+Measured run: Task A P14: HV 0.32905 +/- 0; IGD 0.35302 +/- 0; Spacing 0 +/- 0; front size 1 +/- 0; runtime 0.022336 +/- 0 s.
 
-Measured limits: Finite recorded front size=1; this is no certificate of complete coverage. Residual sampled-front IGD=0.35302; positive residual measures finite-budget approximation error.
+Measured links to use: 1) HV=0.32905 +/- 0 records achieved normalized dominated volume; 2) IGD=0.35302 +/- 0 measures distance to the sampled exact front.
+
+Measured cautions: 1) The recorded front has 1 +/- 0 points and cannot certify complete coverage; 2) runtime=0.022336 +/- 0 s at 45 +/- 0 evaluations quantifies finite-budget cost, not asymptotic efficiency.
+
+Evidence boundary: Measured links support achieved quality, coverage limits and cost observations. Mechanism-specific causal claims require additional targeted ablations; these are labelled reasoned.
 
 Suitable: Laptop or portfolio profile decisions; avoid: Exploration without known preferences
 
@@ -80,9 +100,13 @@ Advantages (reasoned): Shows unavoidable shortfall;Can normalize incompatible un
 
 Disadvantages (reasoned): Goal weights control tradeoffs;Infeasible goals cannot be guaranteed;Units can overwhelm deviations;Satisfied goals may leave efficiency ties
 
-Measured: Task A P11: HV 1.21 +/- 0; IGD 4.8252e-11 +/- 0; Spacing 0 +/- 0; front size 1 +/- 0; runtime 0.025949 +/- 0 s.
+Measured run: Task A P11: HV 1.21 +/- 0; IGD 9.6355e-11 +/- 0; Spacing 0 +/- 0; front size 1 +/- 0; runtime 0.52765 +/- 0 s.
 
-Measured limits: Finite recorded front size=1; this is no certificate of complete coverage. Residual sampled-front IGD=4.8252e-11; positive residual measures finite-budget approximation error.
+Measured links to use: 1) HV=1.21 +/- 0 records achieved normalized dominated volume; 2) IGD=9.6355e-11 +/- 0 measures distance to the sampled exact front.
+
+Measured cautions: 1) The recorded front has 1 +/- 0 points and cannot certify complete coverage; 2) runtime=0.52765 +/- 0 s at 1219 +/- 0 evaluations quantifies finite-budget cost, not asymptotic efficiency.
+
+Evidence boundary: Measured links support achieved quality, coverage limits and cost observations. Mechanism-specific causal claims require additional targeted ablations; these are labelled reasoned.
 
 Suitable: Production targets with soft priorities; avoid: Searching an entire front without goals
 
@@ -94,9 +118,13 @@ Advantages (reasoned): Priority order is transparent;Breaks first-objective ties
 
 Disadvantages (reasoned): Lower objectives may have little freedom;Tolerance changes strictness;Priority mistakes are expensive;Sequential solves add cost
 
-Measured: Task A P11: HV 1.21 +/- 0; IGD 6.457e-08 +/- 0; Spacing 0 +/- 0; front size 1 +/- 0; runtime 0.029337 +/- 0 s.
+Measured run: Task A P11: HV 1.21 +/- 0; IGD 1.6309e-11 +/- 0; Spacing 0 +/- 0; front size 1 +/- 0; runtime 0.08428 +/- 0 s.
 
-Measured limits: Finite recorded front size=1; this is no certificate of complete coverage. Residual sampled-front IGD=6.457e-08; positive residual measures finite-budget approximation error.
+Measured links to use: 1) HV=1.21 +/- 0 records achieved normalized dominated volume; 2) IGD=1.6309e-11 +/- 0 measures distance to the sampled exact front.
+
+Measured cautions: 1) The recorded front has 1 +/- 0 points and cannot certify complete coverage; 2) runtime=0.08428 +/- 0 s at 219 +/- 0 evaluations quantifies finite-budget cost, not asymptotic efficiency.
+
+Evidence boundary: Measured links support achieved quality, coverage limits and cost observations. Mechanism-specific causal claims require additional targeted ablations; these are labelled reasoned.
 
 Suitable: Profit first and units second; avoid: Balanced objectives with no hierarchy
 
@@ -108,9 +136,13 @@ Advantages (reasoned): Fast finite-table ranking;Uses all criteria;Distances are
 
 Disadvantages (reasoned): Does not generate new designs;Vector normalization affects rank;Compensation can hide a bad criterion;Alternatives can change the ideal
 
-Measured: P12 w=[0.3, 0.3, 0.2, 0.2] v=0.5: top 3 [3, 1, 5]; P12 w=[0.4, 0.2, 0.2, 0.2] v=0.5: top 3 [1, 2, 3]; P4 NSGA-II front w=[0.5, 0.5] v=0.5: top 3 [2, 14, 27]; P4 NSGA-II front w=[0.6, 0.4] v=0.5: top 3 [27, 7, 15]
+Measured run: P12 w=[0.3, 0.3, 0.2, 0.2] v=0.5: top 3 [3, 1, 5]; P12 w=[0.4, 0.2, 0.2, 0.2] v=0.5: top 3 [1, 2, 3]; P4 NSGA-II front w=[0.5, 0.5] v=0.5: top 3 [18, 22, 2]; P4 NSGA-II front w=[0.6, 0.4] v=0.5: top 3 [32, 8, 3]
 
-Measured limits: Five existing suppliers are ranked; no new design is generated. Preference changes are measured in rankings.csv; ranking quality does not imply a global optimum.
+Measured links to use: 1) Two weight settings produce traceable ranked orders; 2) both P12 and a generated P4 front are evaluated.
+
+Measured cautions: 1) Only existing alternatives are ranked; 2) preference sensitivity does not demonstrate search or global optimality.
+
+Evidence boundary: Measured links support achieved quality, coverage limits and cost observations. Mechanism-specific causal claims require additional targeted ablations; these are labelled reasoned.
 
 Suitable: Supplier or existing-front ranking; avoid: Optimization without an alternatives table
 
@@ -122,9 +154,13 @@ Advantages (reasoned): Worst criterion enters R;v exposes group versus individua
 
 Disadvantages (reasoned): Requires preference weights;v can change rank;Range normalization changes regrets;Does not generate designs
 
-Measured: P12 w=[0.3, 0.3, 0.2, 0.2] v=0.25: top 3 [1, 2, 5]; P12 w=[0.4, 0.2, 0.2, 0.2] v=0.25: top 3 [2, 1, 4]; P12 w=[0.3, 0.3, 0.2, 0.2] v=0.5: top 3 [1, 2, 5]; P12 w=[0.4, 0.2, 0.2, 0.2] v=0.5: top 3 [2, 1, 3]; P12 w=[0.3, 0.3, 0.2, 0.2] v=0.75: top 3 [1, 3, 2]; P12 w=[0.4, 0.2, 0.2, 0.2] v=0.75: top 3 [1, 2, 3]; P4 NSGA-II front w=[0.5, 0.5] v=0.5: top 3 [27, 14, 2]; P4 NSGA-II front w=[0.6, 0.4] v=0.5: top 3 [7, 15, 20]
+Measured run: P12 w=[0.3, 0.3, 0.2, 0.2] v=0.25: top 3 [1, 2, 5]; P12 w=[0.4, 0.2, 0.2, 0.2] v=0.25: top 3 [2, 1, 4]; P12 w=[0.3, 0.3, 0.2, 0.2] v=0.5: top 3 [1, 2, 5]; P12 w=[0.4, 0.2, 0.2, 0.2] v=0.5: top 3 [2, 1, 3]; P12 w=[0.3, 0.3, 0.2, 0.2] v=0.75: top 3 [1, 3, 2]; P12 w=[0.4, 0.2, 0.2, 0.2] v=0.75: top 3 [1, 2, 3]; P4 NSGA-II front w=[0.5, 0.5] v=0.5: top 3 [2, 38, 35]; P4 NSGA-II front w=[0.6, 0.4] v=0.5: top 3 [8, 32, 3]
 
-Measured limits: Five existing suppliers are ranked; no new design is generated. Preference changes are measured in rankings.csv; ranking quality does not imply a global optimum.
+Measured links to use: 1) Two weight settings produce traceable ranked orders; 2) both P12 and a generated P4 front are evaluated.
+
+Measured cautions: 1) Only existing alternatives are ranked; 2) preference sensitivity does not demonstrate search or global optimality.
+
+Evidence boundary: Measured links support achieved quality, coverage limits and cost observations. Mechanism-specific causal claims require additional targeted ablations; these are labelled reasoned.
 
 Suitable: Supplier compromise with severe weak criteria; avoid: A Pareto front generator
 
@@ -136,9 +172,13 @@ Advantages (reasoned): Very simple selection;No preference weights needed;Handle
 
 Disadvantages (reasoned): Extremes can dominate mating pool;No parent elitism;Middle tradeoffs may disappear;Objective partition sizes affect pressure
 
-Measured: Task A P2: HV 1.1097 +/- 0.0017957; IGD 0.015417 +/- 0.0022031; Spacing 0.01628 +/- 0.0012429; front size 40 +/- 0; runtime 0.41085 +/- 0.02133 s.
+Measured run: Task A P2: HV 1.1109 +/- 0.00092541; IGD 0.014362 +/- 0.0015584; Spacing 0.017002 +/- 0.0027901; front size 40 +/- 0; runtime 3.0395 +/- 0.27359 s.
 
-Measured limits: Finite recorded front size=40; this is no certificate of complete coverage. Residual sampled-front IGD=0.015417; positive residual measures finite-budget approximation error.
+Measured links to use: 1) HV=1.1109 +/- 0.00092541 records achieved normalized dominated volume; 2) IGD=0.014362 +/- 0.0015584 measures distance to the sampled exact front.
+
+Measured cautions: 1) The recorded front has 40 +/- 0 points and cannot certify complete coverage; 2) runtime=3.0395 +/- 0.27359 s at 10000 +/- 0 evaluations quantifies finite-budget cost, not asymptotic efficiency.
+
+Evidence boundary: Measured links support achieved quality, coverage limits and cost observations. Mechanism-specific causal claims require additional targeted ablations; these are labelled reasoned.
 
 Suitable: Teaching objective competition; avoid: Reliable uniform front preservation
 
@@ -150,9 +190,13 @@ Advantages (reasoned): No scalar utility required;Sharing promotes sparse niches
 
 Disadvantages (reasoned): No elitism;Sharing radius sensitive;All nondominated members tie in rank;Pairwise density costs quadratically
 
-Measured: Task A P3: HV 0.52443 +/- 0.00078858; IGD 0.012438 +/- 0.00050827; Spacing 0.013095 +/- 0.001648; front size 40 +/- 0; runtime 0.38295 +/- 0.010848 s.
+Measured run: Task A P3: HV 0.52378 +/- 0.0010854; IGD 0.012703 +/- 0.00047311; Spacing 0.012773 +/- 0.002314; front size 40 +/- 0; runtime 3.7674 +/- 0.43826 s.
 
-Measured limits: Finite recorded front size=40; this is no certificate of complete coverage. Residual sampled-front IGD=0.012438; positive residual measures finite-budget approximation error.
+Measured links to use: 1) HV=0.52378 +/- 0.0010854 records achieved normalized dominated volume; 2) IGD=0.012703 +/- 0.00047311 measures distance to the sampled exact front.
+
+Measured cautions: 1) The recorded front has 40 +/- 0 points and cannot certify complete coverage; 2) runtime=3.7674 +/- 0.43826 s at 10000 +/- 0 evaluations quantifies finite-budget cost, not asymptotic efficiency.
+
+Evidence boundary: Measured links support achieved quality, coverage limits and cost observations. Mechanism-specific causal claims require additional targeted ablations; these are labelled reasoned.
 
 Suitable: Small bi-objective populations; avoid: Many objectives with sparse dominance
 
@@ -164,9 +208,13 @@ Advantages (reasoned): Explicit Pareto hierarchy;Sharing is local to fronts;No o
 
 Disadvantages (reasoned): No elitism;Quadratic sorting and sharing;Dummy fitness spacing is arbitrary;Niche radius must be tuned
 
-Measured: Task A P5: HV 1.1818 +/- 7.7235e-05; IGD 0.014333 +/- 0.00117; Spacing 0.0191 +/- 0.0013825; front size 40 +/- 0; runtime 0.428 +/- 0.011804 s.
+Measured run: Task A P5: HV 1.1818 +/- 6.7066e-05; IGD 0.013578 +/- 0.0014855; Spacing 0.019587 +/- 0.0029038; front size 40 +/- 0; runtime 3.6444 +/- 0.27288 s.
 
-Measured limits: Finite recorded front size=40; this is no certificate of complete coverage. Residual sampled-front IGD=0.014333; positive residual measures finite-budget approximation error.
+Measured links to use: 1) HV=1.1818 +/- 6.7066e-05 records achieved normalized dominated volume; 2) IGD=0.013578 +/- 0.0014855 measures distance to the sampled exact front.
+
+Measured cautions: 1) The recorded front has 40 +/- 0 points and cannot certify complete coverage; 2) runtime=3.6444 +/- 0.27288 s at 10000 +/- 0 evaluations quantifies finite-budget cost, not asymptotic efficiency.
+
+Evidence boundary: Measured links support achieved quality, coverage limits and cost observations. Mechanism-specific causal claims require additional targeted ablations; these are labelled reasoned.
 
 Suitable: Teaching early Pareto GAs; avoid: Large fast convergence requirements
 
@@ -178,9 +226,13 @@ Advantages (reasoned): No fixed utility weights;Niche tie-break preserves sparse
 
 Disadvantages (reasoned): Nonelitist generations lose parents;Small comparison set gives noisy niche counts;Sigma changes density pressure;Lecture tournament differs from original publication
 
-Measured: Task A P3: HV 0.47123 +/- 0.04723; IGD 0.040099 +/- 0.034626; Spacing 0.022057 +/- 0.0056312; front size 38.3 +/- 3.335; runtime 0.73103 +/- 0.020128 s.
+Measured run: Task A P3: HV 0.45723 +/- 0.07144; IGD 0.052909 +/- 0.063934; Spacing 0.032899 +/- 0.019469; front size 36.9 +/- 4.1218; runtime 6.4637 +/- 0.38143 s.
 
-Measured limits: Finite recorded front size=38.3; this is no certificate of complete coverage. Residual sampled-front IGD=0.040099; positive residual measures finite-budget approximation error.
+Measured links to use: 1) HV=0.45723 +/- 0.07144 records achieved normalized dominated volume; 2) IGD=0.052909 +/- 0.063934 measures distance to the sampled exact front.
+
+Measured cautions: 1) The recorded front has 36.9 +/- 4.1218 points and cannot certify complete coverage; 2) runtime=6.4637 +/- 0.38143 s at 10000 +/- 0 evaluations quantifies finite-budget cost, not asymptotic efficiency.
+
+Evidence boundary: Measured links support achieved quality, coverage limits and cost observations. Mechanism-specific causal claims require additional targeted ablations; these are labelled reasoned.
 
 Suitable: Bi-objective diversity experiments; avoid: Many-objective fronts where most tournaments tie
 
@@ -192,9 +244,13 @@ Advantages (reasoned): Elitist survivor retention;Boundary points receive protec
 
 Disadvantages (reasoned): Crowding weakens as objectives grow;Quadratic pairwise sorting;Finite population truncates front;Crowding is not an explicit convergence measure
 
-Measured: Task A P3: HV 0.52839 +/- 0.0006346; IGD 0.01223 +/- 0.00062729; Spacing 0.018498 +/- 0.0029193; front size 40 +/- 0; runtime 0.50741 +/- 0.0096394 s.
+Measured run: Task A P3: HV 0.52858 +/- 0.0010011; IGD 0.012078 +/- 0.0012439; Spacing 0.017655 +/- 0.0017465; front size 40 +/- 0; runtime 3.5278 +/- 0.33619 s.
 
-Measured limits: Finite recorded front size=40; this is no certificate of complete coverage. Residual sampled-front IGD=0.01223; positive residual measures finite-budget approximation error.
+Measured links to use: 1) HV=0.52858 +/- 0.0010011 records achieved normalized dominated volume; 2) IGD=0.012078 +/- 0.0012439 measures distance to the sampled exact front.
+
+Measured cautions: 1) The recorded front has 40 +/- 0 points and cannot certify complete coverage; 2) runtime=3.5278 +/- 0.33619 s at 10000 +/- 0 evaluations quantifies finite-budget cost, not asymptotic efficiency.
+
+Evidence boundary: Measured links support achieved quality, coverage limits and cost observations. Mechanism-specific causal claims require additional targeted ablations; these are labelled reasoned.
 
 Suitable: General constrained two-objective search; avoid: Very many objectives with weak dominance
 
@@ -206,9 +262,13 @@ Advantages (reasoned): Reference niches control coverage;Supports many objective
 
 Disadvantages (reasoned): Range normalization simplifies original intercepts;Reference count grows combinatorially;Poor reference geometry biases coverage;Dominance layers still require quadratic work
 
-Measured: Task A P10: HV 0.65785 +/- 0.012066; IGD 0.10953 +/- 0.0058358; Spacing 0.10223 +/- 0.011323; front size 40 +/- 0; runtime 0.72152 +/- 0.013569 s.
+Measured run: Task A P10: HV 0.66113 +/- 0.0058963; IGD 0.10798 +/- 0.0058195; Spacing 0.099172 +/- 0.010105; front size 40 +/- 0; runtime 5.1274 +/- 0.45929 s.
 
-Measured limits: Finite recorded front size=40; this is no certificate of complete coverage. Residual sampled-front IGD=0.10953; positive residual measures finite-budget approximation error.
+Measured links to use: 1) HV=0.66113 +/- 0.0058963 records achieved normalized dominated volume; 2) IGD=0.10798 +/- 0.0058195 measures distance to the sampled exact front.
+
+Measured cautions: 1) The recorded front has 40 +/- 0 points and cannot certify complete coverage; 2) runtime=5.1274 +/- 0.45929 s at 10000 +/- 0 evaluations quantifies finite-budget cost, not asymptotic efficiency.
+
+Evidence boundary: Measured links support achieved quality, coverage limits and cost observations. Mechanism-specific causal claims require additional targeted ablations; these are labelled reasoned.
 
 Suitable: DTLZ2 with three or five objectives; avoid: Irregular fronts without adapted references
 
@@ -220,9 +280,13 @@ Advantages (reasoned): Strength combines domination information;Density distingu
 
 Disadvantages (reasoned): Quadratic distance storage;Repeated truncation adds cost;k-neighbour density depends on scale;Archive size limits attainable resolution
 
-Measured: Task A P4: HV 0.93383 +/- 0.0015081; IGD N/A +/- N/A; Spacing 0.014057 +/- 0.0033503; front size 40 +/- 0; runtime 1.3313 +/- 0.019422 s.
+Measured run: Task A P4: HV 0.93318 +/- 0.0017067; IGD N/A +/- N/A; Spacing 0.014089 +/- 0.0016077; front size 40 +/- 0; runtime 6.1215 +/- 0.087996 s.
 
-Measured limits: Finite recorded front size=40; this is no certificate of complete coverage. Exact-front IGD is unavailable for this problem, so convergence is not certified.
+Measured links to use: 1) HV=0.93318 +/- 0.0017067 records achieved normalized dominated volume; 2) Spacing=0.014089 +/- 0.0016077 measures within-front regularity because exact-front IGD is unavailable.
+
+Measured cautions: 1) The recorded front has 40 +/- 0 points and cannot certify complete coverage; 2) runtime=6.1215 +/- 0.087996 s at 10000 +/- 0 evaluations quantifies finite-budget cost, not asymptotic efficiency.
+
+Evidence boundary: Measured links support achieved quality, coverage limits and cost observations. Mechanism-specific causal claims require additional targeted ablations; these are labelled reasoned.
 
 Suitable: Small smooth front archives; avoid: Large populations with tight memory
 
@@ -234,9 +298,13 @@ Advantages (reasoned): Region selection directly rewards sparsity;Archive keeps 
 
 Disadvantages (reasoned): Grid divisions sensitive;High-dimensional grids become sparse;Archive can shrink to few members;Grid boundaries change selection abruptly
 
-Measured: Task A P3: HV 0.51 +/- 0.010935; IGD 0.025403 +/- 0.0080166; Spacing 0.025956 +/- 0.003239; front size 40 +/- 0; runtime 0.72595 +/- 0.019302 s.
+Measured run: Task A P3: HV 0.511 +/- 0.0071042; IGD 0.021934 +/- 0.0033027; Spacing 0.023398 +/- 0.0078827; front size 40 +/- 0; runtime 5.2361 +/- 0.23935 s.
 
-Measured limits: Finite recorded front size=40; this is no certificate of complete coverage. Residual sampled-front IGD=0.025403; positive residual measures finite-budget approximation error.
+Measured links to use: 1) HV=0.511 +/- 0.0071042 records achieved normalized dominated volume; 2) IGD=0.021934 +/- 0.0033027 measures distance to the sampled exact front.
+
+Measured cautions: 1) The recorded front has 40 +/- 0 points and cannot certify complete coverage; 2) runtime=5.2361 +/- 0.23935 s at 10000 +/- 0 evaluations quantifies finite-budget cost, not asymptotic efficiency.
+
+Evidence boundary: Measured links support achieved quality, coverage limits and cost observations. Mechanism-specific causal claims require additional targeted ablations; these are labelled reasoned.
 
 Suitable: Bi-objective region coverage; avoid: Many objectives with almost unique cells
 
@@ -248,9 +316,13 @@ Advantages (reasoned): Cooperation shares good designs;Scalar subproblems retain
 
 Disadvantages (reasoned): Reference geometry biases front;Neighbourhood size affects spread;Shared donors can homogenize subproblems;Ideal updates alter scalar values
 
-Measured: Task A P10: HV 0.99988 +/- 0.033592; IGD 0.32929 +/- 0.024052; Spacing 0.27088 +/- 0.033604; front size 40 +/- 0; runtime 3.2985 +/- 0.094054 s.
+Measured run: Task A P10: HV 0.99538 +/- 0.038577; IGD 0.32121 +/- 0.020673; Spacing 0.26134 +/- 0.029898; front size 40 +/- 0; runtime 19.578 +/- 0.88406 s.
 
-Measured limits: Finite recorded front size=40; this is no certificate of complete coverage. Residual sampled-front IGD=0.32929; positive residual measures finite-budget approximation error.
+Measured links to use: 1) HV=0.99538 +/- 0.038577 records achieved normalized dominated volume; 2) IGD=0.32121 +/- 0.020673 measures distance to the sampled exact front.
+
+Measured cautions: 1) The recorded front has 40 +/- 0 points and cannot certify complete coverage; 2) runtime=19.578 +/- 0.88406 s at 10000 +/- 0 evaluations quantifies finite-budget cost, not asymptotic efficiency.
+
+Evidence boundary: Measured links support achieved quality, coverage limits and cost observations. Mechanism-specific causal claims require additional targeted ablations; these are labelled reasoned.
 
 Suitable: Smooth continuous many-objective design; avoid: Disconnected fronts badly matched by weights
 
@@ -262,9 +334,13 @@ Advantages (reasoned): DE exploits vector differences;Neighbour cooperation;Tche
 
 Disadvantages (reasoned): F and CR need tuning;DE requires enough distinct neighbours;Boundary clipping distorts donors;Weight coverage may be uneven
 
-Measured: Task A P3: HV 0.082464 +/- 0.18269; IGD 1.2572 +/- 0.8031; Spacing 0.00071465 +/- 0.0016128; front size 8.8 +/- 16.444; runtime 1.6722 +/- 0.29288 s.
+Measured run: Task A P3: HV 0.21242 +/- 0.27423; IGD 1.0419 +/- 0.9331; Spacing 0.0010261 +/- 0.0015032; front size 16.6 +/- 20.14; runtime 11.795 +/- 2.1489 s.
 
-Measured limits: Finite recorded front size=8.8; this is no certificate of complete coverage. Residual sampled-front IGD=1.2572; positive residual measures finite-budget approximation error.
+Measured links to use: 1) HV=0.21242 +/- 0.27423 records achieved normalized dominated volume; 2) IGD=1.0419 +/- 0.9331 measures distance to the sampled exact front.
+
+Measured cautions: 1) The recorded front has 16.6 +/- 20.14 points and cannot certify complete coverage; 2) runtime=11.795 +/- 2.1489 s at 10000 +/- 0 evaluations quantifies finite-budget cost, not asymptotic efficiency.
+
+Evidence boundary: Measured links support achieved quality, coverage limits and cost observations. Mechanism-specific causal claims require additional targeted ablations; these are labelled reasoned.
 
 Suitable: Continuous real-coded nonconvex design; avoid: Permutation encodings without a new donor operator
 
@@ -276,9 +352,13 @@ Advantages (reasoned): Valid tours by construction;Heuristic directs ant choices
 
 Disadvantages (reasoned): Pheromone arrays cost N*cities^2;Deposits can lock routes;Alpha beta evaporation matter;Continuous encodings unsupported
 
-Measured: Task A P8: HV 0.92372 +/- 0.00050562; IGD N/A +/- N/A; Spacing 0.0038903 +/- 0.0017628; front size 5 +/- 0.8165; runtime 4.1297 +/- 0.026407 s.
+Measured run: Task A P8: HV 0.92348 +/- 0.00073621; IGD N/A +/- N/A; Spacing 0.0036041 +/- 0.0011622; front size 4.6 +/- 0.96609; runtime 26.418 +/- 0.90564 s.
 
-Measured limits: Finite recorded front size=5; this is no certificate of complete coverage. Exact-front IGD is unavailable for this problem, so convergence is not certified.
+Measured links to use: 1) HV=0.92348 +/- 0.00073621 records achieved normalized dominated volume; 2) Spacing=0.0036041 +/- 0.0011622 measures within-front regularity because exact-front IGD is unavailable.
+
+Measured cautions: 1) The recorded front has 4.6 +/- 0.96609 points and cannot certify complete coverage; 2) runtime=26.418 +/- 0.90564 s at 10000 +/- 0 evaluations quantifies finite-budget cost, not asymptotic efficiency.
+
+Evidence boundary: Measured links support achieved quality, coverage limits and cost observations. Mechanism-specific causal claims require additional targeted ablations; these are labelled reasoned.
 
 Suitable: Bi-objective routing; avoid: Smooth gradient problems
 
@@ -290,9 +370,13 @@ Advantages (reasoned): Feasible beats infeasible without objective penalty;Lower
 
 Disadvantages (reasoned): Violation normalization affects infeasible order;Feasibility boundary can trap search;Quadratic ranking;Finite crowding resolution
 
-Measured: Task A P5: HV 1.1818 +/- 7.2189e-05; IGD 0.014663 +/- 0.002837; Spacing 0.019743 +/- 0.0023194; front size 40 +/- 0; runtime 0.56378 +/- 0.0070457 s.
+Measured run: Task A P5: HV 1.1818 +/- 3.9631e-05; IGD 0.014057 +/- 0.0012871; Spacing 0.020672 +/- 0.0032737; front size 40 +/- 0; runtime 3.3173 +/- 0.34218 s.
 
-Measured limits: Finite recorded front size=40; this is no certificate of complete coverage. Residual sampled-front IGD=0.014663; positive residual measures finite-budget approximation error.
+Measured links to use: 1) HV=1.1818 +/- 3.9631e-05 records achieved normalized dominated volume; 2) IGD=0.014057 +/- 0.0012871 measures distance to the sampled exact front.
+
+Measured cautions: 1) The recorded front has 40 +/- 0 points and cannot certify complete coverage; 2) runtime=3.3173 +/- 0.34218 s at 10000 +/- 0 evaluations quantifies finite-budget cost, not asymptotic efficiency.
+
+Evidence boundary: Measured links support achieved quality, coverage limits and cost observations. Mechanism-specific causal claims require additional targeted ablations; these are labelled reasoned.
 
 Suitable: Constrained beam or Binh-Korn; avoid: Problems needing stochastic feasibility guarantees
 
@@ -304,9 +388,13 @@ Advantages (reasoned): Memory of personal successes;Few basic coefficients;Archi
 
 Disadvantages (reasoned): Velocities can collapse;Boundary clipping affects dynamics;Leader policy controls diversity;Coefficients require tuning
 
-Measured: Task A P4: HV 0.93253 +/- 0.0010078; IGD N/A +/- N/A; Spacing 0.013262 +/- 0.0021254; front size 40 +/- 0; runtime 0.34884 +/- 0.014273 s.
+Measured run: Task A P4: HV 0.92587 +/- 0.0045498; IGD N/A +/- N/A; Spacing 0.013429 +/- 0.0037554; front size 40 +/- 0; runtime 2.1787 +/- 0.2485 s.
 
-Measured limits: Finite recorded front size=40; this is no certificate of complete coverage. Exact-front IGD is unavailable for this problem, so convergence is not certified.
+Measured links to use: 1) HV=0.92587 +/- 0.0045498 records achieved normalized dominated volume; 2) Spacing=0.013429 +/- 0.0037554 measures within-front regularity because exact-front IGD is unavailable.
+
+Measured cautions: 1) The recorded front has 40 +/- 0 points and cannot certify complete coverage; 2) runtime=2.1787 +/- 0.2485 s at 10000 +/- 0 evaluations quantifies finite-budget cost, not asymptotic efficiency.
+
+Evidence boundary: Measured links support achieved quality, coverage limits and cost observations. Mechanism-specific causal claims require additional targeted ablations; these are labelled reasoned.
 
 Suitable: Continuous portfolio and beam designs; avoid: Permutation tours without discrete velocity
 
@@ -318,9 +406,13 @@ Advantages (reasoned): Multiple leaders guide movement;Coefficient shrinks autom
 
 Disadvantages (reasoned): Averaging leaders may erase diversity;No strict improvement guarantee;Transfer sigmoid biases masks;Binary objective evaluation is costly
 
-Measured: Task A P5: HV 1.1817 +/- 0.00012554; IGD 0.013138 +/- 0.00062362; Spacing 0.019854 +/- 0.001345; front size 40 +/- 0; runtime 0.5998 +/- 0.042198 s.
+Measured run: Task A P5: HV 1.1817 +/- 0.00011936; IGD 0.013415 +/- 0.0012894; Spacing 0.020775 +/- 0.0019689; front size 40 +/- 0; runtime 4.1017 +/- 0.37263 s.
 
-Measured limits: Finite recorded front size=40; this is no certificate of complete coverage. Residual sampled-front IGD=0.013138; positive residual measures finite-budget approximation error.
+Measured links to use: 1) HV=1.1817 +/- 0.00011936 records achieved normalized dominated volume; 2) IGD=0.013415 +/- 0.0012894 measures distance to the sampled exact front.
+
+Measured cautions: 1) The recorded front has 40 +/- 0 points and cannot certify complete coverage; 2) runtime=4.1017 +/- 0.37263 s at 10000 +/- 0 evaluations quantifies finite-budget cost, not asymptotic efficiency.
+
+Evidence boundary: Measured links support achieved quality, coverage limits and cost observations. Mechanism-specific causal claims require additional targeted ablations; these are labelled reasoned.
 
 Suitable: Continuous design or exploratory feature masks; avoid: Required stable high-accuracy feature conclusions on tiny budgets
 
@@ -332,9 +424,13 @@ Advantages (reasoned): Scouts restart abandoned sources;Onlooker pressure favour
 
 Disadvantages (reasoned): Dominance-only greed can reject useful tradeoffs;Limit needs tuning;Three phases complicate budget accounting;One-coordinate changes may be slow
 
-Measured: Task A P3: HV 0.50954 +/- 0.01272; IGD 0.022583 +/- 0.0070538; Spacing 0.026638 +/- 0.006989; front size 36.6 +/- 3.3731; runtime 0.92756 +/- 0.026621 s.
+Measured run: Task A P3: HV 0.50853 +/- 0.0089927; IGD 0.022472 +/- 0.0044901; Spacing 0.023861 +/- 0.0049917; front size 37.2 +/- 4.0497; runtime 9.7198 +/- 0.72292 s.
 
-Measured limits: Finite recorded front size=36.6; this is no certificate of complete coverage. Residual sampled-front IGD=0.022583; positive residual measures finite-budget approximation error.
+Measured links to use: 1) HV=0.50853 +/- 0.0089927 records achieved normalized dominated volume; 2) IGD=0.022472 +/- 0.0044901 measures distance to the sampled exact front.
+
+Measured cautions: 1) The recorded front has 37.2 +/- 4.0497 points and cannot certify complete coverage; 2) runtime=9.7198 +/- 0.72292 s at 10000 +/- 0 evaluations quantifies finite-budget cost, not asymptotic efficiency.
+
+Evidence boundary: Measured links support achieved quality, coverage limits and cost observations. Mechanism-specific causal claims require additional targeted ablations; these are labelled reasoned.
 
 Suitable: Small continuous design with restarts; avoid: Strongly coupled high-dimensional variables
 
@@ -346,9 +442,13 @@ Advantages (reasoned): Produces valid permutations;Two objectives retain separat
 
 Disadvantages (reasoned): Strong evaporation forgets edges;Weak evaporation stagnates;Traffic/distance scales matter;No exact TSP optimality guarantee
 
-Measured: Task A P8: HV 0.92341 +/- 0.0012174; IGD N/A +/- N/A; Spacing 0.0027239 +/- 0.0011462; front size 4.6 +/- 1.1738; runtime 2.0433 +/- 0.022421 s.
+Measured run: Task A P8: HV 0.92394 +/- 0; IGD N/A +/- N/A; Spacing 0.0031115 +/- 0.00082031; front size 5.2 +/- 0.42164; runtime 18.135 +/- 2.1703 s.
 
-Measured limits: Finite recorded front size=4.6; this is no certificate of complete coverage. Exact-front IGD is unavailable for this problem, so convergence is not certified.
+Measured links to use: 1) HV=0.92394 +/- 0 records achieved normalized dominated volume; 2) Spacing=0.0031115 +/- 0.00082031 measures within-front regularity because exact-front IGD is unavailable.
+
+Measured cautions: 1) The recorded front has 5.2 +/- 0.42164 points and cannot certify complete coverage; 2) runtime=18.135 +/- 2.1703 s at 10000 +/- 0 evaluations quantifies finite-budget cost, not asymptotic efficiency.
+
+Evidence boundary: Measured links support achieved quality, coverage limits and cost observations. Mechanism-specific causal claims require additional targeted ablations; these are labelled reasoned.
 
 Suitable: Distance-time routing; avoid: Continuous portfolio allocation
 
@@ -360,9 +460,13 @@ Advantages (reasoned): May accept uphill escape moves;Works without derivatives;
 
 Disadvantages (reasoned): Cooling schedule sensitive;Local moves can miss distant regions;Incomparable moves remain random at low temperature;Finite cooling gives no global guarantee
 
-Measured: Task A P3: HV 0.5048 +/- 0.011421; IGD 0.023434 +/- 0.0065873; Spacing 0.040497 +/- 0.013832; front size 35.1 +/- 4.4335; runtime 0.1936 +/- 0.010629 s.
+Measured run: Task A P3: HV 0.51354 +/- 0.0060662; IGD 0.020405 +/- 0.0038149; Spacing 0.033881 +/- 0.01308; front size 35 +/- 4.5704; runtime 1.4704 +/- 0.13765 s.
 
-Measured limits: Finite recorded front size=35.1; this is no certificate of complete coverage. Residual sampled-front IGD=0.023434; positive residual measures finite-budget approximation error.
+Measured links to use: 1) HV=0.51354 +/- 0.0060662 records achieved normalized dominated volume; 2) IGD=0.020405 +/- 0.0038149 measures distance to the sampled exact front.
+
+Measured cautions: 1) The recorded front has 35 +/- 4.5704 points and cannot certify complete coverage; 2) runtime=1.4704 +/- 0.13765 s at 10000 +/- 0 evaluations quantifies finite-budget cost, not asymptotic efficiency.
+
+Evidence boundary: Measured links support achieved quality, coverage limits and cost observations. Mechanism-specific causal claims require additional targeted ablations; these are labelled reasoned.
 
 Suitable: Budgeted local exploration on nonconvex fronts; avoid: Uniform global coverage with insufficient chains
 
@@ -374,9 +478,13 @@ Advantages (reasoned): Simple vector donor;No utility weights;CR forces one dono
 
 Disadvantages (reasoned): Incomparable trials do not replace targets;F CR sensitivity;Coordinate clipping can stagnate;Only real encoding is implemented
 
-Measured: Task A P3: HV 0.11 +/- 3.731e-11; IGD 0.6098 +/- 1.4155e-11; Spacing 0 +/- 0; front size 1 +/- 0; runtime 0.21803 +/- 0.0066205 s.
+Measured run: Task A P3: HV 0.11 +/- 3.0227e-10; IGD 0.6098 +/- 1.1468e-10; Spacing 0 +/- 0; front size 1 +/- 0; runtime 1.7695 +/- 0.068943 s.
 
-Measured limits: Finite recorded front size=1; this is no certificate of complete coverage. Residual sampled-front IGD=0.6098; positive residual measures finite-budget approximation error.
+Measured links to use: 1) HV=0.11 +/- 3.0227e-10 records achieved normalized dominated volume; 2) IGD=0.6098 +/- 1.1468e-10 measures distance to the sampled exact front.
+
+Measured cautions: 1) The recorded front has 1 +/- 0 points and cannot certify complete coverage; 2) runtime=1.7695 +/- 0.068943 s at 10000 +/- 0 evaluations quantifies finite-budget cost, not asymptotic efficiency.
+
+Evidence boundary: Measured links support achieved quality, coverage limits and cost observations. Mechanism-specific causal claims require additional targeted ablations; these are labelled reasoned.
 
 Suitable: Continuous design with comparable improvements; avoid: Many objectives with almost no domination
 
@@ -388,9 +496,13 @@ Advantages (reasoned): No crossover design needed;Teacher encourages exploitatio
 
 Disadvantages (reasoned): Teacher choice depends on archive;Incomparable moves can wander;Population means blur disconnected regions;TF schedule differs from conventional TLBO
 
-Measured: Task A P3: HV 0.53182 +/- 6.3878e-05; IGD 0.0095565 +/- 0.00010113; Spacing 0.0033392 +/- 0.0011262; front size 40 +/- 0; runtime 1.3873 +/- 0.0082006 s.
+Measured run: Task A P3: HV 0.53179 +/- 7.0884e-05; IGD 0.0095087 +/- 9.0745e-05; Spacing 0.0036712 +/- 0.0012871; front size 40 +/- 0; runtime 11.386 +/- 1.2374 s.
 
-Measured limits: Finite recorded front size=40; this is no certificate of complete coverage. Residual sampled-front IGD=0.0095565; positive residual measures finite-budget approximation error.
+Measured links to use: 1) HV=0.53179 +/- 7.0884e-05 records achieved normalized dominated volume; 2) IGD=0.0095087 +/- 9.0745e-05 measures distance to the sampled exact front.
+
+Measured cautions: 1) The recorded front has 40 +/- 0 points and cannot certify complete coverage; 2) runtime=11.386 +/- 1.2374 s at 10000 +/- 0 evaluations quantifies finite-budget cost, not asymptotic efficiency.
+
+Evidence boundary: Measured links support achieved quality, coverage limits and cost observations. Mechanism-specific causal claims require additional targeted ablations; these are labelled reasoned.
 
 Suitable: Small continuous educational examples; avoid: Highly multimodal separated feasible regions
 
@@ -402,9 +514,13 @@ Advantages (reasoned): Few interpretable schedules;Local walks exploit leaders;F
 
 Disadvantages (reasoned): Loudness decay suppresses replacement;Velocity can explode then clip;Pulse schedule sensitive;Archive quality may exceed final-chain quality
 
-Measured: Task A P3: HV 0.4002 +/- 0.11298; IGD 0.13896 +/- 0.12161; Spacing 0.043804 +/- 0.062473; front size 37.1 +/- 6.1545; runtime 0.48204 +/- 0.011403 s.
+Measured run: Task A P3: HV 0.39676 +/- 0.14429; IGD 0.12888 +/- 0.16313; Spacing 0.04146 +/- 0.050385; front size 36.3 +/- 6.3605; runtime 4.6044 +/- 0.22895 s.
 
-Measured limits: Finite recorded front size=37.1; this is no certificate of complete coverage. Residual sampled-front IGD=0.13896; positive residual measures finite-budget approximation error.
+Measured links to use: 1) HV=0.39676 +/- 0.14429 records achieved normalized dominated volume; 2) IGD=0.12888 +/- 0.16313 measures distance to the sampled exact front.
+
+Measured cautions: 1) The recorded front has 36.3 +/- 6.3605 points and cannot certify complete coverage; 2) runtime=4.6044 +/- 0.22895 s at 10000 +/- 0 evaluations quantifies finite-budget cost, not asymptotic efficiency.
+
+Evidence boundary: Measured links support achieved quality, coverage limits and cost observations. Mechanism-specific causal claims require additional targeted ablations; these are labelled reasoned.
 
 Suitable: Continuous local refinement; avoid: Robust full-front exploration without schedule tuning
 
@@ -416,9 +532,13 @@ Advantages (reasoned): Local moves refine global children;Elitist survival;Works
 
 Disadvantages (reasoned): Local calls reduce global generations;Combined-score preference changes tradeoffs;Mutation neighbourhood determines refinement;Feature CV makes local search costly
 
-Measured: Task A P5: HV 1.1818 +/- 4.2647e-05; IGD 0.013616 +/- 0.0021346; Spacing 0.019714 +/- 0.002315; front size 40 +/- 0; runtime 0.7399 +/- 0.014007 s.
+Measured run: Task A P5: HV 1.1818 +/- 5.8274e-05; IGD 0.01291 +/- 0.0015554; Spacing 0.018358 +/- 0.0017049; front size 40 +/- 0; runtime 6.3309 +/- 0.65198 s.
 
-Measured limits: Finite recorded front size=40; this is no certificate of complete coverage. Residual sampled-front IGD=0.013616; positive residual measures finite-budget approximation error.
+Measured links to use: 1) HV=1.1818 +/- 5.8274e-05 records achieved normalized dominated volume; 2) IGD=0.01291 +/- 0.0015554 measures distance to the sampled exact front.
+
+Measured cautions: 1) The recorded front has 40 +/- 0 points and cannot certify complete coverage; 2) runtime=6.3309 +/- 0.65198 s at 10000 +/- 0 evaluations quantifies finite-budget cost, not asymptotic efficiency.
+
+Evidence boundary: Measured links support achieved quality, coverage limits and cost observations. Mechanism-specific causal claims require additional targeted ablations; these are labelled reasoned.
 
 Suitable: Beam refinement or routing; avoid: Expensive objectives with no local structure
 
@@ -430,9 +550,13 @@ Advantages (reasoned): Angular niches aid many objectives;APD shifts toward conv
 
 Disadvantages (reasoned): Penalty strength and adaptation period matter;Observed ranges can be unstable;Empty niches require fill policy;Reference alignment can bias coverage
 
-Measured: Task A P10: HV 0.64011 +/- 0.0086752; IGD 0.10871 +/- 0.0050531; Spacing 0.10132 +/- 0.0076621; front size 40 +/- 0; runtime 0.54633 +/- 0.012232 s.
+Measured run: Task A P10: HV 0.64035 +/- 0.011426; IGD 0.10879 +/- 0.0032335; Spacing 0.10064 +/- 0.01106; front size 40 +/- 0; runtime 5.6417 +/- 0.57606 s.
 
-Measured limits: Finite recorded front size=40; this is no certificate of complete coverage. Residual sampled-front IGD=0.10871; positive residual measures finite-budget approximation error.
+Measured links to use: 1) HV=0.64035 +/- 0.011426 records achieved normalized dominated volume; 2) IGD=0.10879 +/- 0.0032335 measures distance to the sampled exact front.
+
+Measured cautions: 1) The recorded front has 40 +/- 0 points and cannot certify complete coverage; 2) runtime=5.6417 +/- 0.57606 s at 10000 +/- 0 evaluations quantifies finite-budget cost, not asymptotic efficiency.
+
+Evidence boundary: Measured links support achieved quality, coverage limits and cost observations. Mechanism-specific causal claims require additional targeted ablations; these are labelled reasoned.
 
 Suitable: Five-objective DTLZ2; avoid: Strongly irregular disconnected fronts
 
@@ -444,9 +568,13 @@ Advantages (reasoned): No separate sharing operator;Indicator gives selection pr
 
 Disadvantages (reasoned): Exponentials can saturate;Kappa changes selection;Recalculated deletion is costly;Fitness depends strongly on scales
 
-Measured: Task A P14: HV 0.83052 +/- 0.010347; IGD 0.020185 +/- 0.0053152; Spacing 0.024488 +/- 0.0066145; front size 40 +/- 0; runtime 1.5016 +/- 0.032249 s.
+Measured run: Task A P14: HV 0.81944 +/- 0.012245; IGD 0.026183 +/- 0.0076532; Spacing 0.027632 +/- 0.0073516; front size 40 +/- 0; runtime 11.829 +/- 0.66806 s.
 
-Measured limits: Finite recorded front size=40; this is no certificate of complete coverage. Residual sampled-front IGD=0.020185; positive residual measures finite-budget approximation error.
+Measured links to use: 1) HV=0.81944 +/- 0.012245 records achieved normalized dominated volume; 2) IGD=0.026183 +/- 0.0076532 measures distance to the sampled exact front.
+
+Measured cautions: 1) The recorded front has 40 +/- 0 points and cannot certify complete coverage; 2) runtime=11.829 +/- 0.66806 s at 10000 +/- 0 evaluations quantifies finite-budget cost, not asymptotic efficiency.
+
+Evidence boundary: Measured links support achieved quality, coverage limits and cost observations. Mechanism-specific causal claims require additional targeted ablations; these are labelled reasoned.
 
 Suitable: Small bi-objective indicator experiments; avoid: Large populations with limited CPU
 
@@ -458,9 +586,13 @@ Advantages (reasoned): Direct quality indicator survival;One-offspring updates a
 
 Disadvantages (reasoned): HV reference controls preferences;One-at-a-time sorting costs many calls;Implemented only for two objectives;HV can prioritize extremes unevenly
 
-Measured: Task A P14: HV 0.85874 +/- 1.9478e-05; IGD 0.0075754 +/- 1.6479e-05; Spacing 0.0024298 +/- 0.00081774; front size 40 +/- 0; runtime 5.5929 +/- 0.29487 s.
+Measured run: Task A P14: HV 0.85873 +/- 1.9917e-05; IGD 0.0075773 +/- 1.8795e-05; Spacing 0.0026642 +/- 0.00083706; front size 40 +/- 0; runtime 30.594 +/- 1.6848 s.
 
-Measured limits: Finite recorded front size=40; this is no certificate of complete coverage. Residual sampled-front IGD=0.0075754; positive residual measures finite-budget approximation error.
+Measured links to use: 1) HV=0.85873 +/- 1.9917e-05 records achieved normalized dominated volume; 2) IGD=0.0075773 +/- 1.8795e-05 measures distance to the sampled exact front.
+
+Measured cautions: 1) The recorded front has 40 +/- 0 points and cannot certify complete coverage; 2) runtime=30.594 +/- 1.6848 s at 10000 +/- 0 evaluations quantifies finite-budget cost, not asymptotic efficiency.
+
+Evidence boundary: Measured links support achieved quality, coverage limits and cost observations. Mechanism-specific causal claims require additional targeted ablations; these are labelled reasoned.
 
 Suitable: Small bi-objective design; avoid: Many objectives without an HV approximation
 
@@ -472,9 +604,13 @@ Advantages (reasoned): HV sharing supports many objectives;Shared samples accoun
 
 Disadvantages (reasoned): Sampling noise changes survivors;Selection sample count is small;Repeated deletion costs CPU;HV still needs a reference box
 
-Measured: Task A P10: HV 0.66139 +/- 0.023239; IGD 0.12184 +/- 0.012992; Spacing 0.096292 +/- 0.017092; front size 40 +/- 0; runtime 4.2892 +/- 0.046984 s.
+Measured run: Task A P10: HV 0.6611 +/- 0.0082237; IGD 0.11712 +/- 0.0042523; Spacing 0.086127 +/- 0.011397; front size 40 +/- 0; runtime 20.197 +/- 0.60127 s.
 
-Measured limits: Finite recorded front size=40; this is no certificate of complete coverage. Residual sampled-front IGD=0.12184; positive residual measures finite-budget approximation error.
+Measured links to use: 1) HV=0.6611 +/- 0.0082237 records achieved normalized dominated volume; 2) IGD=0.11712 +/- 0.0042523 measures distance to the sampled exact front.
+
+Measured cautions: 1) The recorded front has 40 +/- 0 points and cannot certify complete coverage; 2) runtime=20.197 +/- 0.60127 s at 10000 +/- 0 evaluations quantifies finite-budget cost, not asymptotic efficiency.
+
+Evidence boundary: Measured links support achieved quality, coverage limits and cost observations. Mechanism-specific causal claims require additional targeted ablations; these are labelled reasoned.
 
 Suitable: Many-objective indicator study; avoid: High-precision survival contribution estimates
 
@@ -486,9 +622,13 @@ Advantages (reasoned): Focuses on desired region;Clearing promotes local diversi
 
 Disadvantages (reasoned): Wrong aspiration biases search;Epsilon controls local spacing;Full-front quality can drop;Default balanced aspiration is arbitrary
 
-Measured: Task A P14: HV 0.85628 +/- 0.00064468; IGD 0.0094464 +/- 0.00049587; Spacing 0.012888 +/- 0.0018259; front size 40 +/- 0; runtime 0.817 +/- 0.017786 s.
+Measured run: Task A P14: HV 0.85563 +/- 0.00087984; IGD 0.010043 +/- 0.00082871; Spacing 0.013059 +/- 0.0019458; front size 40 +/- 0; runtime 4.1524 +/- 0.33328 s.
 
-Measured limits: Finite recorded front size=40; this is no certificate of complete coverage. Residual sampled-front IGD=0.0094464; positive residual measures finite-budget approximation error.
+Measured links to use: 1) HV=0.85563 +/- 0.00087984 records achieved normalized dominated volume; 2) IGD=0.010043 +/- 0.00082871 measures distance to the sampled exact front.
+
+Measured cautions: 1) The recorded front has 40 +/- 0 points and cannot certify complete coverage; 2) runtime=4.1524 +/- 0.33328 s at 10000 +/- 0 evaluations quantifies finite-budget cost, not asymptotic efficiency.
+
+Evidence boundary: Measured links support achieved quality, coverage limits and cost observations. Mechanism-specific causal claims require additional targeted ablations; these are labelled reasoned.
 
 Suitable: Decision-maker laptop region; avoid: Unknown or frequently changing preferences
 
@@ -500,9 +640,13 @@ Advantages (reasoned): Common descent when norm is nonzero;Analytical two-task w
 
 Disadvantages (reasoned): Requires gradients;Stationarity is not full-front coverage;May stop while each task has gradient;Nonconvex network optima are local
 
-Measured: Task A P13: HV 0.28389 +/- 0; IGD 0.62794 +/- 0; Spacing 0 +/- 0; front size 1 +/- 0; runtime 0.31087 +/- 0 s.
+Measured run: Task A P13: HV 0.28389 +/- 0; IGD 0.62794 +/- 0; Spacing 0 +/- 0; front size 1 +/- 0; runtime 2.3516 +/- 0 s.
 
-Measured limits: Finite recorded front size=1; this is no certificate of complete coverage. Residual sampled-front IGD=0.62794; positive residual measures finite-budget approximation error.
+Measured links to use: 1) HV=0.28389 +/- 0 records achieved normalized dominated volume; 2) IGD=0.62794 +/- 0 measures distance to the sampled exact front.
+
+Measured cautions: 1) The recorded front has 1 +/- 0 points and cannot certify complete coverage; 2) runtime=2.3516 +/- 0 s at 10000 +/- 0 evaluations quantifies finite-budget cost, not asymptotic efficiency.
+
+Evidence boundary: Measured links support achieved quality, coverage limits and cost observations. Mechanism-specific causal claims require additional targeted ablations; these are labelled reasoned.
 
 Suitable: Differentiable conflicting tasks; avoid: Discrete designs or a full Pareto-front sweep
 
@@ -514,9 +658,13 @@ Advantages (reasoned): Balances task gradient magnitudes;Training rates influenc
 
 Disadvantages (reasoned): Requires gradients and initial losses;Alpha weight_lr matter;Does not guarantee common descent;Toy final point is not an entire front
 
-Measured: Task A P13: HV 0.60519 +/- 0; IGD 0.43296 +/- 0; Spacing 0 +/- 0; front size 1 +/- 0; runtime 0.40707 +/- 0 s.
+Measured run: Task A P13: HV 0.60519 +/- 0; IGD 0.43296 +/- 0; Spacing 0 +/- 0; front size 1 +/- 0; runtime 2.6674 +/- 0 s.
 
-Measured limits: Finite recorded front size=1; this is no certificate of complete coverage. Residual sampled-front IGD=0.43296; positive residual measures finite-budget approximation error.
+Measured links to use: 1) HV=0.60519 +/- 0 records achieved normalized dominated volume; 2) IGD=0.43296 +/- 0 measures distance to the sampled exact front.
+
+Measured cautions: 1) The recorded front has 1 +/- 0 points and cannot certify complete coverage; 2) runtime=2.6674 +/- 0 s at 10000 +/- 0 evaluations quantifies finite-budget cost, not asymptotic efficiency.
+
+Evidence boundary: Measured links support achieved quality, coverage limits and cost observations. Mechanism-specific causal claims require additional targeted ablations; these are labelled reasoned.
 
 Suitable: Shared network with unequal loss gradients; avoid: A guaranteed Pareto descent method
 

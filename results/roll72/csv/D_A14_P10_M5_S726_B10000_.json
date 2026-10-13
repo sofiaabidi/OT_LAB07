@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 14,
+  "algorithm": "NSGA-II",
+  "problem": "P10",
+  "objectives": 5,
+  "seed": 726,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.47949632446289087,
+  "IGD": 0.39139649240324864,
+  "Spacing": 0.34325940436184993,
+  "runtime": 4.046489499974996,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "D_A14_P10_M5_S726_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 726
+}

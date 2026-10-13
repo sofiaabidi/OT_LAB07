@@ -1,77 +1,135 @@
-# Task C: roll 63 study cards
+# Task C study cards — roll suffix 72
 
-## 26. MOSA - Multiobjective Simulated Annealing
+The assignment formulas produce algorithms 35, 10 and 22. These cards describe
+the implemented teaching variants and do not claim original-paper equivalence.
 
-Historical context: Paolo Serafini's 1994 chapter, "Simulated annealing for multi objective optimization problems", in Multiple Criteria Decision Making: Expand and Enrich the Domains of Thinking and Application, Springer, pp. 283-292, is an early multiobjective SA treatment. The author's older web listing says 1993; his current CV says 1994. We report 1994 as the publication year and record this discrepancy. MOSA is a family rather than one universally fixed algorithm; this implementation does not claim to reproduce all of Serafini's acceptance rules.
+## 35. R-NSGA-II — Reference Point-Based NSGA-II
 
-Core idea (five lines): keep four or more local-search chains; propose a nearby design; accept improving or incomparable neighbours; occasionally accept dominated moves with probability exp(-delta/T); cool T and record a Pareto archive.
+Historical context: the supplied Bonus 5E lecture identifies Kalyanmoy Deb,
+J. Sundar, N. Udaya Bhaskara Rao and Shamik Chaudhuri (2006). It addresses the
+cost of approximating an entire front when a decision-maker already knows the
+region of interest.
 
-Flow: initialize chains -> mutate -> evaluate -> Deb feasibility check -> energy/temperature acceptance -> update chain -> record nondominated proposals -> cool -> budget reached?
+Core idea (five lines): retain NSGA-II nondominated fronts; normalize objectives;
+measure Euclidean distance to a decision-maker reference point; use epsilon
+clearing so selected points near that reference do not collapse; backfill by
+distance if clearing leaves too few survivors.
 
-1. Sample population uniformly in bounds. Repair encodings and initialize recording archive.
-2. Propose one mutation per chain. Real coordinate mutation: x'=clip(x+0.1*(upper-lower)*z), z normal(0,1); permutations use swap or inversion.
-3. Normalize z_j=(f_j-ideal_j)/(nadir_j-ideal_j). Use the lecture sum of positive objective differences for dominated moves.
-4. If proposal dominates chain under Deb's rules, accept. Feasible-to-infeasible moves are rejected. If the current solution does not dominate the feasible proposal, accept unconditionally. Otherwise delta=sum(max(z'-z,0)), p=exp(-delta/T). Between infeasible proposals use violation increase.
-5. Accept if uniform u<p; record every proposal in a passive archive; cool T=T0*cooling^generation.
-6. Terminate at 10000 counted candidate evaluations. Archive capped at population size by crowding.
+Flow: parents + offspring → Deb nondominated fronts → normalize objective values
+and reference → sort the splitting front by reference distance → epsilon clearing
+→ preferred survivors.
 
-Parameters: T0=.1; too small freezes uphill escape, too large yields random wandering. Cooling=.97; too low cools before exploration, too high prolongs random acceptance. Move scale=.1; small misses distant basins, large repeatedly hits bounds. Population=40; small limits output coverage, large uses budget on fewer sweeps. Archive cap=population; low cap loses diversity, large increases O(A^2*M) bookkeeping. Violation penalty=10 only between infeasible candidates; stronger promotes feasibility but can erase objective influence.
+Steps and formulas:
 
-Convergence: cooling helps exploitation but finite-budget runs do not inherit a global SA theorem. Diversity: unconditional tradeoff moves and archive crowding, without a guaranteed uniform front. Constraints: feasibility first, then violation. Nonconvex/disconnected fronts: local moves can traverse them at sufficient temperature but may miss separated basins. Many objectives: scalar energies remain usable, yet domination becomes sparse and bounded archives lose coverage.
+1. Combine parents and offspring and form fronts F1, F2, ... using Deb feasibility
+   rules before objective dominance.
+2. Normalize `z_ij=(f_ij-ideal_j)/(nadir_j-ideal_j)` using the problem's fixed
+   assignment scales. Normalize a natural-unit reference in the same way.
+3. Compute `d_i=sqrt(sum_j (z_ij-r_j)^2)`.
+4. Copy complete fronts. In the splitting front, inspect increasing `d_i` and
+   accept i only when `min ||z_i-z_q|| >= epsilon` for already accepted q.
+5. Backfill deferred points by reference distance until population size N.
 
-Cost: proposal O(d), evaluation problem dependent, chain update O(M); archive maintenance O(M*A^2) per recorded population in a straightforward implementation. This implementation records each population batch for MOSA; peak memory O(A*d+A*M+M*A^2).
+Parameters: a wrong reference focuses on an irrelevant region; epsilon too small
+permits crowding, while epsilon too large clears useful neighbours and forces
+distance-only backfill. Small N gives little preferred-region resolution; large N
+costs more evaluations per generation. Crossover and mutation control exploration.
 
-Hand traces: exact Part 4 chip example x=10->13->15, F=(20,10)->(17,11.5)->(15,12.5), T=100->90->81; both moves incomparable and accepted. Additional population-four P1 fixture starts [3,4,6,7], T0=.1. Proposals [3.5,4.5,6.5,7.5] have summed positive normalized differences [.015625,.078125,.203125,.28125]; only the fourth is dominated, probability exp(-2.8125). Fixed uniforms [.1,.2,.9,.1] yield [3.5,4.5,6.5,7]. Next proposals [4,5,7,6.5] are all incomparable and accepted. Full objective tables, acceptance and mutation draws are stored in hand_traces.json and tested.
+Properties: convergence comes first from nondominated rank and then preference
+distance in the splitting front. Epsilon clearing supplies local diversity.
+Deb rules handle constraints. Nondominated sorting can follow nonconvex fronts,
+but an unreachable reference and finite population can bias coverage. A k-D
+reference works for more than three objectives, although distance concentration
+and epsilon tuning become harder.
 
-Sensitivity: cooling=.90,.97,.995, 10 seeds each on P3, fixed 10000 cap. These correspond to fast, moderate and slow cooling. Interpretation is generated from measured summary rows, not assumed.
+Cost: pairwise sorting is `O(M N^2)` for M objectives and 2N candidates;
+reference distances and clearing add `O(M N^2)` in the straightforward code.
 
-## 1. Weighted Sum
+Sensitivity evidence: epsilon = 0.02, 0.05, 0.10 on P14, using ten independent
+optimizer seeds 720-729. Raw rows and aggregate statistics are stored under
+`results/roll72/`; the sensitivity figure is `figures/roll72/C_A35.png`.
 
-Historical context: weighted sums predate modern named multiobjective optimizers, so a unique inventor/year is not asserted. Lotfi A. Zadeh's 1963 "Optimality and non-scalar-valued performance criteria", IEEE Transactions on Automatic Control 8(1), 59-60, DOI 10.1109/TAC.1963.1105511, is a foundational efficiency reference, not a claim that he invented the weighted-sum method.
+## 10. VEGA — Vector Evaluated Genetic Algorithm
 
-Core idea: choose nonnegative weights; normalize objectives; minimize one linear combination; repeat for a sequence of weights; keep feasible nondominated solutions.
+Historical context: David Schaffer proposed VEGA in 1985. It was an early way to
+extend a genetic algorithm to several objectives, but objective-wise selection can
+duplicate extreme solutions and discard balanced compromises.
 
-Flow: fixed scales -> simplex weight -> scalar solve -> save feasible endpoint -> next weight -> Pareto filter.
+Core idea (five lines): evaluate all objectives; allocate equal mating-pool slots
+to the objectives; select each slot using one objective only; merge and shuffle the
+subpools; apply crossover and mutation and replace the population without elitism.
 
-1. Declare common objective ideal/nadir constants.
-2. Choose w_j>=0 with sum(w)=1. Default two-objective weights t,1-t for t in linspace(0,1,21).
-3. Solve min s(x)=sum_j w_j*z_j(x), subject to the original bounds and constraints using SLSQP.
-4. Record solver termination, actual objective/constraint objective calls and decision.
-5. Pareto-filter successful feasible sweep candidates. Natural termination means fewer than 10000 actual calls; no unused calls are relabelled.
+Flow: population → objective-specific tournaments/subpools → merged mating pool →
+crossover and mutation → nonelitist offspring replacement.
 
-Parameters: weight t controls orientation; near 0 favours objective 2 and near 1 objective 1. Number of settings=21; fewer than 10 violates Task D; very many spends effort on duplicate supported solutions. Ideal/nadir scales control weight meaning; poor scales overwhelm small objectives. SLSQP tolerance=1e-10: loose leaves error, extremely tight increases work; max iterations=120: low truncates solves, high increases cost. Starting point depends on seed; a local optimizer may miss a global scalar minimum. Zero weights can produce only weak efficiency.
+Steps and formulas:
 
-Guarantee: positive weights and an exact global solve imply Pareto efficiency: any dominator would reduce the weighted scalar, a contradiction. The converse holds only for supported efficient points. On P3, z2=1-z1^2; for fixed w the scalar is concave in z1 and attains its minimum at 0 or 1, so interior dented points cannot be selected by any positive weight. Finite local solves need independent convergence checks.
+1. Evaluate every `f_j(x_i)` and constraint violation.
+2. For mating slot i use objective `j=i mod M`; compare two candidates using Deb
+   feasibility, then the scalar value `f_j` when both are feasible.
+3. Pool the N winners. Each objective receives equal slots when N is divisible by M.
+4. Apply the shared real/binary/permutation-safe crossover and mutation operators.
+5. The offspring replace the parents; the passive output archive records discoveries
+   but does not make the breeding algorithm elitist.
 
-Diversity: controlled by sweep, not automatic. Equal weights are not equal arc lengths. Constraints: inherited from scalar solver. Many objectives: number of simplex settings grows rapidly and preferences become difficult. Discrete variants need enumeration or a discrete scalar solver; SLSQP is used only for real-valued problems here.
+Parameters: small N increases genetic drift; large N improves instantaneous
+coverage but yields fewer generations at a fixed evaluation budget. Excessive
+mutation destroys selected structure, while too little mutation cannot restore
+lost regions. Strong crossover can mix extremes but provides no diversity guarantee.
 
-Cost: K scalar solves; O(K*S*C_eval) objective work, where S is calls per solve, plus O(K^2*M) Pareto filtering. Solver complexity is problem dependent, not universally O(n^3).
+Properties: single-objective subpools provide convergence pressure toward extremes
+but no explicit Pareto convergence or diversity pressure. Deb feasibility is used
+inside each tournament. The search operators can visit nonconvex fronts, but
+selection does not protect their interior. With many objectives each subpool becomes
+small and balanced tradeoffs receive even weaker selection pressure.
 
-Hand trace P1 (raw scale is equal in both objectives): derivative 2*w*(x-3)+2*(1-w)*(x-7)=0 -> x=7-4*w. w=.25 gives x=6, F=(9,1), scalar=3. w=.75 gives x=4, F=(1,9), scalar=3. Second derivative=2>0, bounds satisfied. Both normalized scalars are 3/16.
+Cost: objective-wise selection is `O(N)` comparisons after `O(MN)` evaluation;
+variation is `O(ND)` for D variables. The implementation's passive archive adds
+pairwise bookkeeping but does not affect parent selection.
 
-Sensitivity: 11,21,41 settings, ten seeds on P3. Sampling density cannot overcome unsupported-front geometry; actual call counts change and this is not a strict equal-consumed-budget comparison.
+Sensitivity evidence: population N = 20, 40, 80 on P3, using ten independent
+optimizer seeds 720-729. At a fixed budget this jointly tests coverage versus
+number of generations; see `figures/roll72/C_A10.png`.
 
-## 13. NPGA - Niched Pareto Genetic Algorithm
+## 22. MOPSO — Multi-Objective Particle Swarm Optimization
 
-Jeffrey Horn, N. Nafpliotis and David E. Goldberg (1994), "A niched Pareto genetic algorithm for multiobjective optimization", Proceedings of the First IEEE Conference on Evolutionary Computation, pp. 82-87, DOI 10.1109/ICEC.1994.350037. An author-uploaded copy verifies the metadata. The method addresses maintaining a diverse tradeoff population without choosing one scalar utility. Earlier technical reports may precede the conference paper; 1994 is the cited publication.
+Historical context: Carlos A. Coello Coello and Maximino Salazar Lechuga proposed
+MOPSO in 2002. It extends scalar PSO by replacing one global best with guides from
+an external nondominated archive.
 
-Core idea: draw two contestants; compare them directly by dominance; otherwise measure each niche count against a separate comparison set and choose the less crowded contestant; vary winners to produce a new non-elitist generation.
+Core idea (five lines): maintain particle positions, velocities and personal bests;
+retain a nondominated external archive; choose leaders with preference for sparse
+archive regions; update velocities toward personal best and leader; mutate some
+particles and update personal best only when the new point dominates it.
 
-Flow: population -> contestants and comparison set -> direct dominance -> comparison-set niche tie-break -> mating -> SBX/mutation -> replace population -> record output archive.
+Flow: particles + archive → crowding-weighted leader → velocity and bounded position
+update → evaluate/mutate → dominance-based personal best → nondominated archive.
 
-1. Initialize real vectors uniformly or valid discrete encodings.
-2. Normalize the current generation by observed ranges for niche distances; this differs from fixed quality-metric scales.
-3. Sample distinct contestants a,b and comparison set C of size min(2,N-2), excluding contestants. Compare a and b directly under Deb rules; this is the supplied lecture teaching variant.
-4. If one contestant dominates the other, return that contestant. Otherwise use niche_i=sum_(j in C) max(0,1-(distance(i,j)/sigma)^2), sigma=.3. The comparison set excludes contestants; ties select the first within numerical tolerance 1e-12.
-5. Pool tournament winners; SBX eta=15 and mutation probability 1/d create children. Permutations, when applicable, use OX plus swap/inversion.
-6. Replace the generation without elitism. A passive logging archive does not participate in selection. Stop at 10000 actual candidate evaluations.
+Steps and formulas:
 
-Parameters: sigma=.3; too small loses sharing except duplicates, too large averages global density and weakens local niche resolution. Comparison size=2; small gives noisy niche estimates, large costs more and approaches full-population density. Population=40; small misses niches, large reduces generations per fixed budget. Crossover eta=15; small jumps widely, large stays close to parents. Mutation scale=.1 and probability=1/d; too low stalls exploration, too high disrupts useful coordinates. Direct contestant dominance and separate comparison-set sharing follow Non-Elitist slide 27. The original publication uses a different tournament convention; the course variant is explicit.
+1. Initialize x, set velocity v=0 and pbest=x, and build the archive.
+2. Choose an archive leader using crowding-derived probabilities.
+3. Update each coordinate:
+   `v'=w v + c1 r1 (pbest-x) + c2 r2 (leader-x)`.
+4. Clip velocity to 20% of the decision range, set `x'=repair(x+v')`, and apply
+   occasional mutation.
+5. Replace pbest only if x' dominates it under Deb rules; merge x' into the
+   nondominated archive and continue to the evaluation budget.
 
-Convergence: selection favours directly dominating contestants but provides no elitist guarantee. Diversity: sharing explicitly rewards sparse regions. Constraints: Deb-aware comparisons. Nonconvex fronts: no linear scalarization barrier. Many objectives: most contestants become incomparable and niche decisions dominate; distances also become less discriminative.
+Parameters: small inertia w can stagnate quickly, while large w overshoots and
+weakens exploitation. Small c1 forgets personal experience; large c1 makes particles
+oscillate around pbest. Small c2 underuses the front; large c2 crowds particles around
+leaders. A small archive loses coverage; an oversized archive increases maintenance.
 
-Cost: the running selector computes normalization and comparison distances per tournament, costing O(N*(N*M+|C|*M)); a cached alternative could reduce repeated normalization, crossover/mutation O(N*d), plus evaluations and output archive costs. Peak comparison-set memory O(|C|*M), plus population O(N*d+N*M) and passive archive pairwise bookkeeping. The standalone tournament helper recomputes sharing for transparent trace verification; the running selector uses the lecture comparison-set helper.
+Properties: pbest and archive leaders supply convergence, while crowding-weighted
+leader choice and mutation support diversity. Deb dominance handles constraints.
+The swarm can sample nonconvex fronts because it does not scalarize them, but its
+continuous velocity model is a poor natural fit for permutations. In many objectives,
+dominance and crowding lose discrimination and archive maintenance becomes costly.
 
-Hand traces: exact four-topology lecture table A=(10,.80),B=(15,.90),C=(12,.85),D=(18,.95). Fixed scales are (cost-10)/10 and (reliability-.8)/.2. For A vs B with C,D: distances .320156,1.096586,.390512,.390512; quadratic shares .59,0,.39,.39 give NC(A)=.59,NC(B)=.78; A wins. C vs D with A,B gives NC(C)=.98,NC(D)=.39; D wins. The displayed lecture values .778/.979 are approximate; exact arithmetic preserves both decisions. Additional full population-four generations on P1 enumerate every distance, sharing term, pair-specific comparison set, winner, fixed SBX beta=1 and Gaussian mutation draw in hand_traces.json. The second generation recomputes dominance before using density.
+Cost: velocity updates cost `O(ND)`; straightforward archive dominance/crowding is
+`O(M A^2)` for archive size A, plus problem evaluation cost.
 
-Sensitivity: sigma=.1,.3,.6, ten seeds on P3. The three values test local, moderate and broad sharing. Compare HV, IGD and Spacing along with final population diversity; a zero Spacing singleton is not good coverage.
+Sensitivity evidence: inertia w = 0.2, 0.4, 0.8 on P4, using ten independent
+optimizer seeds 720-729; see `figures/roll72/C_A22.png`. IGD is unavailable for
+P4 because no exact reference front is known, so the plot states that limitation.

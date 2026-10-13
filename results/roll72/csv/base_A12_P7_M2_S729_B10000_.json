@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 12,
+  "algorithm": "NSGA",
+  "problem": "P7",
+  "objectives": 2,
+  "seed": 729,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.6893208944065969,
+  "IGD": 0.011861183067858841,
+  "Spacing": 0.009877911566378723,
+  "runtime": 3.8649863000027835,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "base_A12_P7_M2_S729_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 729
+}

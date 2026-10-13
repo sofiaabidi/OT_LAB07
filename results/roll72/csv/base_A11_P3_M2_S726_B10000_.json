@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 11,
+  "algorithm": "MOGA",
+  "problem": "P3",
+  "objectives": 2,
+  "seed": 726,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.5237784914314716,
+  "IGD": 0.01261064690616556,
+  "Spacing": 0.012542806825132048,
+  "runtime": 3.1782716000452638,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "base_A11_P3_M2_S726_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 726
+}

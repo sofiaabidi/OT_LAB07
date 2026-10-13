@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 18,
+  "algorithm": "MOEA/D",
+  "problem": "P10",
+  "objectives": 5,
+  "seed": 725,
+  "group": "base",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.9487696850585942,
+  "IGD": 0.3039230877528629,
+  "Spacing": 0.24938651657815597,
+  "runtime": 17.926533300196752,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "base_A18_P10_M5_S725_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 725
+}

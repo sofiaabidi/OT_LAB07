@@ -1,11 +1,12 @@
 """Command-line entry points. Run from the project root."""
 import argparse,subprocess,sys,json
 from pathlib import Path
+from src.project_config import DEFAULT_OPTIMIZER_SEED
 
 def main():
     p=argparse.ArgumentParser(); sub=p.add_subparsers(dest='command',required=True)
     sub.add_parser('test'); exp=sub.add_parser('experiments'); exp.add_argument('--workers',type=int,default=4); exp.add_argument('--budget',type=int,default=10000)
-    one=sub.add_parser('one'); one.add_argument('--algorithm',type=int,required=True); one.add_argument('--problem',required=True); one.add_argument('--budget',type=int,default=10000); one.add_argument('--seed',type=int,default=630); one.add_argument('--objectives',type=int,default=3)
+    one=sub.add_parser('one'); one.add_argument('--algorithm',type=int,required=True); one.add_argument('--problem',required=True); one.add_argument('--budget',type=int,default=10000); one.add_argument('--seed',type=int,default=DEFAULT_OPTIMIZER_SEED); one.add_argument('--objectives',type=int,default=3)
     sub.add_parser('report'); sub.add_parser('verify')
     args=p.parse_args(); root=Path(__file__).resolve().parent
     def call(*cmd): subprocess.run([sys.executable,*cmd],cwd=root,check=True)

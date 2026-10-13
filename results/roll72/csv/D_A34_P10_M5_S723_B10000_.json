@@ -1,0 +1,21 @@
+{
+  "algorithm_number": 34,
+  "algorithm": "HypE",
+  "problem": "P10",
+  "objectives": 5,
+  "seed": 723,
+  "group": "D",
+  "parameters": "",
+  "budget_cap": 10000,
+  "evaluations": 10000,
+  "HV": 0.7796975903320317,
+  "IGD": 0.5466908294021838,
+  "Spacing": 0.46952859245024675,
+  "runtime": 25.3955143999774,
+  "front_size": 40,
+  "feasible_fraction": 1.0,
+  "file": "D_A34_P10_M5_S723_B10000_",
+  "provenance": "roll72",
+  "roll_suffix": 72,
+  "optimizer_seed": 723
+}

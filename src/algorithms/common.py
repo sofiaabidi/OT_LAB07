@@ -5,9 +5,10 @@ archive unless explicitly used by that algorithm; it is not fed to early GAs.
 """
 import numpy as np
 from src.moo_utils import archive, non_dominated_sort, crowding_distance, dominates
+from src.project_config import DEFAULT_OPTIMIZER_SEED
 
 class State:
-    def __init__(self,problem,budget=10000,seed=63,population=40,**params):
+    def __init__(self,problem,budget=10000,seed=DEFAULT_OPTIMIZER_SEED,population=40,**params):
         self.p=problem; self.budget=budget; self.rng=np.random.default_rng(seed)
         self.n=min(population,budget); self.params=params; self.used=0; self.generation=0
         self.x=problem.sample(self.rng,self.n); self.f,self.cv=self.evaluate(self.x)
@@ -76,7 +77,7 @@ def merge(s,y,f,cv,selector=environmental):
     x=np.r_[s.x,y]; ff=np.r_[s.f,f]; cc=np.r_[s.cv,cv]; idx=selector(ff,cc,s.n)
     s.x,s.f,s.cv=x[idx],ff[idx],cc[idx]
 
-def execute(initialize,iterate,problem,budget=10000,seed=63,**params):
+def execute(initialize,iterate,problem,budget=10000,seed=DEFAULT_OPTIMIZER_SEED,**params):
     s=initialize(problem,budget,seed,**params)
     while s.used<s.budget:
         old=s.used; iterate(s); s.generation+=1
