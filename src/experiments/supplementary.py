@@ -46,13 +46,13 @@ def population_job(job):
     N,budget,seed=job; folder=CSV_DIR/'population'; folder.mkdir(parents=True,exist_ok=True)
     key=f'N{N}_B{budget}_S{seed}'; checkpoint=folder/f'{key}.json'
     if checkpoint.exists():
-        row=json.loads(checkpoint.read_text())
+        row=json.loads(checkpoint.read_text(encoding='utf-8'))
         if row.get('seed')!=seed or seed not in OPTIMIZER_SEEDS:
             raise ValueError(f'{checkpoint} has an incompatible optimizer seed')
         if 'provenance' not in row:
             row.update(provenance=ACTIVE_PROVENANCE,roll_suffix=ROLL_SUFFIX,
                        optimizer_seed=seed)
-            checkpoint.write_text(json.dumps(row,indent=2))
+            checkpoint.write_text(json.dumps(row,indent=2),encoding='utf-8')
         elif (row.get('provenance')!=ACTIVE_PROVENANCE or
               row.get('roll_suffix')!=ROLL_SUFFIX or
               row.get('optimizer_seed')!=seed):
@@ -60,7 +60,7 @@ def population_job(job):
         return row
     p=get_problem('P3'); t=time.perf_counter(); r=load(14).run(p,budget,seed,population=N); duration=time.perf_counter()-t
     z=p.normalized(r['f']); row={'population':N,'budget':budget,'seed':seed,'optimizer_seed':seed,'provenance':ACTIVE_PROVENANCE,'roll_suffix':ROLL_SUFFIX,'full_generations':(budget-N)//N,'HV':hypervolume(z,[1.1,1.1]),'IGD':igd(z,p.normalized(p.true_front())),'Spacing':spacing(z),'runtime':duration}
-    np.savez_compressed(folder/f'{key}.npz',x=r['x'],f=r['f'],cv=r['cv']); checkpoint.write_text(json.dumps(row,indent=2)); return row
+    np.savez_compressed(folder/f'{key}.npz',x=r['x'],f=r['f'],cv=r['cv']); checkpoint.write_text(json.dumps(row,indent=2),encoding='utf-8'); return row
 
 def population_study():
     from concurrent.futures import ProcessPoolExecutor

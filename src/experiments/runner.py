@@ -56,7 +56,7 @@ def run_job(job):
     a,p,m,seed,group,params,b=job
     key=job_key(job); target=CSV_DIR/f'{key}.json'; target.parent.mkdir(parents=True,exist_ok=True)
     if target.exists():
-        saved=json.loads(target.read_text())
+        saved=json.loads(target.read_text(encoding='utf-8'))
         if (saved.get('provenance')!=ACTIVE_PROVENANCE or
                 saved.get('roll_suffix')!=ROLL_SUFFIX or
                 saved.get('optimizer_seed')!=seed):
@@ -76,12 +76,12 @@ def run_job(job):
     # Retain both decisions and objectives for every front, even if empty.
     np.savez_compressed(CSV_DIR/f'{key}.npz',x=result['x'],f=f,cv=result['cv'],history=np.asarray(result.get('history',[])),final_f=result.get('final_f',f))
     if 'solves' in result: row['solves']=result['solves']
-    target.write_text(json.dumps(row,indent=2)); return row
+    target.write_text(json.dumps(row,indent=2),encoding='utf-8'); return row
 
 def write_csv(path,rows,columns=None):
     if not rows: return
     columns=columns or list(rows[0]); path.parent.mkdir(parents=True,exist_ok=True)
-    with path.open('w',newline='') as handle:
+    with path.open('w',newline='',encoding='utf-8') as handle:
         writer=csv.DictWriter(handle,fieldnames=columns,extrasaction='ignore'); writer.writeheader(); writer.writerows(rows)
 
 def aggregate(rows):
@@ -150,7 +150,7 @@ if __name__=='__main__':
     with concurrent.futures.ProcessPoolExecutor(max_workers=args.workers) as pool:
         for i,row in enumerate(pool.map(run_job,jobs),1):
             if i%10==0 or i==len(jobs): print(f'{i}/{len(jobs)} {row["algorithm"]} {row["problem"]}',flush=True)
-    rows=[json.loads(f.read_text()) for f in CSV_DIR.glob('*.json') if f.name!='hand_traces.json']
+    rows=[json.loads(f.read_text(encoding='utf-8')) for f in CSV_DIR.glob('*.json') if f.name!='hand_traces.json']
     write_csv(CSV_DIR/'raw_experiments.csv',rows,[k for k in rows[0] if k!='solves'])
     summary=aggregate(rows); write_csv(TABLES_DIR/'summary.csv',summary)
     if not args.skip_extras: extras()

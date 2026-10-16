@@ -1,6 +1,6 @@
 # Roll-72 requirements audit
 
-Student: Sofia Abidi (241071072). Audit date: 13 October 2026.
+Student: Sofia Abidi (241071072). Audit updated: 16 October 2026.
 
 Functional correctness means the implementation satisfies its executable checks. Assignment compliance additionally requires the specified methods/problems, valid budgets, independent trials, reproducible provenance, and evidence that supports each written claim.
 
@@ -32,18 +32,20 @@ The local Python 3.12 runtime used to execute the repository is ignored by Git.
 | Task E/F | Existing prose could outlive the evidence it cited | builders; case studies; viva material | Medium | Rebuilt from active summaries; student understanding remains outside automated verification |
 | P9 | Suggested 10,000-evaluation evidence is impractical in the current five-fold implementation | runner; README; tables | High | Runs remain explicitly capped at 200 and are never relabelled; full-budget compliance is open |
 | Dependency policy | Needed confirmation that optimizers do not use external optimization libraries | `requirements.txt`; `src/` | High | Static audit finds SciPy only in methods 1-7 and scikit-learn only in the P9 loader |
-| Final report | Report metadata and Task C sections required correction | `docx_report.py`; verifier | High | Generator is updated; DOCX generation is intentionally deferred for the next phase |
+| Text encoding | Five generated Markdown/CSV evidence files used the Windows-1252 encoding | evidence builders; generated docs/tables; tests | Medium | Converted the files to UTF-8, made relevant readers/writers explicit, and added a regression test |
+| Final report | Report metadata and Task C sections required correction | `docx_report.py`; verifier | High | The approved editable report is `Lab_Assignment_7_Sofia_Abidi_241071072.docx`; verifier checks identity, required sections, XML, and current manifest media without modifying it |
 
 ## Current evidence state
 
-- Final `run_all.py test`: 62 tests passed in 5.009 s.
+- Final `run_all.py test`: 63 tests passed in 8.752 s.
 - Final `run_all.py verify`: no errors; 37 modules, 1,196 main jobs, 90
   population-study jobs, 134 summary groups, budgets, stored objectives/metrics,
-  and figures verified. DOCX status is correctly recorded as deferred.
+  figures, and the approved DOCX structure verified.
 - 1,196 main experiment jobs, 90 population-study jobs, and 134 summary groups are present under `results/roll72/`.
 - Active results use optimizer seeds 720-729 and carry provenance metadata.
 - Tables, algorithm notes, six case studies, viva material, 37 algorithm plots, Task D plots, three Task C sensitivity plots, and three Task C flowcharts were regenerated.
 - Unknown exact fronts are not given invented IGD values; unavailable panels say why.
+- A strict UTF-8 scan passed for all 1,450 active text files; inherited roll-63 reference data was excluded from that active scan.
 - Remaining assignment-level gaps are the P9 full budget, universal claim-level Task B ablations, and the non-uniform four-function module interface.
 
-No final DOCX, submission ZIP, commit, or push was produced.
+The final editable DOCX exists under its student-specific filename. No submission ZIP is retained.

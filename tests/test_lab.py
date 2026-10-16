@@ -1,4 +1,5 @@
 import unittest
+from pathlib import Path
 import numpy as np
 from src import moo_utils as u
 from src.problems import get_problem, SUPPLIERS, DIST, TIME, nearest_neighbour
@@ -28,6 +29,19 @@ class ProjectConfiguration(unittest.TestCase):
         self.assertIsNone(metric_series(rows,'IGD'))
         means,stds=metric_series([{'HV_mean':1.,'HV_std':.1}],'HV')
         self.assertEqual(means,[1.]); self.assertEqual(stds,[.1])
+
+    def test_generated_text_evidence_is_utf8(self):
+        root=Path(__file__).resolve().parents[1]
+        generated=[
+            'docs/algorithm_notes.md',
+            'docs/case_studies.md',
+            'results/roll72/implementation_log.csv',
+            'results/roll72/tables/case_studies.csv',
+            'results/roll72/tables/comparison.csv',
+        ]
+        for relative in generated:
+            with self.subTest(file=relative):
+                (root/relative).read_text(encoding='utf-8')
 
 class Utilities(unittest.TestCase):
     def test_dominance(self):

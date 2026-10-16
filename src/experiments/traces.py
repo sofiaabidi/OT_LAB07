@@ -129,7 +129,7 @@ def build():
         'r_nsga2':_r_nsga2_trace(),'vega':_vega_trace(),'mopso':_mopso_trace(),
     }
     CSV_DIR.mkdir(parents=True,exist_ok=True)
-    (CSV_DIR/'hand_traces.json').write_text(json.dumps(output,indent=2))
+    (CSV_DIR/'hand_traces.json').write_text(json.dumps(output,indent=2),encoding='utf-8')
     return output
 
 

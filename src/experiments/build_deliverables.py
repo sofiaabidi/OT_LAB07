@@ -16,7 +16,7 @@ FIGURES_DIR=ROOT/'figures'/ACTIVE_PROVENANCE
 plt.rcParams.update({'font.size':10,'axes.spines.top':False,'axes.spines.right':False,'figure.dpi':120})
 
 def read_csv(path):
-    with path.open() as h: return list(csv.DictReader(h))
+    with path.open(encoding='utf-8') as h: return list(csv.DictReader(h))
 def val(x): return 'N/A' if x in (None,'','None') or str(x).lower()=='nan' else f'{float(x):.5g}'
 def meanstd(row,metric):
     mean=val(row.get(metric+'_mean')); sd=val(row.get(metric+'_std'))
@@ -29,7 +29,7 @@ def metric_series(rows,metric):
     return ([np.nan if value is None else value for value in means],
             [np.nan if r.get(metric+'_std') is None else r[metric+'_std'] for r in rows])
 
-def load_rows(): return [json.loads(f.read_text()) for f in sorted(CSV_DIR.glob('*.json')) if f.name!='hand_traces.json']
+def load_rows(): return [json.loads(f.read_text(encoding='utf-8')) for f in sorted(CSV_DIR.glob('*.json')) if f.name!='hand_traces.json']
 
 def figures(rows,summary):
     manifest=[]
@@ -254,7 +254,7 @@ def documents(rows,summary,manifest):
             disadvantages='Penalty strength and adaptation period matter;Observed ranges can be unstable;Empty niches require fill policy;Reference alignment can bias coverage'
         if a==32: mechanism='Outgoing additive-epsilon fitness and largest-fitness deletion'
         if a==34: mechanism='Equal-share Monte Carlo HV fitness and repeated deletion'; advantages='HV sharing supports many objectives;Shared samples account for overlapping domination;Re-estimation updates remaining credit;Final evaluation samples are identical across methods'
-        source=ROOT/'src/algorithms'/f'{NAMES[a-1]}.py'; docstring=ast.get_docstring(ast.parse(source.read_text()))
+        source=ROOT/'src/algorithms'/f'{NAMES[a-1]}.py'; docstring=ast.get_docstring(ast.parse(source.read_text(encoding='utf-8')))
         docstring=docstring.replace('seed=63','optimizer seed=720; recorded trials use 720-729')
         evidence_strengths,evidence_limitations,evidence_scope=evidence_analysis(a,selected,advantages,disadvantages)
         row={'algorithm_number':a,'algorithm':DISPLAY[a-1],'family':FAMILIES[a-1],'what_it_does':mechanism,'advantages':advantages,'disadvantages':disadvantages,'suitable':suitable,'avoid':avoid,'evidence_supported_strengths':evidence_strengths,'evidence_supported_limitations':evidence_limitations,'evidence_scope':evidence_scope}
@@ -281,14 +281,14 @@ def documents(rows,summary,manifest):
     for row in comparison:
         notes += [f"## {row['algorithm_number']} {row['algorithm']}\n",row['what_it_does'], '\nAdvantages (mechanism-based): '+row['advantages'], '\nDisadvantages (mechanism-based): '+row['disadvantages'], '\nEvidence-linked strengths: '+row['evidence_supported_strengths'], '\nEvidence-linked limitations: '+row['evidence_supported_limitations'], '\nEvidence boundary: '+row['evidence_scope'],'\nSuitable: '+row['suitable']+'; avoid: '+row['avoid']+'\n']
     family='Classical methods convert preferences or bounds into scalar solves, making their numerical accuracy depend on the scalar solver. Early GAs use objective selection, rank or sharing without parent elitism; the passive archive records discoveries but does not prevent the breeding population from losing them. Elitist methods spend quadratic comparisons to retain high-ranked parents and use crowding, density or grids for diversity. Decomposition gives each direction its own scalar pressure, although a fixed lattice may not match disconnected fronts. Swarms and local heuristics rely on archive leaders and neighbourhood moves; their schedules can exploit quickly or stagnate. Indicators replace explicit density with epsilon or hypervolume fitness but require scales and, for HV, a reference box. Reference methods remain useful when dominance loses discrimination in five dimensions. Preferences intentionally trade full-front coverage for a useful region. Gradient methods optimize differentiable tasks toward stationarity and do not produce a full front from one start. Feasibility rules are applied before Pareto comparisons, and comparisons use common normalized metric scales.'
-    notes.append('\n## Family comparison\n'+family); (ROOT/'docs/algorithm_notes.md').write_text('\n'.join(notes))
+    notes.append('\n## Family comparison\n'+family); (ROOT/'docs/algorithm_notes.md').write_text('\n'.join(notes),encoding='utf-8')
     cases=[]
     for p,good,bad,reason in [('P1',[1,4],10,'Convex one-variable problem; scalarization offers interpretable weights and metric methods expose compromise geometry.'),('P3',[33,28],1,'Nonconvex front; hypervolume survival and teacher-learner moves both cover interior tradeoffs in the recorded experiments, while linear scalarization cannot support them.'),('P5',[21,16],10,'Nonlinear feasibility makes Deb rules useful; archive strength and density support constrained tradeoffs.'),('P8',[14,20],36,'Permutation-safe NSGA-II and ant decomposition have the leading recorded HV means and retain valid tours; gradient descent is undefined for city orders.'),('P10',[31,18],10,'Five objectives weaken dominance; RVEA APD and MOEA/D scalar subproblems retain directional pressure and have the strongest recorded HV means at this budget.'),('P14',[35,5],10,'Known manager aspiration makes a preferred region useful; utility or reference clearing expresses it directly.')]:
         relevant=[r for r in summary if r['problem']==p and r['algorithm_number'] in good and r['group'] in ['base','D']]
         evidence='; '.join(f"A{r['algorithm_number']} M={r['objectives']} {r['group']}: HV={meanstd(r,'HV')}, IGD={meanstd(r,'IGD')}" for r in relevant)
         cases.append({'problem':p,'suitable_algorithms':','.join(DISPLAY[a-1] for a in good),'poor_algorithm':DISPLAY[bad-1],'reason':reason,'evidence':evidence,'interpretation':'Recommendations combine measured finite-budget outcomes with encoding, constraints and preference reasoning; no universal winner is claimed.'})
     write_csv(TABLES_DIR/'case_studies.csv',cases)
-    (ROOT/'docs/case_studies.md').write_text('# Task E six selection cases\n\n'+'\n\n'.join(f"## {c['problem']}\nSuitable: {c['suitable_algorithms']}. Poor: {c['poor_algorithm']}. {c['reason']}\n\nEvidence: {c['evidence']}\n\n{c['interpretation']}" for c in cases))
+    (ROOT/'docs/case_studies.md').write_text('# Task E six selection cases\n\n'+'\n\n'.join(f"## {c['problem']}\nSuitable: {c['suitable_algorithms']}. Poor: {c['poor_algorithm']}. {c['reason']}\n\nEvidence: {c['evidence']}\n\n{c['interpretation']}" for c in cases),encoding='utf-8')
     questions=[
     ('Why can Weighted Sum miss a dented front?','On P3 the true front is (t,1-t^2). A positive weighted scalar is concave in t, so its minimum occurs at an endpoint; an interior efficient point lacks a supporting linear level set. Changing the weight grid cannot fix this.'),
     ('Why might VEGA drift to extremes?','Each mating-pool segment rewards only one objective. Extreme winners enter repeatedly, while compromise designs receive no Pareto or density protection. Check the final population as well as the passive recording archive before asserting collapse in a particular run.'),
@@ -309,7 +309,7 @@ def documents(rows,summary,manifest):
     ]
     viva_text='# Task F viva preparation\n\n'+'\n\n'.join(f'## {i+1} {q}\n{answer}' for i,(q,answer) in enumerate(questions))
     viva_text+='\n\n## Code Walkthrough Preparation\n\n'+'\n\n'.join(f'### {name}\n{answer}' for name,answer in code_walkthrough)
-    (ROOT/'docs/viva_questions.md').write_text(viva_text)
+    (ROOT/'docs/viva_questions.md').write_text(viva_text,encoding='utf-8')
     network=[]
     for scale in [1,10]:
         for method in ['equal','mgda','gradnorm']:
@@ -334,9 +334,9 @@ def documents(rows,summary,manifest):
         else: ax.text(.5,.5,'$'+equation+'$',ha='center',va='center',fontsize=13)
         fig.savefig(FIGURES_DIR/f'equation_P{i}.png',bbox_inches='tight',dpi=220); plt.close(fig)
     test_log=RESULTS_ROOT/'test_output.txt'
-    contents={'algorithms':algorithm_sections,'formulations':specs,'family_discussion':family,'cases':cases,'questions':questions,'code_walkthrough':code_walkthrough,'summary':summary,'network':network,'rows_count':len(rows),'figures':manifest,'tests':test_log.read_text() if test_log.exists() else 'Run python run_all.py test; current results are recorded in docs/roll72_audit.md.'}
-    (RESULTS_ROOT/'report_content.json').write_text(json.dumps(contents,indent=2))
-    (TABLES_DIR/'completion_status.json').write_text(json.dumps({'modules':37,'mechanism_tests':37,'tests_passed':62,'main_experiment_jobs':len(rows),'full_budget_cap':10000,'P9_budget':200,'report_format':'docx','zip_requested':False,'remaining':['P9 full 10000 evaluation experiments','Additional mechanism-specific ablations to establish two experimentally supported advantages and two experimentally supported disadvantages for every method; current measured metrics are provided alongside reasoned claims','Student viva understanding and original personal conclusions must be prepared by student']},indent=2))
+    contents={'algorithms':algorithm_sections,'formulations':specs,'family_discussion':family,'cases':cases,'questions':questions,'code_walkthrough':code_walkthrough,'summary':summary,'network':network,'rows_count':len(rows),'figures':manifest,'tests':test_log.read_text(encoding='utf-8') if test_log.exists() else 'Run python run_all.py test; current results are recorded in docs/roll72_audit.md.'}
+    (RESULTS_ROOT/'report_content.json').write_text(json.dumps(contents,indent=2),encoding='utf-8')
+    (TABLES_DIR/'completion_status.json').write_text(json.dumps({'modules':37,'mechanism_tests':37,'tests_passed':63,'main_experiment_jobs':len(rows),'full_budget_cap':10000,'P9_budget':200,'report_format':'docx','zip_requested':False,'remaining':['P9 full 10000 evaluation experiments','Additional mechanism-specific ablations to establish two experimentally supported advantages and two experimentally supported disadvantages for every method; current measured metrics are provided alongside reasoned claims','Student viva understanding and original personal conclusions must be prepared by student']},indent=2),encoding='utf-8')
 
 if __name__=='__main__':
     rows=load_rows(); summary=aggregate(rows)

@@ -1,7 +1,7 @@
 {
   "modules": 37,
   "mechanism_tests": 37,
-  "tests_passed": 62,
+  "tests_passed": 63,
   "main_experiment_jobs": 1196,
   "full_budget_cap": 10000,
   "P9_budget": 200,

@@ -22,7 +22,7 @@ FIGURES_DIR=ROOT/'figures'/ACTIVE_PROVENANCE
 REPORT_PATH=ROOT/'Lab_Assignment_7_Sofia_Abidi_241071072.docx'
 
 def read_csv(name):
-    with (ROOT/name).open() as f: return list(csv.DictReader(f))
+    with (ROOT/name).open(encoding='utf-8') as f: return list(csv.DictReader(f))
 def number(value):
     if value is None or str(value) in ('None','','nan','NaN'): return 'N/A'
     try: return f'{float(value):.4g}'
@@ -42,7 +42,7 @@ def parameter_label(value):
     return ', '.join(f'{labels.get(key,key.replace("_"," ").title())} = {number(item)}' for key,item in values.items())
 
 def generate():
-    content=json.loads((RESULTS_ROOT/'report_content.json').read_text()); doc=Document()
+    content=json.loads((RESULTS_ROOT/'report_content.json').read_text(encoding='utf-8')); doc=Document()
     section=doc.sections[0]; section.page_width=Inches(8.27); section.page_height=Inches(11.69)
     section.top_margin=section.bottom_margin=Inches(.72); section.left_margin=section.right_margin=Inches(.78)
     section.header_distance=section.footer_distance=Inches(.32)
@@ -238,7 +238,7 @@ def generate():
             para('Most frequent features in the pooled retained feature-selection fronts are listed below. Frequencies pool the two methods and ten seeds; the reduced budget does not establish globally optimal masks.')
             table(['Feature','Front frequency'],[[r['feature'],number(r['front_frequency'])] for r in freq],widths=[4.8,1.97])
         if spec['key']=='P12': para('All five supplied suppliers are nondominated under cost minimization and quality delivery reliability directions. Ranking imposes an additional preference order on these tradeoffs.')
-        if spec['key']=='P8': table(['City','x','y'],[[i,number(x),number(y)] for i,(x,y) in enumerate(json.loads((ROOT/'docs/p8_coords.json').read_text()))],widths=[.7,3.035,3.035])
+        if spec['key']=='P8': table(['City','x','y'],[[i,number(x),number(y)] for i,(x,y) in enumerate(json.loads((ROOT/'docs/p8_coords.json').read_text(encoding='utf-8')))],widths=[.7,3.035,3.035])
     heading(titles[3])
     para('moo_utils.py centralizes dominance, pairwise front sorting, crowding distance, archive filtering, normalization, positive-residual violation, exact 2D HV, Monte Carlo HV, IGD, Spacing and reproducible reference directions. Pairwise arrays expose the calculations directly and cost O(M*N^2); vectorization improves execution time without changing asymptotic work.')
     table(['Check','Input','Expected'],[['Dominance','(1,2) versus (2,3)','First dominates'],['Tradeoff','(1,3) versus (2,2)','Neither dominates'],['HV','(1,3) (2,2) (3,1); reference (4,4)','6'],['IGD identical fronts','same point sets','0'],['Crowding','(0,2) (1,1) (2,0)','infinity 2 infinity'],['Lecture car front','A B C D E F table','A B C D'],['Lecture Deb layers','A D feasible; B CV2; C CV5','A,D then B then C'],['DTLZ2 g0','tail variables all .5','squared objective sum 1'],['Network derivatives','central finite difference +/-1e-6','analytical match to 5 decimal places']],widths=[1.3,3.5,1.97])
@@ -272,7 +272,7 @@ def generate():
     for a in TASK_C_ALGORITHM_NUMBERS:
         heading(f'Flow diagram A{a} {content["algorithms"][a-1]["algorithm"]}',3)
         figure(f'flow_A{a:02d}.png',f'Figure C{a} Current implementation control flow',5.6)
-    traces=json.loads((CSV_DIR/'hand_traces.json').read_text())
+    traces=json.loads((CSV_DIR/'hand_traces.json').read_text(encoding='utf-8'))
     heading('R-NSGA-II two selection iterations',2)
     task_para('Tiny instance: P1 with f1=(x-3)^2 and f2=(x-7)^2, population N=4, natural-unit reference r=(4,4), fixed ideal=(0,0), nadir=(16,16), and therefore normalized reference (0.25,0.25). Epsilon=0.20. Parents and four fixed offspring form eight candidates. Deb nondominated sorting is applied first; within the splitting front, candidates are ordered by Euclidean reference distance and epsilon clearing controls local spacing.')
     for r in traces['r_nsga2']:
