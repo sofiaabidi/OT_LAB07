@@ -1,15 +1,16 @@
 """RVEA: reference-vector association and angle-penalized distance (APD),
 penalty strength alpha=2. Range-adapt vectors every 10 generations.
 One best member per vector, fill unoccupied slots by APD.
-Shared defaults: population=40, budget=10000, seed=63.
+Shared defaults: population=40, budget=10000, optimizer seed=720.
 Constraints: Deb feasibility comparison unless the stated method uses scalar penalty.
 Lecture decks supplied on 12 October 2026; teaching variants documented in docs/lecture_alignment.md.
 """
 import numpy as np
+from src.project_config import DEFAULT_OPTIMIZER_SEED
 from src.algorithms.common import State, evaluate, execute, offspring, merge, tournament, environmental, mutate, crossover
 from src.moo_utils import dominates, dominance_matrix, non_dominated_sort, crowding_distance, normalize, reference_vectors, archive, nondominated, hypervolume
 
-def initialize(problem,budget=10000,seed=63,**params):
+def initialize(problem,budget=10000,seed=DEFAULT_OPTIMIZER_SEED,**params):
     s=State(problem,budget,seed,**params)
     s.extra['v']=reference_vectors(s.n,problem.m)
     return s
@@ -33,5 +34,5 @@ def iterate(s):
     if s.generation%10==0: s.extra['v']=reference_vectors(s.n,s.p.m)*np.maximum(np.ptp(np.r_[s.f,f],axis=0),1e-9)
     merge(s,y,f,c,lambda f,c,n:select(f,c,n,s.extra['v'],s.used/s.budget))
 
-def run(problem,budget=10000,seed=63,**params):
+def run(problem,budget=10000,seed=DEFAULT_OPTIMIZER_SEED,**params):
     return execute(initialize,iterate,problem,budget,seed,**params)

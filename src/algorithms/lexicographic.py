@@ -1,15 +1,16 @@
 """Lexicographic: sequential strict-priority scalar minimizations, preserving
 prior best objective within tolerance=1e-7 in normalized units. Profit first
 then units on P11; agricultural yield first on P7.
-Default SLSQP ftol=1e-10, maxiter=120; sweep=21; seed=63.
+Default SLSQP ftol=1e-10, maxiter=120; sweep=21; optimizer seed=720.
 Bounds and explicit constraints handled by SLSQP. Only scalar subproblems use SciPy.
 Local solves are not a global optimality certificate.
 """
 import numpy as np
+from src.project_config import DEFAULT_OPTIMIZER_SEED
 from scipy.optimize import minimize
 from src.moo_utils import archive
 
-def initialize(problem,budget=10000,seed=63,**params):
+def initialize(problem,budget=10000,seed=DEFAULT_OPTIMIZER_SEED,**params):
     return {'p':problem,'budget':budget,'seed':seed,'params':params,'used':0,'x':[],'f':[],'cv':[],'solves':[]}
 
 def evaluate(s,x):
@@ -46,7 +47,7 @@ def finish(s):
     good=c<=1e-8
     return {'x':x[good],'f':f[good],'cv':c[good],'evaluations':s['used'],'solves':s['solves']}
 
-def run(problem,budget=10000,seed=63,**params):
+def run(problem,budget=10000,seed=DEFAULT_OPTIMIZER_SEED,**params):
     s=initialize(problem,budget,seed,**params)
     try: iterate(s)
     except StopIteration: pass

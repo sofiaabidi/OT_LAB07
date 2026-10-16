@@ -3,15 +3,16 @@ summed worsened-objective energy for dominated moves, Boltzmann acceptance and a
 Temperature T0=.1, cooling=.97 per population sweep, move scale=.1.
 Lecture Part 4 slide 41 acceptance; parallel chains are a declared extension.
 Incomparable neighbours always accepted. Normalized T0=.1 is not raw-unit T0=100.
-Shared defaults: population=40, budget=10000, seed=63.
+Shared defaults: population=40, budget=10000, optimizer seed=720.
 Constraints: Deb feasibility comparison unless the stated method uses scalar penalty.
 Lecture decks supplied on 12 October 2026; teaching variants documented in docs/lecture_alignment.md.
 """
 import numpy as np
+from src.project_config import DEFAULT_OPTIMIZER_SEED
 from src.algorithms.common import State, evaluate, execute, offspring, merge, tournament, environmental, mutate, crossover
 from src.moo_utils import dominates, dominance_matrix, non_dominated_sort, crowding_distance, normalize, reference_vectors, archive, nondominated, hypervolume
 
-def initialize(problem,budget=10000,seed=63,**params):
+def initialize(problem,budget=10000,seed=DEFAULT_OPTIMIZER_SEED,**params):
     return State(problem,budget,seed,**params)
 
 def acceptance(old,new,T,weight=None,ca=0.,cb=0.):
@@ -33,5 +34,5 @@ def iterate(s):
         old=s.p.normalized(s.f[i]); new=s.p.normalized(f[i])
         if s.rng.random()<acceptance(old,new,T,None,s.cv[i],c[i]): s.x[i],s.f[i],s.cv[i]=y[i],f[i],c[i]
 
-def run(problem,budget=10000,seed=63,**params):
+def run(problem,budget=10000,seed=DEFAULT_OPTIMIZER_SEED,**params):
     return execute(initialize,iterate,problem,budget,seed,**params)

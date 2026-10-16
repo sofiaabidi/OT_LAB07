@@ -60,7 +60,7 @@ python -m src.experiments.build_deliverables
 
 `python -m src.experiments.build_deliverables` rebuilds tables, figures, algorithm notes, case studies, and viva material from active checkpoints. Task C has two deterministic hand-worked iterations and three-value, ten-seed sensitivity studies for each assigned method.
 
-`python run_all.py report` additionally creates the editable DOCX. The DOCX is intentionally deferred in the current phase; it is not required for `python run_all.py verify` to validate the stored experiment evidence.
+`python run_all.py report` additionally creates the editable `Lab_Assignment_7_Sofia_Abidi_241071072.docx`. The verifier checks its structure, identity, Task C content, and embedded media when it is present.
 
 ## Scope and limitations
 

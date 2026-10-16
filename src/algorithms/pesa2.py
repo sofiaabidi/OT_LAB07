@@ -1,14 +1,15 @@
 """PESA-II: archive adaptive grid regions; region tournament selects lower
 occupancy region, then uniform individual. Default grid divisions=8.
-Shared defaults: population=40, budget=10000, seed=63.
+Shared defaults: population=40, budget=10000, optimizer seed=720.
 Constraints: Deb feasibility comparison unless the stated method uses scalar penalty.
 Lecture decks supplied on 12 October 2026; teaching variants documented in docs/lecture_alignment.md.
 """
 import numpy as np
+from src.project_config import DEFAULT_OPTIMIZER_SEED
 from src.algorithms.common import State, evaluate, execute, offspring, merge, tournament, environmental, mutate, crossover
 from src.moo_utils import dominates, dominance_matrix, non_dominated_sort, crowding_distance, normalize, reference_vectors, archive, nondominated, hypervolume
 
-def initialize(problem,budget=10000,seed=63,**params):
+def initialize(problem,budget=10000,seed=DEFAULT_OPTIMIZER_SEED,**params):
     return State(problem,budget,seed,**params)
 
 def regions(f,divisions=8):
@@ -30,5 +31,5 @@ def iterate(s):
         ids.pop(int(s.rng.choice(positions)))
     s.ax,s.af,s.ac=x[ids],ff[ids],cc[ids]
 
-def run(problem,budget=10000,seed=63,**params):
+def run(problem,budget=10000,seed=DEFAULT_OPTIMIZER_SEED,**params):
     return execute(initialize,iterate,problem,budget,seed,**params)

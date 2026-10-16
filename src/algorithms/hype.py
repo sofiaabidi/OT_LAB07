@@ -1,15 +1,16 @@
 """HypE: Monte Carlo hypervolume fitness with equal shared credits,
 iterative contribution deletion. Samples=256 selection, final HV uses 8192.
 Credits account for shared dominated samples; noisy selection is a limitation.
-Shared defaults: population=40, budget=10000, seed=63.
+Shared defaults: population=40, budget=10000, optimizer seed=720.
 Constraints: Deb feasibility comparison unless the stated method uses scalar penalty.
 Lecture decks supplied on 12 October 2026; teaching variants documented in docs/lecture_alignment.md.
 """
 import numpy as np
+from src.project_config import DEFAULT_OPTIMIZER_SEED
 from src.algorithms.common import State, evaluate, execute, offspring, merge, tournament, environmental, mutate, crossover
 from src.moo_utils import dominates, dominance_matrix, non_dominated_sort, crowding_distance, normalize, reference_vectors, archive, nondominated, hypervolume
 
-def initialize(problem,budget=10000,seed=63,**params):
+def initialize(problem,budget=10000,seed=DEFAULT_OPTIMIZER_SEED,**params):
     return State(problem,budget,seed,**params)
 
 def contributions(f,reference,rng,samples=256,k=1):
@@ -30,5 +31,5 @@ def iterate(s):
     y=offspring(s,tournament(s)); f,c=evaluate(s,y); s.record(y,f,c)
     merge(s,y,f,c,lambda f,c,n:select(f,c,n,s.rng,s.params.get('samples',256)))
 
-def run(problem,budget=10000,seed=63,**params):
+def run(problem,budget=10000,seed=DEFAULT_OPTIMIZER_SEED,**params):
     return execute(initialize,iterate,problem,budget,seed,**params)

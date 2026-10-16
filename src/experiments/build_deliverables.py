@@ -17,8 +17,10 @@ plt.rcParams.update({'font.size':10,'axes.spines.top':False,'axes.spines.right':
 
 def read_csv(path):
     with path.open() as h: return list(csv.DictReader(h))
-def val(x): return 'N/A' if x in (None,'','None') else f'{float(x):.5g}'
-def meanstd(row,metric): return val(row.get(metric+'_mean'))+' +/- '+val(row.get(metric+'_std'))
+def val(x): return 'N/A' if x in (None,'','None') or str(x).lower()=='nan' else f'{float(x):.5g}'
+def meanstd(row,metric):
+    mean=val(row.get(metric+'_mean')); sd=val(row.get(metric+'_std'))
+    return 'N/A' if mean=='N/A' else (mean if sd=='N/A' else mean+' ± '+sd)
 
 def metric_series(rows,metric):
     """Return numeric mean/SD arrays, or None when a metric is unavailable."""
@@ -130,12 +132,110 @@ FORMULATIONS=[
 ('Differentiable multi-task toy and network','toy x in R^2, start (0,5); network 5->8 tanh->two heads','toy min [||x-(3,3)||^2,||x-(-3,-3)||^2]; network BCE/MSE','Toy unconstrained. Numerical plotting scale [0,72], no claim of bounding all R^2.','Pareto set x1=x2 in [-3,3]. MGDA minimizes norm of convex gradient combination. GradNorm balances weighted shared-body gradient norms. Synthetic 128x5 data seed 63, class sign(x0-x1), regression 3*x0+2*x2+noise. Network H=tanh(XW+b), class=sigmoid(H*wc+bc), regression=H*wr+br; 66 real parameters, 48 shared. BCE=-mean(y*log(class)+(1-y)*log(1-class)); MSE=mean((regression-target)^2). Regression scale 1 vs 10; all training derivatives handwritten.'),
 ('Laptop preference','screen [13,17]in, battery [40,90]Wh','min [.4+.05*screen+.012*battery,-.2*battery/(.5+.03*screen)]','Bounds; Pareto screen=13.','Every screen increase worsens both objectives. Natural reference (1.8kg,12h) becomes (1.8,-12). At 12h front weight=1.6908kg; reference is dominated, so preference focuses near a attainable compromise rather than exact equal target.')]
 
+SANITY_CHECKS=[
+    'x=3 gives (f1,f2)=(0,16), while x=7 gives (16,0); both are Pareto endpoints.',
+    'x=1 gives (100,1) and x=10 gives (10,100), confirming the opposing monotone objectives.',
+    'With x2..x10=0, g=1; x1=0.5 gives (0.5,0.75) on f2=1-f1^2.',
+    'w=(0.25,0.25,0.25,0.25) sums to one, has risk 0.012625 and expected return 0.1125.',
+    'At (b,h)=(0.10,0.02), b*h^2=4e-5 exceeds 2.4e-5, mass=15.7 kg and deflection=0.025.',
+    'A=(0,0) gives (0,50), B=(1,1) gives (8,32), and both are feasible; the report retains the full four-point Deb-rule calculation.',
+    '(x1,x2)=(40,50) exactly uses the capacity 90 and gives minimized objectives (-32,-60).',
+    'Every stored decision is checked to contain each city index 0..14 exactly once; nearest-neighbour distance and time baselines are reported separately.',
+    'The all-features five-fold 5NN baseline error is 0.04042; an empty mask has positive violation and is repaired before optimization.',
+    'When every tail variable is 0.5, g=0 and the implementation test confirms sum(f_j^2)=1.',
+    '(xA,xB)=(300,200) makes both resource left sides 1200 and 1600, with profit 2400 and 500 total units.',
+    'Supplier S1 is encoded as (120,-8,10,-92) in the common minimization convention; the supplied five-row table is not synthesized.',
+    'For the toy at x=(0,0), both squared-distance losses equal 18; finite-difference tests check the network gradients.',
+    'At screen=13 and runtime=12 h, battery=53.4 Wh and weight=1.6908 kg; increasing screen size worsens both objectives.',
+]
+
+TERMINATION_RULES=[
+    'Classical scalar sweeps stop at solver tolerance under the 10000-call cap; stochastic methods use at most 10000 evaluations.',
+    'Scalar or stochastic runs use the shared 10000-evaluation cap; integer repair is applied after variation.',
+    'Task A and Task D stochastic comparisons stop at 10000 evaluations; scalar sweeps use the same cap.',
+    'Portfolio optimizers stop at 10000 evaluations; scalar solvers stop at tolerance under that cap.',
+    'Constrained stochastic runs stop at 10000 evaluations with Deb feasibility applied at every comparison.',
+    'Stochastic runs stop at 10000 evaluations; feasibility is checked before objective dominance.',
+    'Scalar and stochastic runs use the shared 10000-evaluation cap.',
+    'Routing methods stop at 10000 evaluated tours, always after permutation repair or construction.',
+    'Feature-selection runs intentionally stop at 200 candidate evaluations; the suggested 10000 budget remains incomplete.',
+    'Three- and five-objective runs stop at 10000 evaluations.',
+    'Goal and lexicographic scalar solves terminate at solver tolerance under the shared cap.',
+    'TOPSIS and VIKOR terminate after scoring the five supplied alternatives or the stored NSGA-II front.',
+    'Toy gradient runs use 10000 objective evaluations; network experiments use 1000 full-batch training steps.',
+    'Preference and scalar runs stop at 10000 evaluations or solver tolerance under the same cap.',
+]
+
 def documents(rows,summary,manifest):
     from src.algorithms import NAMES
     import ast
     # Update comments following supplied lecture definitions.
     corrected={3:('Reference coordinates require preference scaling','Reference bounds can restrict the feasible front'),13:('Lecture tournament differs from historical comparison-set dominance','Small comparison sets give noisy niche estimates'),26:('Dominated-move cooling can still freeze basin escape','Incomparable moves are accepted even at low temperature'),34:('Equal-share credit is a lecture simplification','Monte Carlo fitness has sampling noise')}
     comparison=[]; log=[]; algorithm_sections=[]
+    def evidence_analysis(number,selected,advantages,disadvantages):
+        """Connect observed outcomes to claims without presenting correlation as causation."""
+        name=DISPLAY[number-1]
+        expected_benefit=advantages.split(';')[0]
+        expected_risk=disadvantages.split(';')[0]
+        observed=list(selected)
+        for result in summary:
+            if result['algorithm_number']==number and result['group']=='D' and result not in observed:
+                observed.append(result)
+        if not observed:
+            method='topsis' if number==8 else 'vikor'
+            ranked=[r for r in read_csv(CSV_DIR/'rankings.csv') if r['method']==method]
+            strengths=(f"On the supplied alternatives, {method.upper()} produced explicit top-three orders for "
+                       f"{len(ranked)} recorded preference settings; for example {ranked[0]['problem']} gave "
+                       f"{ranked[0]['top_three']}. The P12 and P4 tables therefore support its practical ability "
+                       "to turn stated weights into an auditable shortlist. These are ranking outcomes, not search quality.")
+            limitations=(f"The same records contain only existing alternatives and no generated decision vector, directly "
+                         f"confirming that {method.upper()} is not an optimizer. Its orders also depend on weights"
+                         +(" and v" if number==9 else "")+"; the recorded weight-shift rows quantify local sensitivity but do not establish global stability.")
+            return strengths,limitations,('The ranking evidence supports auditable preference application, while the mechanism-based '
+                                           f'benefit "{expected_benefit}" and risk "{expected_risk}" remain analytical claims rather than optimizer evidence.')
+        first=observed[0]
+        quality=(f"{name} recorded HV {meanstd(first,'HV')} on {first['problem']}"
+                 +(f", IGD {meanstd(first,'IGD')}" if first['IGD_mean'] is not None
+                   else f", and Spacing {meanstd(first,'Spacing')} where exact-front IGD is unavailable")
+                 +f" (Figure A{number:02d}).")
+        comparison_source=next((candidate for candidate in observed if any(
+            r['group']=='D' and r['problem']==candidate['problem'] and r['objectives']==candidate['objectives']
+            and r['algorithm_number']!=number and r['budget_cap']==candidate['budget_cap'] for r in summary)),first)
+        comparable=[r for r in summary if r['group']=='D' and r['problem']==comparison_source['problem']
+                    and r['objectives']==comparison_source['objectives'] and r['algorithm_number']!=number
+                    and r['budget_cap']==comparison_source['budget_cap']]
+        if comparable:
+            peer=min(comparable,key=lambda r:abs(r['HV_mean']-comparison_source['HV_mean']))
+            comparison=(f" In the comparable {comparison_source['problem']} study with the same {comparison_source['budget_cap']:,}-evaluation cap, "
+                        f"{name} recorded HV {meanstd(comparison_source,'HV')}; the nearest peer by mean HV was "
+                        f"{peer['algorithm']} at {meanstd(peer,'HV')}, with runtime {meanstd(peer,'runtime')} s versus "
+                        f"{meanstd(comparison_source,'runtime')} s for {name}.")
+        else:
+            comparison=(f" The run used {meanstd(first,'evaluations')} evaluations and took {meanstd(first,'runtime')} s; "
+                        "no same-problem comparison row is used to manufacture a benchmark claim.")
+        quality += comparison
+        if len(observed)>1:
+            second=observed[1]
+            efficiency=(f" A separate {second['problem']} record gives HV {meanstd(second,'HV')} after "
+                        f"{meanstd(second,'evaluations')} evaluations in {meanstd(second,'runtime')} s, so the evidence is not limited to one problem.")
+        else:
+            efficiency=' The saved result supports finite-run quality and cost only, not an asymptotic efficiency claim.'
+        if first['IGD_mean'] is None:
+            gap=(f"No exact front is available for {first['problem']}, so the run cannot experimentally establish convergence; "
+                 f"HV {meanstd(first,'HV')} and Spacing {meanstd(first,'Spacing')} cover different questions.")
+        else:
+            gap=(f"The nonzero {first['problem']} IGD of {meanstd(first,'IGD')} measures remaining sampled-front error. "
+                 "Thus the run does not support exact convergence or global optimality.")
+        variable=next((r for r in observed if r['trials']>=10 and (r['HV_std'] or 0)>0),None)
+        if variable is not None:
+            second_gap=(f" Across {variable['trials']} {variable['problem']} trials, HV SD was {val(variable['HV_std'])} and runtime SD was "
+                        f"{val(variable['runtime_std'])} s, which quantifies seed sensitivity at this budget.")
+        else:
+            second_gap=(f" The {first['problem']} output retained {meanstd(first,'front_size')} point(s). That finite resolution "
+                        "limits what the plot can demonstrate; front size or zero Spacing alone is not evidence of complete coverage.")
+        boundary=(f'The measurements provide context for the claimed benefit "{expected_benefit}" and the risk '
+                  f'"{expected_risk}". They do not isolate either mechanism; controlled ablation would be required for causal attribution.')
+        return quality+efficiency,gap+second_gap,boundary
     for a in range(1,38):
         selected=[r for r in summary if r['group']=='base' and r['algorithm_number']==a]
         mechanism,advantages,disadvantages,suitable,avoid=NOTES[a-1]
@@ -155,34 +255,31 @@ def documents(rows,summary,manifest):
         if a==32: mechanism='Outgoing additive-epsilon fitness and largest-fitness deletion'
         if a==34: mechanism='Equal-share Monte Carlo HV fitness and repeated deletion'; advantages='HV sharing supports many objectives;Shared samples account for overlapping domination;Re-estimation updates remaining credit;Final evaluation samples are identical across methods'
         source=ROOT/'src/algorithms'/f'{NAMES[a-1]}.py'; docstring=ast.get_docstring(ast.parse(source.read_text()))
-        if selected:
-            first=selected[0]; evidence=f"Task A {first['problem']}: HV {meanstd(first,'HV')}; IGD {meanstd(first,'IGD')}; Spacing {meanstd(first,'Spacing')}; front size {meanstd(first,'front_size')}; runtime {meanstd(first,'runtime')} s."
-            second_quality=(f"IGD={meanstd(first,'IGD')} measures distance to the sampled exact front"
-                            if first['IGD_mean'] is not None else
-                            f"Spacing={meanstd(first,'Spacing')} measures within-front regularity because exact-front IGD is unavailable")
-            measured_support=(f"1) HV={meanstd(first,'HV')} records achieved normalized dominated volume; "
-                              f"2) {second_quality}.")
-            measured_cautions=(f"1) The recorded front has {meanstd(first,'front_size')} points and cannot certify complete coverage; "
-                               f"2) runtime={meanstd(first,'runtime')} s at {meanstd(first,'evaluations')} evaluations quantifies finite-budget cost, not asymptotic efficiency.")
-            limitation=f"Finite recorded front size={val(first['front_size_mean'])}; this is no certificate of complete coverage. "
-            if first['IGD_mean'] is not None: limitation+=f"Residual sampled-front IGD={val(first['IGD_mean'])}; positive residual measures finite-budget approximation error."
-            else: limitation+='Exact-front IGD is unavailable for this problem, so convergence is not certified.'
-        else:
-            ranks=read_csv(CSV_DIR/'rankings.csv'); chosen=[r for r in ranks if r['method']==('topsis' if a==8 else 'vikor')]
-            evidence='; '.join(f"{r['problem']} w={r['weights']} v={r['v']}: top 3 {r['top_three']}" for r in chosen)
-            measured_support='1) Two weight settings produce traceable ranked orders; 2) both P12 and a generated P4 front are evaluated.'
-            measured_cautions='1) Only existing alternatives are ranked; 2) preference sensitivity does not demonstrate search or global optimality.'
-            limitation='Five existing suppliers are ranked; no new design is generated. Preference changes are measured in rankings.csv; ranking quality does not imply a global optimum.'
-        row={'algorithm_number':a,'algorithm':DISPLAY[a-1],'family':FAMILIES[a-1],'what_it_does':mechanism,'advantages':advantages,'disadvantages':disadvantages,'suitable':suitable,'avoid':avoid,'measured_evidence':evidence,'measured_support_links':measured_support,'measured_caution_links':measured_cautions,'measured_limitations':limitation,'evidence_scope':'Measured links support achieved quality, coverage limits and cost observations. Mechanism-specific causal claims require additional targeted ablations; these are labelled reasoned.'}
+        docstring=docstring.replace('seed=63','optimizer seed=720; recorded trials use 720-729')
+        evidence_strengths,evidence_limitations,evidence_scope=evidence_analysis(a,selected,advantages,disadvantages)
+        row={'algorithm_number':a,'algorithm':DISPLAY[a-1],'family':FAMILIES[a-1],'what_it_does':mechanism,'advantages':advantages,'disadvantages':disadvantages,'suitable':suitable,'avoid':avoid,'evidence_supported_strengths':evidence_strengths,'evidence_supported_limitations':evidence_limitations,'evidence_scope':evidence_scope}
         comparison.append(row)
         status='partly works' if a in [23,30] else 'works'
         note='P9 uses 200 evaluations; full suggested budget incomplete.' if a in [23,30] else 'Teaching mechanism validated; see lecture alignment for variants.'
-        log.append({'algorithm_number':a,'algorithm':DISPLAY[a-1],'problems_tested':';'.join(sorted(set(r['problem'] for r in selected))) if selected else 'P12;P4 NSGA-II front','evaluation_budget':';'.join(f"{r['problem']}: {val(r['evaluations_mean'])} actual / {r['budget_cap']} cap" for r in selected) if selected else 'ranking only','HV':';'.join(meanstd(r,'HV') for r in selected) if selected else 'N/A','IGD':';'.join(meanstd(r,'IGD') for r in selected) if selected else 'N/A','Spacing':';'.join(meanstd(r,'Spacing') for r in selected) if selected else 'N/A','runtime':';'.join(meanstd(r,'runtime') for r in selected) if selected else 'ranking table operations','test_status':'PASS defining mechanism','implementation_status':status,'notes_and_limitations':note})
+        if selected:
+            for result in selected:
+                log.append({'algorithm_number':a,'algorithm':DISPLAY[a-1],
+                            'problems_used':result['problem']+(' M='+str(result['objectives']) if result['problem']=='P10' else ''),
+                            'evaluation_budget':f"{val(result['evaluations_mean'])} actual / {result['budget_cap']} cap",
+                            'HV':meanstd(result,'HV'),'IGD':meanstd(result,'IGD'),
+                            'runtime_seconds':meanstd(result,'runtime'),'status':status,
+                            'notes':note})
+        else:
+            for problem in ['P12 alternatives','P4 NSGA-II front']:
+                log.append({'algorithm_number':a,'algorithm':DISPLAY[a-1],'problems_used':problem,
+                            'evaluation_budget':'ranking only','HV':'N/A','IGD':'N/A',
+                            'runtime_seconds':'N/A (not timed)','status':status,
+                            'notes':'Ranks existing alternatives; does not generate a front.'})
         algorithm_sections.append({**row,'module':str(source.relative_to(ROOT)),'docstring':docstring,'results':selected,'status':status,'figure':f'A{a:02d}.png'})
     write_csv(TABLES_DIR/'comparison.csv',comparison); write_csv(RESULTS_ROOT/'implementation_log.csv',log)
-    notes=['# Task B algorithm comparison\n\nMeasured output quality and theoretical mechanisms are distinguished. Values refer to normalized metrics with fixed scales. Each method has two explicit measured-use links and two measured cautions; these observations do not turn untested mechanism claims into causal conclusions.\n']
+    notes=['# Task B algorithm comparison\n\nMeasured outcomes and theory-based mechanism arguments are distinguished. Values use the common normalized metric scales. Each method has two concrete observed strengths and two concrete observed limitations where the stored data permits them; causal attribution remains explicitly bounded.\n']
     for row in comparison:
-        notes += [f"## {row['algorithm_number']} {row['algorithm']}\n",row['what_it_does'], '\nAdvantages (reasoned): '+row['advantages'], '\nDisadvantages (reasoned): '+row['disadvantages'], '\nMeasured run: '+row['measured_evidence'], '\nMeasured links to use: '+row['measured_support_links'], '\nMeasured cautions: '+row['measured_caution_links'], '\nEvidence boundary: '+row['evidence_scope'],'\nSuitable: '+row['suitable']+'; avoid: '+row['avoid']+'\n']
+        notes += [f"## {row['algorithm_number']} {row['algorithm']}\n",row['what_it_does'], '\nAdvantages (mechanism-based): '+row['advantages'], '\nDisadvantages (mechanism-based): '+row['disadvantages'], '\nEvidence-linked strengths: '+row['evidence_supported_strengths'], '\nEvidence-linked limitations: '+row['evidence_supported_limitations'], '\nEvidence boundary: '+row['evidence_scope'],'\nSuitable: '+row['suitable']+'; avoid: '+row['avoid']+'\n']
     family='Classical methods convert preferences or bounds into scalar solves, making their numerical accuracy depend on the scalar solver. Early GAs use objective selection, rank or sharing without parent elitism; the passive archive records discoveries but does not prevent the breeding population from losing them. Elitist methods spend quadratic comparisons to retain high-ranked parents and use crowding, density or grids for diversity. Decomposition gives each direction its own scalar pressure, although a fixed lattice may not match disconnected fronts. Swarms and local heuristics rely on archive leaders and neighbourhood moves; their schedules can exploit quickly or stagnate. Indicators replace explicit density with epsilon or hypervolume fitness but require scales and, for HV, a reference box. Reference methods remain useful when dominance loses discrimination in five dimensions. Preferences intentionally trade full-front coverage for a useful region. Gradient methods optimize differentiable tasks toward stationarity and do not produce a full front from one start. Feasibility rules are applied before Pareto comparisons, and comparisons use common normalized metric scales.'
     notes.append('\n## Family comparison\n'+family); (ROOT/'docs/algorithm_notes.md').write_text('\n'.join(notes))
     cases=[]
@@ -201,15 +298,18 @@ def documents(rows,summary,manifest):
     ('Explain Deb rules numerically','Lecture A=(3,6),CV=0 and D=(4,5),CV=0 beat B=(1,2),CV=2 and C=(.5,1),CV=5. A,D trade off. B beats C because 2<5. Thus front layers are [A,D],[B],[C], irrespective of the attractive infeasible objectives.'),
     ('How can premature convergence be detected?','Track HV, IGD where exact-front samples exist, final-population spread, archive turnover and decision-variable variance across budget checkpoints and seeds. Flat HV alone may mean saturation, a poor reference box or a single-region stall; inspect more than one diagnostic.'),
     ('Why are TOPSIS and VIKOR ranking methods rather than optimizers?','Their input is an existing alternatives matrix. They compute closeness or regret and reorder rows; they never choose new decision vectors or explore bounds.'),
-    ('What do HV IGD and Spacing measure?','HV is dominated volume within one fixed reference; for (1,3),(2,2),(3,1) and r=(4,4), HV=6. IGD averages true-front sample distance to the approximation. Spacing is sample SD of nearest L1 distances. A singleton has Spacing=0 but poor coverage. Normalize using the same constants across algorithms.'),
-    ('Why keep decisions as well as objective arrays?','Objectives rank tradeoffs, while decisions verify bounds, repair, feature masks and tours. NPZ files retain both and constraint residuals. Dense pairwise arrays permit vectorized dominance at O(M*N^2) storage/work; they do not remove quadratic complexity.'),
-    ('What does the hand trace prove?','R-NSGA-II reproduces reference-distance ordering and epsilon clearing, VEGA reproduces two objective-wise selections, and MOPSO reproduces two velocity/position updates with retained incomparable personal bests. These are mechanism checks, not proofs of global convergence.'),
-    ('How does changing a parameter affect behaviour?','Larger R-NSGA-II epsilon clears a wider preferred neighbourhood; VEGA population changes instantaneous coverage versus generations at fixed budget; larger MOPSO inertia preserves momentum and may overshoot. Inspect the three-value, ten-trial sensitivity rows before claiming numerical improvement.'),
-    ('Why does MGDA sometimes stop while task gradients remain nonzero?','At Pareto stationarity the minimum-norm convex combination is zero; individual gradients may oppose one another. For [1,0] and [-1,0], weights .5,.5 cancel. GradNorm instead controls magnitudes and need not choose a common descent direction.'),
-    ('How is network correctness verified?','Forward and backward BCE/MSE derivatives are handwritten. Tests perturb shared weights, biases and both heads by +/-1e-6 and compare finite differences to analytical task gradients. Standardization in feature selection is fitted only to training observations.'),
     ]
-    for a,row in enumerate(comparison,1): questions.append((f"Explain A{a} {row['algorithm']} and predict one change",row['what_it_does']+'. '+algorithm_sections[a-1]['docstring']+' Inspect '+row['algorithm']+' in '+algorithm_sections[a-1]['module']+' and identify the test_'+f'{a:02d}'+'_mechanism assertion before editing.'))
-    (ROOT/'docs/viva_questions.md').write_text('# Task F viva preparation\n\n'+'\n\n'.join(f'## {i+1} {q}\n{answer}' for i,(q,answer) in enumerate(questions)))
+    code_walkthrough=[
+        ('A10 VEGA',
+         'In src/algorithms/vega.py, change the population default from 40 to 20 while retaining the 10000-evaluation cap. Predict twice as many approximate generations but half as many simultaneous candidates. Objective-wise tournaments remain unchanged; coverage can become less stable even if later generations improve convergence. The existing N=20,40,80 sensitivity rows test this tradeoff.'),
+        ('A22 MOPSO',
+         'In src/algorithms/mopso.py, change inertia from 0.4 to 0.8 in the velocity call. The retained w*v term doubles, so particles preserve momentum longer, explore farther and can overshoot leaders or hit clipping more often. Personal-best and archive dominance rules do not change. The stored w=0.2,0.4,0.8 P4 study provides the numerical comparison.'),
+        ('A35 R-NSGA-II',
+         'In src/algorithms/r_nsga2.py, increase epsilon in preference selection from 0.05 to 0.10. Candidates must then be farther apart in normalized objective space to survive clearing; more near-reference points are deferred and distance-ordered backfill becomes more likely. Nondominated fronts and reference distances themselves do not change. The stored epsilon=0.02,0.05,0.10 P14 study tests the effect.'),
+    ]
+    viva_text='# Task F viva preparation\n\n'+'\n\n'.join(f'## {i+1} {q}\n{answer}' for i,(q,answer) in enumerate(questions))
+    viva_text+='\n\n## Code Walkthrough Preparation\n\n'+'\n\n'.join(f'### {name}\n{answer}' for name,answer in code_walkthrough)
+    (ROOT/'docs/viva_questions.md').write_text(viva_text)
     network=[]
     for scale in [1,10]:
         for method in ['equal','mgda','gradnorm']:
@@ -219,7 +319,11 @@ def documents(rows,summary,manifest):
     specs=[]
     for i,(title,variables,formula,constraints,interpretation) in enumerate(FORMULATIONS,1):
         p=get_problem(f'P{i}',m=5 if i==10 else 3)
-        specs.append({'key':f'P{i}','title':title,'variables':variables,'formula':formula,'constraints':constraints,'interpretation':interpretation,'ideal':p.ideal.tolist(),'nadir':p.nadir.tolist(),'reference':[1.1]*p.m,'termination':'10000 candidate evaluations for stochastic search, 200 on P9, scalar solver termination under shared cap, 1000 full-batch network steps. Ranking terminates after table scoring.'})
+        specs.append({'key':f'P{i}','title':title,'variables':variables,'formula':formula,
+                      'constraints':constraints,'interpretation':interpretation,
+                      'sanity_check':SANITY_CHECKS[i-1],
+                      'ideal':p.ideal.tolist(),'nadir':p.nadir.tolist(),
+                      'reference':[1.1]*p.m,'termination':TERMINATION_RULES[i-1]})
     # Render display equations with mathtext. Body and tables remain editable.
     latex=[r'\min\;[(x-3)^2,\;(x-7)^2]',r'\min\;[100/x,\;x^2]',r'g=1+\sum_{i=2}^{10}x_i,\quad \min\;[x_1,\;g(1-(x_1/g)^2)]',r'\min\;[w^T\Sigma w,\;-\mu^T w]',r'\min\;[7850bh,\;4000/(200\times10^9bh^3)]',r'\min\;[4(x_1^2+x_2^2),\;(x_1-5)^2+(x_2-5)^2]',r'\min\;[-0.8x_1,\;-1.2x_2]',r'\min\;[\sum_{(i,j)\in tour}d_{ij},\;\sum_{(i,j)\in tour}t_{ij}]',r'\min\;[1-accuracy_{5fold,5NN},\;\sum_i mask_i]',r'g=\sum_{i=M}^{M+9}(x_i-0.5)^2,\quad\sum_j f_j^2=(1+g)^2',r'\min\;[-4x_A-6x_B,\;-x_A-x_B]',r'\min\;[cost,\;-quality,\;delivery,\;-reliability]',r'\min\;[\Vert x-(3,3)\Vert^2,\;\Vert x-(-3,-3)\Vert^2]',r'\min\;[0.4+0.05x_1+0.012x_2,\;-0.2x_2/(0.5+0.03x_1)]']
     for i,equation in enumerate(latex,1):
@@ -230,7 +334,7 @@ def documents(rows,summary,manifest):
         else: ax.text(.5,.5,'$'+equation+'$',ha='center',va='center',fontsize=13)
         fig.savefig(FIGURES_DIR/f'equation_P{i}.png',bbox_inches='tight',dpi=220); plt.close(fig)
     test_log=RESULTS_ROOT/'test_output.txt'
-    contents={'algorithms':algorithm_sections,'formulations':specs,'family_discussion':family,'cases':cases,'questions':questions,'summary':summary,'network':network,'rows_count':len(rows),'figures':manifest,'tests':test_log.read_text() if test_log.exists() else 'Run python run_all.py test; current results are recorded in docs/roll72_audit.md.'}
+    contents={'algorithms':algorithm_sections,'formulations':specs,'family_discussion':family,'cases':cases,'questions':questions,'code_walkthrough':code_walkthrough,'summary':summary,'network':network,'rows_count':len(rows),'figures':manifest,'tests':test_log.read_text() if test_log.exists() else 'Run python run_all.py test; current results are recorded in docs/roll72_audit.md.'}
     (RESULTS_ROOT/'report_content.json').write_text(json.dumps(contents,indent=2))
     (TABLES_DIR/'completion_status.json').write_text(json.dumps({'modules':37,'mechanism_tests':37,'tests_passed':62,'main_experiment_jobs':len(rows),'full_budget_cap':10000,'P9_budget':200,'report_format':'docx','zip_requested':False,'remaining':['P9 full 10000 evaluation experiments','Additional mechanism-specific ablations to establish two experimentally supported advantages and two experimentally supported disadvantages for every method; current measured metrics are provided alongside reasoned claims','Student viva understanding and original personal conclusions must be prepared by student']},indent=2))
 

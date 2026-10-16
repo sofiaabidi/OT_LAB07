@@ -12,15 +12,19 @@ from src.moo_utils import dominates, dominance_matrix, non_dominated_sort, crowd
 def initialize(problem,budget=10000,seed=DEFAULT_OPTIMIZER_SEED,**params):
     return State(problem,budget,seed,**params)
 
+def objective_winner(f,cv,a,b,objective,feasibility_tolerance=1e-10):
+    """Return the VEGA tournament winner for one objective."""
+    a_feasible=cv[a]<=feasibility_tolerance
+    b_feasible=cv[b]<=feasibility_tolerance
+    if a_feasible != b_feasible: return a if a_feasible else b
+    if not a_feasible: return a if cv[a]<cv[b] else b
+    return a if f[a,objective]<f[b,objective] else b
+
 def select(s):
     winners=[]
     for i in range(s.n):
         j=i%s.p.m; a,b=s.rng.integers(s.n,size=2)
-        a_feasible=s.cv[a]<=1e-10; b_feasible=s.cv[b]<=1e-10
-        if a_feasible != b_feasible: winner=a if a_feasible else b
-        elif not a_feasible: winner=a if s.cv[a]<s.cv[b] else b
-        else: winner=a if s.f[a,j]<s.f[b,j] else b
-        winners.append(winner)
+        winners.append(objective_winner(s.f,s.cv,a,b,j))
     return np.array(winners)
 def iterate(s):
     y=offspring(s,select(s)); f,cv=evaluate(s,y); s.record(y,f,cv)

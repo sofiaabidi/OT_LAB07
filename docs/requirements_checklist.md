@@ -13,17 +13,17 @@ For roll suffix 72, the formulas compute `(35, 10, 22)`.
 | P13 handwritten network | `src/problems/network.py`; gradient checks | Verified against central finite differences |
 | 37 separate methods | `src/algorithms/`; mechanism tests | Functionally covered; tests do not prove paper-level equivalence or convergence |
 | Task A designated runs, metrics, and figures | `results/roll72/`; `figures/roll72/A*.png` | 1,196 main jobs complete; active summaries and plots generated |
-| Task A implementation log | `results/roll72/implementation_log.csv` | Generated from active rows |
-| Task B advantages/disadvantages | `docs/algorithm_notes.md`; `results/roll72/tables/comparison.csv` | Measured outcomes and mechanism reasoning are separated; universal claim-level causal evidence remains partial |
+| Task A implementation log | `results/roll72/implementation_log.csv`; `src/experiments/docx_report.py` | Generated per algorithm/problem from active summaries and included by the report generator |
+| Task B advantages/disadvantages | `docs/algorithm_notes.md`; `results/roll72/tables/comparison.csv` | Four mechanism arguments plus two evidence-linked observed strengths and limitations per method; universal causal evidence remains partial |
 | Task C assignment | `src/project_config.py`; configuration tests | R-NSGA-II (35), VEGA (10), MOPSO (22) computed and asserted |
 | Task C study cards and flowcharts | `docs/study_cards.md`; `figures/roll72/flow_A*.png` | Complete for the three assigned methods |
-| Task C two iterations with four individuals | `results/roll72/csv/hand_traces.json`; `tests/test_traces.py` | Deterministic arithmetic and selections asserted |
+| Task C two iterations with four individuals | `results/roll72/csv/hand_traces.json`; `tests/test_traces.py` | Deterministic arithmetic and selections asserted; R-NSGA-II reference is normalized to (0.25,0.25), and MOPSO is explicitly an independent bounded toy |
 | Task C sensitivities | sensitivity rows in `results/roll72/` | Three settings x ten seeds x three methods complete |
 | Task D P3/P5 comparisons | Task D rows and `figures/roll72/D_*.png` | Complete under equal caps; actual evaluation counts disclosed |
 | Task D P10, P8, ranking, and gradient studies | active summary/supplementary tables and CSVs | Generated and verified; HV is a common-sample Monte Carlo estimate |
 | Task E six cases | `docs/case_studies.md`; `case_studies.csv` | Rebuilt from active summaries |
-| Task F viva preparation | `docs/viva_questions.md` | Covers specified and implementation-specific questions; student mastery is not machine-verifiable |
-| Editable DOCX | `src/experiments/docx_report.py` | Generator updated; output intentionally deferred |
+| Task F viva preparation | `docs/viva_questions.md` | Eight official questions plus focused A10/A22/A35 code walkthrough changes; student mastery is not machine-verifiable |
+| Editable DOCX | `Lab_Assignment_7_Sofia_Abidi_241071072.docx`; `src/experiments/docx_report.py` | Existing DOCX remains valid; generator has newer content corrections pending the explicitly deferred final regeneration |
 | Runnable CLI and verification | `run_all.py`; `src/experiments/verify.py` | Test and verify commands are the acceptance checks |
 
 ## Interpretation decisions

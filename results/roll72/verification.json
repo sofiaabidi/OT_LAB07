@@ -7,6 +7,6 @@
   "budgets": "verified",
   "raw_objectives_and_metrics": "recomputed from stored decisions",
   "figures": "exist",
-  "docx": "not generated (deferred by user)",
+  "docx": "valid XML and embedded media",
   "errors": []
 }

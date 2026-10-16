@@ -1,15 +1,16 @@
 """MOGWO: alpha, beta, delta archive leaders; decreasing encircling
 coefficient a=2*(1-used/budget), average three proposed positions.
 Binary masks use a sigmoid transfer, then at-least-one repair.
-Shared defaults: population=40, budget=10000, seed=63.
+Shared defaults: population=40, budget=10000, optimizer seed=720.
 Constraints: Deb feasibility comparison unless the stated method uses scalar penalty.
 Lecture decks supplied on 12 October 2026; teaching variants documented in docs/lecture_alignment.md.
 """
 import numpy as np
+from src.project_config import DEFAULT_OPTIMIZER_SEED
 from src.algorithms.common import archive_leader, State, evaluate, execute, offspring, merge, tournament, environmental, mutate, crossover
 from src.moo_utils import dominates, dominance_matrix, non_dominated_sort, crowding_distance, normalize, reference_vectors, archive, nondominated, hypervolume
 
-def initialize(problem,budget=10000,seed=63,**params):
+def initialize(problem,budget=10000,seed=DEFAULT_OPTIMIZER_SEED,**params):
     return State(problem,budget,seed,**params)
 
 def encircle(x,leaders,A,C): return np.mean(leaders-A*np.abs(C*leaders-x),axis=0)
@@ -23,5 +24,5 @@ def iterate(s):
         y.append(s.p.repair(z))
     y=np.array(y); f,c=evaluate(s,y); s.record(y,f,c); s.x[:n],s.f[:n],s.cv[:n]=y,f,c
 
-def run(problem,budget=10000,seed=63,**params):
+def run(problem,budget=10000,seed=DEFAULT_OPTIMIZER_SEED,**params):
     return execute(initialize,iterate,problem,budget,seed,**params)

@@ -15,6 +15,12 @@ def initialize(problem,budget=10000,seed=DEFAULT_OPTIMIZER_SEED,**params):
 
 def preference_select(f,cv,n,p,epsilon=.05,reference=None,
                       reference_is_normalized=False):
+    return preference_select_details(f,cv,n,p,epsilon,reference,
+                                     reference_is_normalized)['selected_indices']
+
+def preference_select_details(f,cv,n,p,epsilon=.05,reference=None,
+                              reference_is_normalized=False):
+    """Return survivors and the intermediate epsilon-clearing decisions."""
     z=p.normalized(f)
     if reference is None:
         ref=p.normalized(np.array([1.8,-12])) if p.key=='P14' else np.full(p.m,.5)
@@ -22,18 +28,30 @@ def preference_select(f,cv,n,p,epsilon=.05,reference=None,
         reference=np.asarray(reference,float)
         if reference.shape!=(p.m,): raise ValueError('reference must have one value per objective')
         ref=reference if reference_is_normalized else p.normalized(reference)
-    chosen=[]
-    for front in non_dominated_sort(f,cv):
+    chosen=[]; decisions=[]; fronts=non_dominated_sort(f,cv)
+    for rank,front in enumerate(fronts):
         if len(chosen)+len(front)<=n: chosen.extend(front); continue
         order=front[np.argsort(np.linalg.norm(z[front]-ref,axis=1))]; deferred=[]
         for i in order:
             if len(chosen)>=n: break
-            if chosen and np.min(np.linalg.norm(z[chosen]-z[i],axis=1))<epsilon: deferred.append(i)
-            else: chosen.append(i)
+            separation=(float('inf') if not chosen else
+                        float(np.min(np.linalg.norm(z[chosen]-z[i],axis=1))))
+            accepted=separation>=epsilon
+            decisions.append({'index':int(i),'rank':rank,
+                              'reference_distance':float(np.linalg.norm(z[i]-ref)),
+                              'minimum_selected_separation':separation,
+                              'decision':'accept' if accepted else 'defer'})
+            if accepted: chosen.append(i)
+            else: deferred.append(i)
         for i in deferred:
-            if len(chosen)<n: chosen.append(i)
+            if len(chosen)<n:
+                chosen.append(i)
+                next(item for item in decisions if item['index']==int(i))['decision']='backfill'
         break
-    return np.array(chosen)
+    return {'selected_indices':np.array(chosen),
+            'fronts':[front.tolist() for front in fronts],
+            'normalized_objectives':z,'normalized_reference':ref,
+            'decisions':decisions}
 def iterate(s):
     y=offspring(s,tournament(s)); f,c=evaluate(s,y); s.record(y,f,c)
     merge(s,y,f,c,lambda f,c,n:preference_select(

@@ -6,7 +6,7 @@ import numpy as np
 from src.algorithms import NAMES
 from src.experiments.runner import ROOT,RESULTS_ROOT,CSV_DIR,TABLES_DIR,tasks,job_key,aggregate
 from src.experiments.catalogue import DESIGNATED
-from src.project_config import ACTIVE_PROVENANCE, OPTIMIZER_SEEDS, ROLL_SUFFIX, TASK_C_ALGORITHMS
+from src.project_config import ACTIVE_PROVENANCE, OPTIMIZER_SEEDS, ROLL_SUFFIX, STUDENT, TASK_C_ALGORITHMS
 from src.problems import get_problem
 from src.moo_utils import hypervolume,spacing,igd
 
@@ -56,26 +56,37 @@ def verify():
     assert len(content['algorithms'])==37; assert len(content['formulations'])==14
     for alg in content['algorithms']:
         assert len(alg['advantages'].split(';'))>=4 and len(alg['disadvantages'].split(';'))>=4
-        for key in ['measured_support_links','measured_caution_links']:
-            assert '1)' in alg[key] and '2)' in alg[key],(alg['algorithm_number'],key)
+        for key in ['evidence_supported_strengths','evidence_supported_limitations']:
+            assert len(alg[key].split())>=20,(alg['algorithm_number'],key)
         assert (ROOT/'figures'/ACTIVE_PROVENANCE/alg['figure']).is_file()
+    assert len(content['questions'])==8
+    assert [name for name,_ in content['code_walkthrough']]==['A10 VEGA','A22 MOPSO','A35 R-NSGA-II']
+    with (RESULTS_ROOT/'implementation_log.csv').open() as f:
+        log=list(csv.DictReader(f))
+    assert {r['algorithm_number'] for r in log}=={str(i) for i in range(1,38)}
+    assert all(r['problems_used'] and r['evaluation_budget'] and r['status'] for r in log)
     traces=json.loads((CSV_DIR/'hand_traces.json').read_text())
     assert traces['metadata']['provenance']==ACTIVE_PROVENANCE
     assert tuple(traces['metadata']['algorithms'])==tuple(number for number,_ in TASK_C_ALGORITHMS)
     for key in ['r_nsga2','vega','mopso']:
         assert len(traces[key])==2,key
         assert all(row['population_size']==4 for row in traces[key]),key
+    assert all(np.allclose(row['normalized_reference'],[.25,.25]) for row in traces['r_nsga2'])
+    assert all(row['problem_definition']=='independent scalar toy; not assignment P2' for row in traces['mopso'])
     with (TABLES_DIR/'figure_manifest.csv').open() as f:
         for r in csv.DictReader(f): assert (ROOT/'figures'/ACTIVE_PROVENANCE/r['figure']).is_file()
-    report=ROOT/'Lab_Assignment_7_Report.docx'; report_status='not generated (deferred by user)'
+    report=ROOT/'Lab_Assignment_7_Sofia_Abidi_241071072.docx'; report_status='not generated'
     if report.exists():
         with zipfile.ZipFile(report) as z:
             assert z.testzip() is None; xml=ET.fromstring(z.read('word/document.xml'))
             text=' '.join(el.text or '' for el in xml.iter() if el.tag.endswith('}t'))
-            assert 'GitHub repository' in text; assert 'Paste your GitHub repository link here' in text
+            assert STUDENT.name in text and STUDENT.registration in text
+            assert 'https://github.com/sofiaabidi/OT_LAB07' in text
+            assert '[Paste your GitHub repository link here after uploading]' not in text
+            assert 'seed=63' not in text
             for token in ['Task C','Task D','Task E','Task F','P14','GradNorm',*[name for _,name in TASK_C_ALGORITHMS]]:
                 assert token in text,token
-            media=[n for n in z.namelist() if n.startswith('word/media/')]; assert len(media)>=50,len(media)
+            media=[n for n in z.namelist() if n.startswith('word/media/')]; assert len(media)>=64,len(media)
         report_status='valid XML and embedded media'
     population=list((CSV_DIR/'population').glob('*.json'))
     assert len(population)==90
