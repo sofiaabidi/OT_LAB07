@@ -46,6 +46,7 @@ The local Python 3.12 runtime used to execute the repository is ignored by Git.
 - Tables, algorithm notes, six case studies, viva material, 37 algorithm plots, Task D plots, three Task C sensitivity plots, and three Task C flowcharts were regenerated.
 - Unknown exact fronts are not given invented IGD values; unavailable panels say why.
 - A strict UTF-8 scan passed for all 1,450 active text files; inherited roll-63 reference data was excluded from that active scan.
+- The obsolete `results/reference/roll63/` tree was confirmed unused, removed, and ignored to prevent accidental reintroduction.
 - Remaining assignment-level gaps are the P9 full budget, universal claim-level Task B ablations, and the non-uniform four-function module interface.
 
 The final editable DOCX exists under its student-specific filename. No submission ZIP is retained.
